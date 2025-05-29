@@ -5,7 +5,6 @@ from au.base import (
     ComputationHandle,
     ComputationStore,
     ComputationResult,
-
     ComputationStatus,
     SerializationFormat,
     FileSystemStore,
@@ -15,5 +14,4 @@ from au.base import (
     MetricsMiddleware,
     temporary_async_compute,
     ThreadBackend,
-    
 )

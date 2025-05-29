@@ -114,7 +114,7 @@ class ComputationResult:
         return None
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class ComputationStore(MutableMapping[str, ComputationResult], ABC):
@@ -202,14 +202,14 @@ class FileSystemStore(ComputationStore):
     def _serialize(self, result: ComputationResult) -> bytes:
         """Serialize result based on configured format."""
         data = {
-            'value': result.value,
-            'status': result.status.value,
-            'error': str(result.error) if result.error else None,
-            'created_at': result.created_at.isoformat(),
-            'completed_at': (
+            "value": result.value,
+            "status": result.status.value,
+            "error": str(result.error) if result.error else None,
+            "created_at": result.created_at.isoformat(),
+            "completed_at": (
                 result.completed_at.isoformat() if result.completed_at else None
             ),
-            'metadata': result.metadata,
+            "metadata": result.metadata,
         }
 
         if self.serialization == SerializationFormat.JSON:
@@ -225,16 +225,16 @@ class FileSystemStore(ComputationStore):
             obj = pickle.loads(data)
 
         return ComputationResult(
-            value=obj.get('value'),
-            status=ComputationStatus(obj['status']),
-            error=Exception(obj['error']) if obj.get('error') else None,
-            created_at=datetime.fromisoformat(obj['created_at']),
+            value=obj.get("value"),
+            status=ComputationStatus(obj["status"]),
+            error=Exception(obj["error"]) if obj.get("error") else None,
+            created_at=datetime.fromisoformat(obj["created_at"]),
             completed_at=(
-                datetime.fromisoformat(obj['completed_at'])
-                if obj.get('completed_at')
+                datetime.fromisoformat(obj["completed_at"])
+                if obj.get("completed_at")
                 else None
             ),
-            metadata=obj.get('metadata', {}),
+            metadata=obj.get("metadata", {}),
         )
 
     def __getitem__(self, key: str) -> ComputationResult:
@@ -245,7 +245,7 @@ class FileSystemStore(ComputationStore):
             return ComputationResult(None, ComputationStatus.PENDING)
 
         try:
-            with open(path, 'rb') as f:
+            with open(path, "rb") as f:
                 return self._deserialize(f.read())
         except Exception as e:
             logger.error(f"Failed to read result for key {key}: {e}")
@@ -259,7 +259,7 @@ class FileSystemStore(ComputationStore):
             result.completed_at = datetime.now()
 
         try:
-            with open(path, 'wb') as f:
+            with open(path, "wb") as f:
                 f.write(self._serialize(result))
         except Exception as e:
             logger.error(f"Failed to write result for key {key}: {e}")
@@ -387,10 +387,10 @@ class MetricsMiddleware(Middleware):
                 else 0.0
             )
             return {
-                'total': self.total_computations,
-                'completed': self.completed_computations,
-                'failed': self.failed_computations,
-                'avg_duration': avg_duration,
+                "total": self.total_computations,
+                "completed": self.completed_computations,
+                "failed": self.failed_computations,
+                "avg_duration": avg_duration,
             }
 
 
@@ -399,10 +399,10 @@ class SharedMetricsMiddleware(Middleware):
 
     def __init__(self):
         # Use multiprocessing.Value for shared counters
-        self.total_computations = multiprocessing.Value('i', 0)
-        self.completed_computations = multiprocessing.Value('i', 0)
-        self.failed_computations = multiprocessing.Value('i', 0)
-        self.total_duration = multiprocessing.Value('d', 0.0)
+        self.total_computations = multiprocessing.Value("i", 0)
+        self.completed_computations = multiprocessing.Value("i", 0)
+        self.failed_computations = multiprocessing.Value("i", 0)
+        self.total_duration = multiprocessing.Value("d", 0.0)
         self._lock = multiprocessing.Lock()
 
     def before_compute(
@@ -428,10 +428,10 @@ class SharedMetricsMiddleware(Middleware):
                 self.total_duration.value / completed if completed > 0 else 0.0
             )
             return {
-                'total': self.total_computations.value,
-                'completed': completed,
-                'failed': self.failed_computations.value,
-                'avg_duration': avg_duration,
+                "total": self.total_computations.value,
+                "completed": completed,
+                "failed": self.failed_computations.value,
+                "avg_duration": avg_duration,
             }
 
 
@@ -496,8 +496,8 @@ def _worker_function(
     # Recreate middleware instances in the worker process
     middleware_instances = []
     for config in middleware_configs:
-        cls = config['class']
-        kwargs = config.get('kwargs', {})
+        cls = config["class"]
+        kwargs = config.get("kwargs", {})
         middleware_instances.append(cls(**kwargs))
 
     # Run before hooks
@@ -563,17 +563,17 @@ class ProcessBackend(ComputationBackend):
         """Serialize middleware for worker process."""
         configs = []
         for mw in self.middleware:
-            config = {'class': type(mw)}
+            config = {"class": type(mw)}
             # Add specific configs for known middleware types
             if isinstance(mw, LoggingMiddleware):
-                config['kwargs'] = {
-                    'level': mw.level,
-                    'logger_name': (
+                config["kwargs"] = {
+                    "level": mw.level,
+                    "logger_name": (
                         mw.logger.name if mw.logger.name != __name__ else None
                     ),
                 }
             elif isinstance(mw, MetricsMiddleware):
-                config['kwargs'] = {}
+                config["kwargs"] = {}
             configs.append(config)
         return configs
 
@@ -824,7 +824,7 @@ def temporary_async_compute(**kwargs):
     import shutil
 
     temp_dir = tempfile.mkdtemp()
-    kwargs['base_path'] = temp_dir
+    kwargs["base_path"] = temp_dir
 
     try:
         yield async_compute(**kwargs)
@@ -864,9 +864,9 @@ if __name__ == "__main__":
             time.sleep(0.1)  # Simulate slow computation
 
         return {
-            'factorial': result,
-            'input': n,
-            'timestamp': datetime.now().isoformat(),
+            "factorial": result,
+            "input": n,
+            "timestamp": datetime.now().isoformat(),
         }
 
     # Launch computation
