@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.base &mdash; au 0.0.10 documentation</title>
+  <title>au.base &mdash; au 0.0.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/documentation_options.js?v=0c446633"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#usage-patterns">Usage Patterns:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.ComputationBackend"><code class="docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationBackend.launch"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.launch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationBackend.terminate"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.terminate()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a><ul>
@@ -102,6 +103,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.ProcessBackend"><code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.ProcessBackend.launch"><code class="docutils literal notranslate"><span class="pre">ProcessBackend.launch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.ProcessBackend.terminate"><code class="docutils literal notranslate"><span class="pre">ProcessBackend.terminate()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.RemoteAPIBackend"><code class="docutils literal notranslate"><span class="pre">RemoteAPIBackend</span></code></a><ul>
@@ -217,11 +219,17 @@ and retrieve results later.</p>
 using the provided key.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#ComputationBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationBackend.terminate" title="Link to this definition"></a></dt>
+<dd><p>Attempt to terminate the computation. Default: do nothing.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.base.ComputationHandle">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#ComputationHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><span class="pre">ComputationBackend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#ComputationHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle" title="Link to this definition"></a></dt>
 <dd><p>Handle to check status and retrieve results of async computation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="s2">&quot;test-key&quot;</span><span class="p">,</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="s2">&quot;/tmp&quot;</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span>
@@ -453,6 +461,12 @@ using the provided key.</p>
 <dd><p>Launch computation in a new process.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ProcessBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#ProcessBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ProcessBackend.terminate" title="Link to this definition"></a></dt>
+<dd><p>Attempt to terminate the computation. Default: do nothing.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -482,23 +496,23 @@ job tracking mechanisms.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">SharedMetricsMiddleware</span></span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">SharedMetricsMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware" title="Link to this definition"></a></dt>
 <dd><p>Metrics middleware using shared memory for multiprocessing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.after_compute">
-<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationResult" title="au.base.ComputationResult"><span class="pre">ComputationResult</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.after_compute" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.after_compute" title="Link to this definition"></a></dt>
 <dd><p>Called after computation completes.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.before_compute">
-<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.before_compute" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.before_compute" title="Link to this definition"></a></dt>
 <dd><p>Called before computation starts.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.on_error">
-<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.on_error" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.on_error" title="Link to this definition"></a></dt>
 <dd><p>Called when computation fails.</p>
 </dd></dl>
 

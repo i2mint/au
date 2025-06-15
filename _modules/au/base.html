@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.base &mdash; au 0.0.10 documentation</title>
+  <title>au.base &mdash; au 0.0.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/documentation_options.js?v=0c446633"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -349,7 +349,17 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deserialize</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+                    <span class="c1"># Empty file: treat as failed</span>
+                    <span class="k">return</span> <span class="n">ComputationResult</span><span class="p">(</span>
+                        <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
+                        <span class="n">error</span><span class="o">=</span><span class="ne">Exception</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Result file for key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is empty or incomplete.&quot;</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deserialize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read result for key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
@@ -545,26 +555,34 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SharedMetricsMiddleware</span><span class="p">(</span><span class="n">Middleware</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Metrics middleware using shared memory for multiprocessing.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Use multiprocessing.Value for shared counters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_duration</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">total_computations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">completed_computations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">failed_computations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">total_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span> <span class="o">=</span> <span class="n">total_computations</span> <span class="ow">or</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span> <span class="o">=</span> <span class="n">completed_computations</span> <span class="ow">or</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span>
+            <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span> <span class="o">=</span> <span class="n">failed_computations</span> <span class="ow">or</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_duration</span> <span class="o">=</span> <span class="n">total_duration</span> <span class="ow">or</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">lock</span> <span class="ow">or</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SharedMetricsMiddleware.before_compute">
 <a class="viewcode-back" href="../../module_docs/au/base.html#au.base.SharedMetricsMiddleware.before_compute">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">before_compute</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="SharedMetricsMiddleware.after_compute">
 <a class="viewcode-back" href="../../module_docs/au/base.html#au.base.SharedMetricsMiddleware.after_compute">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">ComputationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
@@ -573,12 +591,12 @@
 
 <div class="viewcode-block" id="SharedMetricsMiddleware.on_error">
 <a class="viewcode-back" href="../../module_docs/au/base.html#au.base.SharedMetricsMiddleware.on_error">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
             <span class="n">completed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span><span class="o">.</span><span class="n">value</span>
             <span class="n">avg_duration</span> <span class="o">=</span> <span class="p">(</span>
@@ -589,7 +607,16 @@
                 <span class="s2">&quot;completed&quot;</span><span class="p">:</span> <span class="n">completed</span><span class="p">,</span>
                 <span class="s2">&quot;failed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="s2">&quot;avg_duration&quot;</span><span class="p">:</span> <span class="n">avg_duration</span><span class="p">,</span>
-            <span class="p">}</span></div>
+            <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">total_computations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span><span class="p">,</span>
+            <span class="n">completed_computations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span><span class="p">,</span>
+            <span class="n">failed_computations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span><span class="p">,</span>
+            <span class="n">total_duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">total_duration</span><span class="p">,</span>
+            <span class="n">lock</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 
@@ -611,6 +638,13 @@
 <span class="sd">        The backend should execute func(*args, **kwargs) and store the result</span>
 <span class="sd">        using the provided key.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ComputationBackend.terminate">
+<a class="viewcode-back" href="../../module_docs/au/base.html#au.base.ComputationBackend.terminate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to terminate the computation. Default: do nothing.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
@@ -652,17 +686,15 @@
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span><span class="p">,</span>
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">middleware_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span>
-        <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-    <span class="p">],</span>  <span class="c1"># Changed: pass configs instead of instances</span>
+    <span class="n">middleware_configs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Global worker function for multiprocessing with middleware support.&quot;&quot;&quot;</span>
     <span class="c1"># Recreate middleware instances in the worker process</span>
     <span class="n">middleware_instances</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">middleware_configs</span><span class="p">:</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">middleware_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">mw_kwargs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="p">{})</span>  <span class="c1"># FIX: use mw_kwargs, not kwargs</span>
+        <span class="n">middleware_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">mw_kwargs</span><span class="p">))</span>
 
     <span class="c1"># Run before hooks</span>
     <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="n">middleware_instances</span><span class="p">:</span>
@@ -676,7 +708,7 @@
     <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">result_value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">result_value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># FIX: do not pass mw_kwargs here</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="n">result_value</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
         <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
 
@@ -714,6 +746,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_fork_method</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_fork_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure we&#39;re using fork method for better pickling compatibility.&quot;&quot;&quot;</span>
@@ -738,6 +771,9 @@
                         <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="vm">__name__</span> <span class="k">else</span> <span class="kc">None</span>
                     <span class="p">),</span>
                 <span class="p">}</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="n">SharedMetricsMiddleware</span><span class="p">):</span>
+                <span class="c1"># Pass shared state for process-safe metrics</span>
+                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mw</span><span class="o">.</span><span class="n">get_shared_state</span><span class="p">()</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="n">MetricsMiddleware</span><span class="p">):</span>
                 <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -747,14 +783,32 @@
 <a class="viewcode-back" href="../../module_docs/au/base.html#au.base.ProcessBackend.launch">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Launch computation in a new process.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_before</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="c1"># Only run non-metrics middleware in the main process</span>
+        <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="n">SharedMetricsMiddleware</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mw</span><span class="o">.</span><span class="n">before_compute</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Middleware </span><span class="si">{</span><span class="n">mw</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> before_compute failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
         <span class="n">middleware_configs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_middleware</span><span class="p">()</span>
         <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
             <span class="n">target</span><span class="o">=</span><span class="n">_worker_function</span><span class="p">,</span>
             <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">middleware_configs</span><span class="p">),</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">process</span>
         <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ProcessBackend.terminate">
+<a class="viewcode-back" href="../../module_docs/au/base.html#au.base.ProcessBackend.terminate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proc</span> <span class="ow">and</span> <span class="n">proc</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 </div>
 
 
@@ -773,6 +827,7 @@
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Add this</span>
 
 <div class="viewcode-block" id="ComputationHandle.is_ready">
 <a class="viewcode-back" href="../../module_docs/au/base.html#au.base.ComputationHandle.is_ready">[docs]</a>
@@ -848,6 +903,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Computation cancelled&quot;</span><span class="p">)</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
