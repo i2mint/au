@@ -246,7 +246,17 @@ class FileSystemStore(ComputationStore):
 
         try:
             with open(path, "rb") as f:
-                return self._deserialize(f.read())
+                data = f.read()
+                if not data:
+                    # Empty file: treat as failed
+                    return ComputationResult(
+                        None,
+                        ComputationStatus.FAILED,
+                        error=Exception(
+                            f"Result file for key {key} is empty or incomplete."
+                        ),
+                    )
+                return self._deserialize(data)
         except Exception as e:
             logger.error(f"Failed to read result for key {key}: {e}")
             return ComputationResult(None, ComputationStatus.FAILED, error=e)
@@ -397,31 +407,39 @@ class MetricsMiddleware(Middleware):
 class SharedMetricsMiddleware(Middleware):
     """Metrics middleware using shared memory for multiprocessing."""
 
-    def __init__(self):
-        # Use multiprocessing.Value for shared counters
-        self.total_computations = multiprocessing.Value("i", 0)
-        self.completed_computations = multiprocessing.Value("i", 0)
-        self.failed_computations = multiprocessing.Value("i", 0)
-        self.total_duration = multiprocessing.Value("d", 0.0)
-        self._lock = multiprocessing.Lock()
+    def __init__(
+        self,
+        total_computations=None,
+        completed_computations=None,
+        failed_computations=None,
+        total_duration=None,
+        lock=None,
+    ):
+        import multiprocessing
 
-    def before_compute(
-        self, func: Callable, args: tuple, kwargs: dict, key: str
-    ) -> None:
+        self.total_computations = total_computations or multiprocessing.Value("i", 0)
+        self.completed_computations = completed_computations or multiprocessing.Value(
+            "i", 0
+        )
+        self.failed_computations = failed_computations or multiprocessing.Value("i", 0)
+        self.total_duration = total_duration or multiprocessing.Value("d", 0.0)
+        self._lock = lock or multiprocessing.Lock()
+
+    def before_compute(self, func, args, kwargs, key):
         with self._lock:
             self.total_computations.value += 1
 
-    def after_compute(self, key: str, result: ComputationResult) -> None:
+    def after_compute(self, key, result):
         with self._lock:
             self.completed_computations.value += 1
             if result.duration:
                 self.total_duration.value += result.duration.total_seconds()
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key, error):
         with self._lock:
             self.failed_computations.value += 1
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict:
         with self._lock:
             completed = self.completed_computations.value
             avg_duration = (
@@ -433,6 +451,15 @@ class SharedMetricsMiddleware(Middleware):
                 "failed": self.failed_computations.value,
                 "avg_duration": avg_duration,
             }
+
+    def get_shared_state(self):
+        return dict(
+            total_computations=self.total_computations,
+            completed_computations=self.completed_computations,
+            failed_computations=self.failed_computations,
+            total_duration=self.total_duration,
+            lock=self._lock,
+        )
 
 
 class ComputationBackend(ABC):
@@ -449,6 +476,10 @@ class ComputationBackend(ABC):
         The backend should execute func(*args, **kwargs) and store the result
         using the provided key.
         """
+        pass
+
+    def terminate(self, key: str) -> None:
+        """Attempt to terminate the computation. Default: do nothing."""
         pass
 
     def _run_middleware_before(
@@ -488,17 +519,15 @@ def _worker_function(
     kwargs: dict,
     store: ComputationStore,
     key: str,
-    middleware_configs: List[
-        Dict[str, Any]
-    ],  # Changed: pass configs instead of instances
+    middleware_configs: List[Dict[str, Any]],
 ) -> None:
     """Global worker function for multiprocessing with middleware support."""
     # Recreate middleware instances in the worker process
     middleware_instances = []
     for config in middleware_configs:
         cls = config["class"]
-        kwargs = config.get("kwargs", {})
-        middleware_instances.append(cls(**kwargs))
+        mw_kwargs = config.get("kwargs", {})  # FIX: use mw_kwargs, not kwargs
+        middleware_instances.append(cls(**mw_kwargs))
 
     # Run before hooks
     for mw in middleware_instances:
@@ -512,7 +541,7 @@ def _worker_function(
     store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
     try:
-        result_value = func(*args, **kwargs)
+        result_value = func(*args, **kwargs)  # FIX: do not pass mw_kwargs here
         result = ComputationResult(result_value, ComputationStatus.COMPLETED)
         store[key] = result
 
@@ -548,6 +577,7 @@ class ProcessBackend(ComputationBackend):
         super().__init__(middleware)
         self.store = store
         self._ensure_fork_method()
+        self._processes = {}
 
     def _ensure_fork_method(self) -> None:
         """Ensure we're using fork method for better pickling compatibility."""
@@ -572,6 +602,9 @@ class ProcessBackend(ComputationBackend):
                         mw.logger.name if mw.logger.name != __name__ else None
                     ),
                 }
+            elif isinstance(mw, SharedMetricsMiddleware):
+                # Pass shared state for process-safe metrics
+                config["kwargs"] = mw.get_shared_state()
             elif isinstance(mw, MetricsMiddleware):
                 config["kwargs"] = {}
             configs.append(config)
@@ -579,14 +612,29 @@ class ProcessBackend(ComputationBackend):
 
     def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
         """Launch computation in a new process."""
-        self._run_middleware_before(func, args, kwargs, key)
+        # Only run non-metrics middleware in the main process
+        for mw in self.middleware:
+            if not isinstance(mw, SharedMetricsMiddleware):
+                try:
+                    mw.before_compute(func, args, kwargs, key)
+                except Exception as e:
+                    logger.error(
+                        f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
+                    )
 
         middleware_configs = self._serialize_middleware()
         process = multiprocessing.Process(
             target=_worker_function,
             args=(func, args, kwargs, self.store, key, middleware_configs),
         )
+        self._processes[key] = process
         process.start()
+
+    def terminate(self, key: str) -> None:
+        proc = self._processes.get(key)
+        if proc and proc.is_alive():
+            proc.terminate()
+            proc.join()
 
 
 @dataclass
@@ -601,6 +649,7 @@ class ComputationHandle(Generic[T]):
 
     key: str
     store: ComputationStore
+    backend: Optional[ComputationBackend] = None  # Add this
 
     def is_ready(self) -> bool:
         """Check if the computation is complete."""
@@ -665,6 +714,8 @@ class ComputationHandle(Generic[T]):
             self.store[self.key] = ComputationResult(
                 None, ComputationStatus.FAILED, error=Exception("Computation cancelled")
             )
+            if self.backend:
+                self.backend.terminate(self.key)
             return True
         return False
 
