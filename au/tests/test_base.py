@@ -73,10 +73,10 @@ def test_middleware_and_metrics(tmp_path):
         results.append(h.get_result(timeout=0.1))
     assert results == [i * i for i in range(5)]
     stats = metrics.get_stats()
-    assert stats['total'] == 5
-    assert stats['completed'] == 5
-    assert stats['failed'] == 0
-    assert stats['avg_duration'] >= 0.0
+    assert stats["total"] == 5
+    assert stats["completed"] == 5
+    assert stats["failed"] == 0
+    assert stats["avg_duration"] >= 0.0
 
 
 def test_cancellation_and_termination(tmp_path):
@@ -97,18 +97,18 @@ def test_cancellation_and_termination(tmp_path):
         handle.get_result(timeout=1)
     assert handle.get_status() == ComputationStatus.FAILED
     # The process should be terminated (no zombie)
-    if hasattr(handle.backend, 'terminate'):
+    if hasattr(handle.backend, "terminate"):
         handle.backend.terminate(handle.key)  # Should be a no-op if already terminated
 
 
 def test_pickle_serialization(tmp_path):
     @async_compute(base_path=tmp_path, serialization=SerializationFormat.PICKLE)
     def make_dict(x):
-        return {'val': x, 'list': [x, x + 1]}
+        return {"val": x, "list": [x, x + 1]}
 
     handle = make_dict(7)
     result = handle.get_result(timeout=5)
-    assert result == {'val': 7, 'list': [7, 8]}
+    assert result == {"val": 7, "list": [7, 8]}
 
 
 def test_cleanup_expired(tmp_path):
