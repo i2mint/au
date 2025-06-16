@@ -6,12 +6,14 @@ A Python framework for transforming synchronous functions into asynchronous ones
 
 - 🚀 **Simple decorator-based API** - Transform any function into an async computation
 - 💾 **Pluggable storage backends** - File system, Redis, databases, etc.
-- 🔄 **Multiple execution backends** - Processes, threads, remote APIs
+- 🔄 **Multiple execution backends** - Processes, threads, distributed queues (RQ, Supabase)
+- 🌐 **Queue backends** - Standard library, Redis Queue, Supabase PostgreSQL
 - 🛡️ **Middleware system** - Logging, metrics, authentication, rate limiting
 - 🧹 **Automatic cleanup** - TTL-based expiration of old results
 - 📦 **Flexible serialization** - JSON, Pickle, or custom formats
 - 🔍 **Status tracking** - Monitor computation state and progress
 - ❌ **Cancellation support** - Stop long-running computations
+- 🏭 **Distributed processing** - Scale across multiple machines
 
 ## Installation
 
@@ -23,6 +25,10 @@ pip install au
 
 ```python
 from au import async_compute
+# For queue backends:
+# from au import StdLibQueueBackend
+# from au.backends.rq_backend import RQBackend
+# from au.backends.supabase_backend import SupabaseQueueBackend
 
 @async_compute()
 def expensive_computation(n: int) -> int:
@@ -67,11 +73,23 @@ def check_status(job_id):
 ```
 
 ### 3. **Distributed Computing**
-Use remote backends to distribute work:
+Use queue backends to distribute work across multiple machines:
 ```python
-@async_compute(backend=RemoteAPIBackend(api_url="https://compute.example.com"))
+# Using Redis Queue backend
+import redis
+from rq import Queue
+from au.backends.rq_backend import RQBackend
+
+redis_conn = redis.Redis()
+rq_queue = Queue('tasks', connection=redis_conn)
+backend = RQBackend(store, rq_queue)
+
+@async_compute(backend=backend, store=store)
 def distributed_task(data):
     return complex_analysis(data)
+
+# Task will be processed by RQ workers on any machine
+handle = distributed_task(large_dataset)
 ```
 
 ### 4. **Batch Processing**
@@ -187,6 +205,165 @@ def fetch_data(url):
 
 # Launch multiple I/O operations
 handles = [fetch_data(url) for url in urls]
+```
+
+## Queue Backends
+
+The AU framework supports multiple queue backends for different distributed computing scenarios:
+
+### Standard Library Queue Backend
+
+Uses Python's `concurrent.futures` for in-memory task processing with no external dependencies.
+
+```python
+from au import StdLibQueueBackend
+
+store = FileSystemStore("/tmp/computations")
+
+# Use ThreadPoolExecutor for I/O-bound tasks
+with StdLibQueueBackend(store, max_workers=4, use_processes=False) as backend:
+    @async_compute(backend=backend, store=store)
+    def fetch_data(url):
+        return requests.get(url).text
+
+# Use ProcessPoolExecutor for CPU-bound tasks  
+with StdLibQueueBackend(store, max_workers=4, use_processes=True) as backend:
+    @async_compute(backend=backend, store=store)
+    def cpu_intensive(n):
+        return sum(i * i for i in range(n))
+```
+
+**Features:**
+- No external dependencies
+- Context manager support for clean shutdown
+- Choice between threads and processes
+- In-memory queuing (not persistent)
+
+### Redis Queue (RQ) Backend
+
+Distributed task processing using Redis and RQ workers.
+
+**Installation:**
+```bash
+pip install redis rq
+```
+
+**Usage:**
+```python
+import redis
+from rq import Queue
+from au.backends.rq_backend import RQBackend
+
+# Setup Redis and RQ
+redis_conn = redis.Redis(host='localhost', port=6379, db=0)
+rq_queue = Queue('au_tasks', connection=redis_conn)
+
+# Create backend
+store = FileSystemStore("/tmp/computations")
+backend = RQBackend(store, rq_queue)
+
+@async_compute(backend=backend, store=store)
+def heavy_computation(data):
+    # This will be processed by RQ workers
+    return process_data(data)
+
+# Launch task (enqueued to Redis)
+handle = heavy_computation(my_data)
+
+# Start RQ worker in separate process/machine:
+# rq worker au_tasks
+```
+
+**Features:**
+- Distributed processing across multiple machines
+- Persistent task queue (survives restarts)
+- Built-in job monitoring and management
+- Fault tolerance and retry mechanisms
+
+### Supabase Queue Backend
+
+PostgreSQL-based task queue using Supabase with internal polling workers.
+
+**Installation:**
+```bash
+pip install supabase
+```
+
+**Database Setup:**
+```sql
+CREATE TABLE au_task_queue (
+    task_id UUID PRIMARY KEY,
+    func_data BYTEA NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    started_at TIMESTAMP WITH TIME ZONE,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    worker_id TEXT
+);
+```
+
+**Usage:**
+```python
+from supabase import create_client
+from au.backends.supabase_backend import SupabaseQueueBackend
+
+# Setup Supabase client
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Create backend with internal polling workers
+store = FileSystemStore("/tmp/computations")
+with SupabaseQueueBackend(
+    store, 
+    supabase, 
+    max_concurrent_tasks=3,
+    polling_interval_seconds=2.0
+) as backend:
+    
+    @async_compute(backend=backend, store=store)
+    def analyze_data(dataset_id):
+        return run_analysis(dataset_id)
+    
+    handle = analyze_data("dataset_123")
+    result = handle.get_result(timeout=60)
+```
+
+**Features:**
+- PostgreSQL-based persistence
+- Internal polling workers (no separate worker processes needed)
+- SQL-based task management and monitoring
+- Integration with Supabase ecosystem
+
+### Backend Comparison
+
+| Backend | Persistence | Distribution | Setup Complexity | Best For |
+|---------|-------------|--------------|------------------|----------|
+| ProcessBackend | No | Single machine | Low | Development, single-machine processing |
+| StdLibQueueBackend | No | Single machine | Low | Simple queuing, testing |
+| RQBackend | Yes | Multi-machine | Medium | Production distributed systems |
+| SupabaseQueueBackend | Yes | Multi-machine | Medium | PostgreSQL-based architectures |
+
+### Function Serialization Requirements
+
+Queue backends require functions to be **pickleable**:
+
+✅ **Good:**
+```python
+# Module-level function
+def my_task(x):
+    return x * 2
+
+@async_compute(backend=queue_backend)
+def another_task(data):
+    return process(data)
+```
+
+❌ **Bad:**
+```python
+def test_function():
+    # Local function - can't be pickled!
+    @async_compute(backend=queue_backend)
+    def local_task(x):
+        return x * 2
 ```
 
 ## Architecture & Design

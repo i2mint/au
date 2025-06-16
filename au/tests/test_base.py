@@ -4,6 +4,7 @@ from au.base import (
     async_compute,
     FileSystemStore,
     ProcessBackend,
+    StdLibQueueBackend,
     LoggingMiddleware,
     MetricsMiddleware,
     SharedMetricsMiddleware,
@@ -121,6 +122,81 @@ def test_cleanup_expired(tmp_path):
     time.sleep(2)
     cleaned = foo.cleanup_expired()
     assert cleaned >= 1
+
+
+def test_stdlib_queue_backend(tmp_path):
+    """Test the StdLibQueueBackend with ThreadPoolExecutor."""
+    # For queue backends, we need to test with a simpler approach
+    # since local functions can't be pickled for distributed execution
+    store = FileSystemStore(tmp_path, ttl_seconds=60)
+
+    # Test basic functionality without distributed execution
+    # StdLibQueueBackend is designed for pickleable functions
+    with StdLibQueueBackend(store, max_workers=2, use_processes=False) as backend:
+        # Test the backend creation and context management
+        assert backend._started
+        assert backend._executor is not None
+
+        # Test termination method
+        backend.terminate("nonexistent_key")  # Should not raise
+
+
+def test_stdlib_queue_backend_processes(tmp_path):
+    """Test the StdLibQueueBackend with ProcessPoolExecutor."""
+    store = FileSystemStore(tmp_path, ttl_seconds=60)
+
+    # Test basic functionality
+    with StdLibQueueBackend(store, max_workers=2, use_processes=True) as backend:
+        # Test the backend creation and context management
+        assert backend._started
+        assert backend._executor is not None
+
+        # Test that it's using ProcessPoolExecutor
+        import concurrent.futures
+
+        assert isinstance(backend._executor, concurrent.futures.ProcessPoolExecutor)
+
+
+def test_stdlib_queue_backend_with_pickleable_functions(tmp_path):
+    """Test StdLibQueueBackend with module-level functions that can be pickled."""
+    store = FileSystemStore(tmp_path, ttl_seconds=60)
+
+    with StdLibQueueBackend(store, max_workers=2, use_processes=False) as backend:
+        # Create async functions using module-level functions
+        multiply_async = async_compute(backend=backend, store=store)(_test_multiply)
+        add_one_async = async_compute(backend=backend, store=store)(_test_add_one)
+
+        # Test basic execution
+        handle1 = multiply_async(6, 7)
+        handle2 = add_one_async(41)
+
+        # Get results
+        result1 = handle1.get_result(timeout=10)
+        result2 = handle2.get_result(timeout=10)
+
+        assert result1 == 42
+        assert result2 == 42
+        assert handle1.is_ready()
+        assert handle2.is_ready()
+
+
+# Module-level functions for testing queue backends (these can be pickled)
+def _test_multiply(x, y):
+    """Test function for queue backends."""
+    return x * y
+
+
+def _test_add_one(x):
+    """Test function for queue backends."""
+    return x + 1
+
+
+def _test_slow_function(seconds):
+    """Test function that takes time."""
+    import time
+
+    time.sleep(seconds)
+    return f"slept_{seconds}"
 
 
 if __name__ == "__main__":

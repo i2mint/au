@@ -62,10 +62,119 @@ import multiprocessing
 import pickle
 import time
 import uuid
+import concurrent.futures
+import threading
+import random
+import shutil
+import tempfile
 from contextlib import contextmanager
 
 
 logger = logging.getLogger(__name__)
+
+
+def _au_worker_entrypoint(serialized_data: bytes) -> None:
+    """
+    Universal entry point for any worker processing an au task from a queue.
+
+    Args:
+        serialized_data: Pickled data containing func, args, kwargs, key,
+                        store_reconstruction_info, and middleware_configs
+    """
+    try:
+        # Deserialize the task data
+        task_data = pickle.loads(serialized_data)
+        func = task_data["func"]
+        args = task_data["args"]
+        kwargs = task_data["kwargs"]
+        key = task_data["key"]
+        store_info = task_data["store_reconstruction_info"]
+        middleware_configs = task_data.get("middleware_configs", [])
+
+        # Reconstruct the store
+        store = _reconstruct_store(store_info)
+
+        # Recreate middleware instances
+        middleware_instances = _reconstruct_middleware(middleware_configs)
+
+        # Run before hooks
+        for mw in middleware_instances:
+            try:
+                mw.before_compute(func, args, kwargs, key)
+            except Exception as e:
+                logger.error(
+                    f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
+                )
+
+        # Set status to running
+        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+
+        # Execute the function
+        try:
+            result_value = func(*args, **kwargs)
+            result = ComputationResult(result_value, ComputationStatus.COMPLETED)
+            store[key] = result
+
+            # Run after hooks
+            for mw in middleware_instances:
+                try:
+                    mw.after_compute(key, result)
+                except Exception as e:
+                    logger.error(
+                        f"Middleware {mw.__class__.__name__} after_compute failed: {e}"
+                    )
+
+        except Exception as e:
+            result = ComputationResult(None, ComputationStatus.FAILED, error=e)
+            store[key] = result
+
+            # Run error hooks
+            for mw in middleware_instances:
+                try:
+                    mw.on_error(key, e)
+                except Exception as ex:
+                    logger.error(
+                        f"Middleware {mw.__class__.__name__} on_error failed: {ex}"
+                    )
+
+    except Exception as e:
+        logger.error(f"Worker entrypoint failed: {e}", exc_info=True)
+
+
+def _reconstruct_store(store_info: Dict[str, Any]) -> "ComputationStore":
+    """Reconstruct a ComputationStore from reconstruction info."""
+    store_class = store_info["class"]
+
+    if store_class == "FileSystemStore":
+        return FileSystemStore(
+            base_path=store_info["base_path"],
+            suffix=store_info.get("suffix", ".json"),
+            ttl_seconds=store_info.get("ttl_seconds"),
+            serialization=SerializationFormat(store_info.get("serialization", "json")),
+            auto_cleanup=store_info.get("auto_cleanup", True),
+            cleanup_probability=store_info.get("cleanup_probability", 0.1),
+        )
+    else:
+        raise ValueError(f"Unknown store class: {store_class}")
+
+
+def _reconstruct_middleware(
+    middleware_configs: List[Dict[str, Any]],
+) -> List["Middleware"]:
+    """Reconstruct middleware instances from configuration."""
+    middleware_instances = []
+    for config in middleware_configs:
+        cls = config["class"]
+        mw_kwargs = config.get("kwargs", {})
+
+        if cls.__name__ == "LoggingMiddleware":
+            middleware_instances.append(cls(**mw_kwargs))
+        elif cls.__name__ == "SharedMetricsMiddleware":
+            middleware_instances.append(cls(**mw_kwargs))
+        elif cls.__name__ == "MetricsMiddleware":
+            middleware_instances.append(cls(**mw_kwargs))
+
+    return middleware_instances
 
 
 class ComputationStatus(Enum):
@@ -138,6 +247,11 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         """Generate a unique key for a new computation."""
         pass
 
+    @abstractmethod
+    def get_reconstruction_info(self) -> Dict[str, Any]:
+        """Get information needed to reconstruct this store in a worker process."""
+        pass
+
     def is_expired(self, result: ComputationResult) -> bool:
         """Check if a result has expired based on TTL."""
         if self.ttl_seconds is None or not result.is_ready:
@@ -186,6 +300,18 @@ class FileSystemStore(ComputationStore):
     def create_key(self) -> str:
         """Generate a unique filename."""
         return str(uuid.uuid4())
+
+    def get_reconstruction_info(self) -> Dict[str, Any]:
+        """Get information needed to reconstruct this FileSystemStore in a worker process."""
+        return {
+            "class": "FileSystemStore",
+            "base_path": str(self.base_path),
+            "suffix": self.suffix,
+            "ttl_seconds": self.ttl_seconds,
+            "serialization": self.serialization.value,
+            "auto_cleanup": self.auto_cleanup,
+            "cleanup_probability": self.cleanup_probability,
+        }
 
     def _get_path(self, key: str) -> Path:
         """Get the full path for a key."""
@@ -282,6 +408,18 @@ class FileSystemStore(ComputationStore):
 
     def __len__(self) -> int:
         return sum(1 for _ in self)
+
+    def get_reconstruction_info(self) -> Dict[str, Any]:
+        """Get information needed to reconstruct this FileSystemStore in a worker process."""
+        return {
+            "class": "FileSystemStore",
+            "base_path": str(self.base_path),
+            "suffix": self.suffix,
+            "ttl_seconds": self.ttl_seconds,
+            "serialization": self.serialization.value,
+            "auto_cleanup": self.auto_cleanup,
+            "cleanup_probability": self.cleanup_probability,
+        }
 
     def cleanup_expired(self) -> int:
         """Remove expired results from filesystem."""
@@ -635,6 +773,108 @@ class ProcessBackend(ComputationBackend):
         if proc and proc.is_alive():
             proc.terminate()
             proc.join()
+
+
+class StdLibQueueBackend(ComputationBackend):
+    """
+    Execute computations using Python's standard library concurrent.futures.
+
+    This backend uses ThreadPoolExecutor or ProcessPoolExecutor for in-memory
+    task queuing. Not persistent across application restarts.
+    """
+
+    def __init__(
+        self,
+        store: ComputationStore,
+        max_workers: int = 5,
+        use_processes: bool = True,
+        middleware: Optional[List[Middleware]] = None,
+    ):
+        super().__init__(middleware)
+        self.store = store
+        self.max_workers = max_workers
+        self.use_processes = use_processes
+        self.executor_cls = (
+            concurrent.futures.ProcessPoolExecutor
+            if use_processes
+            else concurrent.futures.ThreadPoolExecutor
+        )
+        self._executor: Optional[
+            Union[
+                concurrent.futures.ThreadPoolExecutor,
+                concurrent.futures.ProcessPoolExecutor,
+            ]
+        ] = None
+        self._futures: Dict[str, concurrent.futures.Future] = {}
+        self._started = False
+
+    def _ensure_started(self) -> None:
+        """Lazy initialization of the executor."""
+        if not self._started:
+            self._executor = self.executor_cls(max_workers=self.max_workers)
+            self._started = True
+
+    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+        """Launch computation using executor."""
+        self._ensure_started()
+
+        # Serialize task data
+        task_data = {
+            "func": func,
+            "args": args,
+            "kwargs": kwargs,
+            "key": key,
+            "store_reconstruction_info": self.store.get_reconstruction_info(),
+            "middleware_configs": self._serialize_middleware(),
+        }
+        serialized_data = pickle.dumps(task_data)
+
+        # Submit to executor
+        future = self._executor.submit(_au_worker_entrypoint, serialized_data)
+        self._futures[key] = future
+
+    def terminate(self, key: str) -> None:
+        """Attempt to cancel a running task."""
+        future = self._futures.get(key)
+        if future:
+            future.cancel()
+            self._futures.pop(key, None)
+
+    def shutdown(self) -> None:
+        """Shutdown the executor."""
+        if self._executor:
+            self._executor.shutdown(wait=True)
+            self._started = False
+
+    def _serialize_middleware(self) -> List[Dict[str, Any]]:
+        """Serialize middleware for worker process."""
+        configs = []
+        for mw in self.middleware:
+            config = {"class": type(mw)}
+            # Add specific configs for known middleware types
+            if isinstance(mw, LoggingMiddleware):
+                config["kwargs"] = {
+                    "level": mw.level,
+                    "logger_name": (
+                        mw.logger.name if mw.logger.name != __name__ else None
+                    ),
+                }
+            elif isinstance(mw, SharedMetricsMiddleware):
+                # Pass shared state for process-safe metrics
+                config["kwargs"] = mw.get_shared_state()
+            elif isinstance(mw, MetricsMiddleware):
+                config["kwargs"] = {}
+            configs.append(config)
+        return configs
+
+    def __enter__(self):
+        """Context manager entry."""
+        self._ensure_started()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.shutdown()
 
 
 @dataclass
