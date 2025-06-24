@@ -56,9 +56,9 @@ class SupabaseQueueBackend(ComputationBackend):
         );
 
     Example:
-        >>> from supabase import create_client
-        >>> supabase = create_client(url, key)
-        >>> backend = SupabaseQueueBackend(store, supabase)
+        >>> from supabase import create_client  # doctest: +SKIP
+        >>> supabase = create_client(url, key)  # doctest: +SKIP
+        >>> backend = SupabaseQueueBackend(store, supabase)  # doctest: +SKIP
     """
 
     def __init__(
