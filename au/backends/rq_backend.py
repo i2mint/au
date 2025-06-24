@@ -38,11 +38,11 @@ class RQBackend(ComputationBackend):
     This backend enqueues tasks to Redis and relies on RQ workers to process them.
 
     Example:
-        >>> import redis
-        >>> from rq import Queue
-        >>> redis_conn = redis.Redis()
-        >>> queue = Queue(connection=redis_conn)
-        >>> backend = RQBackend(store, queue)
+        >>> import redis  # doctest: +SKIP
+        >>> from rq import Queue  # doctest: +SKIP
+        >>> redis_conn = redis.Redis()  # doctest: +SKIP
+        >>> queue = Queue(connection=redis_conn)  # doctest: +SKIP
+        >>> backend = RQBackend(store, queue)  # doctest: +SKIP
     """
 
     def __init__(
