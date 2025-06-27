@@ -144,12 +144,12 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
             # Try to extract key and store if possible
             key = (
                 task_data["key"]
-                if 'task_data' in locals() and "key" in task_data
+                if "task_data" in locals() and "key" in task_data
                 else None
             )
             store = (
                 _reconstruct_store(task_data["store_reconstruction_info"])
-                if 'task_data' in locals() and "store_reconstruction_info" in task_data
+                if "task_data" in locals() and "store_reconstruction_info" in task_data
                 else None
             )
             if key and store:

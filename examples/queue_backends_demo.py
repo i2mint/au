@@ -76,8 +76,8 @@ def example_rq_backend():
 
         with tempfile.TemporaryDirectory() as tmpdir:
             # Create Redis connection and RQ queue
-            redis_conn = redis.Redis(host='localhost', port=6379, db=0)
-            rq_queue = Queue('au_tasks', connection=redis_conn)
+            redis_conn = redis.Redis(host="localhost", port=6379, db=0)
+            rq_queue = Queue("au_tasks", connection=redis_conn)
 
             # Create store and backend
             store = FileSystemStore(tmpdir, ttl_seconds=300)

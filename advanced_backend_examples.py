@@ -13,7 +13,7 @@ def demo_rq_usage():
     print("3. Start RQ worker: rq worker au_tasks")
     print()
 
-    code_example = '''
+    code_example = """
 import redis
 from rq import Queue
 from au.backends.rq_backend import RQBackend
@@ -39,7 +39,7 @@ print(f"Task queued: {handle.key}")
 # Worker will process this task
 result = handle.get_result(timeout=60)
 print(f"Result: {result}")
-'''
+"""
     print(code_example)
 
 
@@ -52,7 +52,7 @@ def demo_supabase_usage():
     print("3. Create the au_task_queue table (see README)")
     print()
 
-    sql_schema = '''
+    sql_schema = """
 -- Required SQL schema for Supabase:
 CREATE TABLE au_task_queue (
     task_id UUID PRIMARY KEY,
@@ -63,9 +63,9 @@ CREATE TABLE au_task_queue (
     completed_at TIMESTAMP WITH TIME ZONE,
     worker_id TEXT
 );
-'''
+"""
 
-    code_example = '''
+    code_example = """
 from supabase import create_client
 from au.backends.supabase_backend import SupabaseQueueBackend
 from au.base import async_compute, FileSystemStore
@@ -96,7 +96,7 @@ with SupabaseQueueBackend(
     # Backend's internal workers will process this
     result = handle.get_result(timeout=300)
     print(f"Analysis result: {result}")
-'''
+"""
 
     print("SQL Schema:")
     print(sql_schema)
@@ -108,7 +108,7 @@ def demo_backend_selection():
     """Guide for choosing the right backend"""
     print("=== Backend Selection Guide ===")
 
-    guide = '''
+    guide = """
 Choose your backend based on your needs:
 
 1. **ProcessBackend (default)**
@@ -137,7 +137,7 @@ Performance recommendations:
 - Distributed: RQBackend for high throughput, SupabaseQueueBackend for simplicity
 - Development: ProcessBackend (default)
 - Testing: StdLibQueueBackend
-'''
+"""
     print(guide)
 
 

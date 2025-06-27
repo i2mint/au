@@ -264,14 +264,14 @@ class SupabaseQueueBackend(ComputationBackend):
         for mw in self.middleware:
             config = {"class": type(mw)}
             # Add specific configs for known middleware types
-            if hasattr(mw, 'level') and hasattr(mw, 'logger'):  # LoggingMiddleware
+            if hasattr(mw, "level") and hasattr(mw, "logger"):  # LoggingMiddleware
                 config["kwargs"] = {
                     "level": mw.level,
                     "logger_name": (
                         mw.logger.name if mw.logger.name != __name__ else None
                     ),
                 }
-            elif hasattr(mw, 'get_shared_state'):  # SharedMetricsMiddleware
+            elif hasattr(mw, "get_shared_state"):  # SharedMetricsMiddleware
                 config["kwargs"] = mw.get_shared_state()
             else:  # Basic middleware
                 config["kwargs"] = {}
