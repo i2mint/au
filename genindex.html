@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; au 0.0.11 documentation</title>
+  <title>Index &mdash; au 0.0.14 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=0c446633"></script>
+      <script src="_static/documentation_options.js?v=544df88d"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -47,6 +47,9 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/base.html">au.base</a></li>
 </ul>
 
@@ -106,8 +109,6 @@
         <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware.after_compute">(au.base.SharedMetricsMiddleware method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/au/base.html#au.base.async_compute">async_compute() (in module au.base)</a>
 </li>
       <li>
@@ -115,6 +116,29 @@
 
       <ul>
         <li><a href="module_docs/au.html#module-au">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    au.backends
+
+      <ul>
+        <li><a href="module_docs/au/backends.html#module-au.backends">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.backends.rq_backend
+
+      <ul>
+        <li><a href="module_docs/au/backends/rq_backend.html#module-au.backends.rq_backend">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.backends.supabase_backend
+
+      <ul>
+        <li><a href="module_docs/au/backends/supabase_backend.html#module-au.backends.supabase_backend">module</a>
 </li>
       </ul></li>
       <li>
@@ -194,10 +218,16 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationHandle.get_result">get_result() (au.base.ComputationHandle method)</a>
+      <li><a href="module_docs/au/base.html#au.base.ComputationStore.get_reconstruction_info">get_reconstruction_info() (au.base.ComputationStore method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.FileSystemStore.get_reconstruction_info">(au.base.FileSystemStore method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/base.html#au.base.ComputationHandle.get_result">get_result() (au.base.ComputationHandle method)</a>
+</li>
       <li><a href="module_docs/au/base.html#au.base.MetricsMiddleware.get_stats">get_stats() (au.base.MetricsMiddleware method)</a>
 </li>
       <li><a href="module_docs/au/base.html#au.base.ComputationHandle.get_status">get_status() (au.base.ComputationHandle method)</a>
@@ -222,12 +252,18 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationBackend.launch">launch() (au.base.ComputationBackend method)</a>
+      <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.launch">launch() (au.backends.rq_backend.RQBackend method)</a>
 
       <ul>
+        <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend.launch">(au.backends.supabase_backend.SupabaseQueueBackend method)</a>
+</li>
+        <li><a href="module_docs/au/base.html#au.base.ComputationBackend.launch">(au.base.ComputationBackend method)</a>
+</li>
         <li><a href="module_docs/au/base.html#au.base.ProcessBackend.launch">(au.base.ProcessBackend method)</a>
 </li>
         <li><a href="module_docs/au/base.html#au.base.RemoteAPIBackend.launch">(au.base.RemoteAPIBackend method)</a>
+</li>
+        <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend.launch">(au.base.StdLibQueueBackend method)</a>
 </li>
         <li><a href="module_docs/au/base.html#au.base.ThreadBackend.launch">(au.base.ThreadBackend method)</a>
 </li>
@@ -248,13 +284,17 @@
 </li>
       <li><a href="module_docs/au/base.html#au.base.Middleware">Middleware (class in au.base)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
       <ul>
         <li><a href="module_docs/au.html#module-au">au</a>
+</li>
+        <li><a href="module_docs/au/backends.html#module-au.backends">au.backends</a>
+</li>
+        <li><a href="module_docs/au/backends/rq_backend.html#module-au.backends.rq_backend">au.backends.rq_backend</a>
+</li>
+        <li><a href="module_docs/au/backends/supabase_backend.html#module-au.backends.supabase_backend">au.backends.supabase_backend</a>
 </li>
         <li><a href="module_docs/au/base.html#module-au.base">au.base</a>
 </li>
@@ -292,6 +332,10 @@
       <li><a href="module_docs/au/base.html#au.base.RemoteAPIBackend">RemoteAPIBackend (class in au.base)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend">RQBackend (class in au.backends.rq_backend)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
@@ -299,9 +343,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/au/base.html#au.base.SerializationFormat">SerializationFormat (class in au.base)</a>
 </li>
+      <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware">SharedMetricsMiddleware (class in au.base)</a>
+</li>
+      <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend.shutdown">shutdown() (au.backends.supabase_backend.SupabaseQueueBackend method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend.shutdown">(au.base.StdLibQueueBackend method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware">SharedMetricsMiddleware (class in au.base)</a>
+      <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend">StdLibQueueBackend (class in au.base)</a>
+</li>
+      <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend">SupabaseQueueBackend (class in au.backends.supabase_backend)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -311,10 +365,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/au/base.html#au.base.temporary_async_compute">temporary_async_compute() (in module au.base)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.ComputationBackend.terminate">terminate() (au.base.ComputationBackend method)</a>
+      <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.terminate">terminate() (au.backends.rq_backend.RQBackend method)</a>
 
       <ul>
+        <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend.terminate">(au.backends.supabase_backend.SupabaseQueueBackend method)</a>
+</li>
+        <li><a href="module_docs/au/base.html#au.base.ComputationBackend.terminate">(au.base.ComputationBackend method)</a>
+</li>
         <li><a href="module_docs/au/base.html#au.base.ProcessBackend.terminate">(au.base.ProcessBackend method)</a>
+</li>
+        <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend.terminate">(au.base.StdLibQueueBackend method)</a>
 </li>
       </ul></li>
   </ul></td>

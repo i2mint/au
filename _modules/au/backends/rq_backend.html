@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.backends.rq_backend &mdash; au 0.0.14 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/base.html">au.base</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">au.backends.rq_backend</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for au.backends.rq_backend</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">RQ (Redis Queue) backend for au framework.</span>
+
+<span class="sd">This module provides RQBackend for distributed task queuing using Redis.</span>
+<span class="sd">It requires the &#39;rq&#39; and &#39;redis&#39; packages to be installed.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># Import for type checking only</span>
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComputationStore</span><span class="p">,</span> <span class="n">Middleware</span><span class="p">,</span> <span class="n">ComputationBackend</span>
+
+<span class="c1"># Check if RQ dependencies are available</span>
+<span class="n">_HAS_RQ</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
+
+    <span class="n">_HAS_RQ</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="c1"># Import base classes</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComputationBackend</span><span class="p">,</span> <span class="n">_au_worker_entrypoint</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># Handle case where we&#39;re importing this before base is fully loaded</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="RQBackend">
+<a class="viewcode-back" href="../../../module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RQBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Backend that uses RQ (Redis Queue) for distributed task processing.</span>
+
+<span class="sd">    This backend enqueues tasks to Redis and relies on RQ workers to process them.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import redis  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; from rq import Queue  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; redis_conn = redis.Redis()  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; queue = Queue(connection=redis_conn)  # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; backend = RQBackend(store, queue)  # doctest: +SKIP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="s2">&quot;ComputationStore&quot;</span><span class="p">,</span>
+        <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">&quot;Queue&quot;</span><span class="p">,</span>
+        <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;Middleware&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_RQ</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;RQBackend requires &#39;rq&#39; and &#39;redis&#39; packages. &quot;</span>
+                <span class="s2">&quot;Please install them with: pip install rq redis&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span> <span class="o">=</span> <span class="n">rq_queue</span>
+
+<div class="viewcode-block" id="RQBackend.launch">
+<a class="viewcode-back" href="../../../module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.launch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enqueue computation task to RQ.&quot;&quot;&quot;</span>
+        <span class="c1"># Serialize task data</span>
+        <span class="n">task_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;func&quot;</span><span class="p">:</span> <span class="n">func</span><span class="p">,</span>
+            <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+            <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">,</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+            <span class="s2">&quot;store_reconstruction_info&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_reconstruction_info</span><span class="p">(),</span>
+            <span class="s2">&quot;middleware_configs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_middleware</span><span class="p">(),</span>
+        <span class="p">}</span>
+        <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">task_data</span><span class="p">)</span>
+
+        <span class="c1"># Enqueue to RQ</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span>
+            <span class="n">_au_worker_entrypoint</span><span class="p">,</span>
+            <span class="n">serialized_data</span><span class="p">,</span>
+            <span class="n">job_id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>  <span class="c1"># Use our key as RQ job ID for easier tracking</span>
+            <span class="n">job_timeout</span><span class="o">=</span><span class="s2">&quot;30m&quot;</span><span class="p">,</span>  <span class="c1"># Default timeout</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RQBackend.terminate">
+<a class="viewcode-back" href="../../../module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.terminate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to cancel RQ job by key.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">job_class</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">connection</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">job</span><span class="p">:</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Job might not exist or already completed</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not terminate RQ job </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize middleware for worker process.&quot;&quot;&quot;</span>
+        <span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">mw</span><span class="p">)}</span>
+            <span class="c1"># Add specific configs for known middleware types</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;logger&#39;</span><span class="p">):</span>  <span class="c1"># LoggingMiddleware</span>
+                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">mw</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+                    <span class="s2">&quot;logger_name&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="vm">__name__</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;get_shared_state&#39;</span><span class="p">):</span>  <span class="c1"># SharedMetricsMiddleware</span>
+                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mw</span><span class="o">.</span><span class="n">get_shared_state</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Basic middleware like MetricsMiddleware</span>
+                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">configs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

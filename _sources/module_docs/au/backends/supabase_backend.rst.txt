@@ -1,0 +1,4 @@
+au.backends.supabase_backend
+============================
+.. automodule:: au.backends.supabase_backend
+   :members:

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.base &mdash; au 0.0.11 documentation</title>
+  <title>au.base &mdash; au 0.0.14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=0c446633"></script>
+      <script src="../../_static/documentation_options.js?v=544df88d"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -24,7 +24,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="au" href="../au.html" /> 
+    <link rel="prev" title="au.backends.supabase_backend" href="backends/supabase_backend.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,6 +49,9 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/supabase_backend.html">au.backends.supabase_backend</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">au.base</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#architecture-overview">Architecture Overview:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#usage-patterns">Usage Patterns:</a></li>
@@ -74,12 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#au.base.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.cleanup_expired()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationStore.create_key"><code class="docutils literal notranslate"><span class="pre">ComputationStore.create_key()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">ComputationStore.get_reconstruction_info()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.ComputationStore.is_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.is_expired()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.FileSystemStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.cleanup_expired()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.FileSystemStore.create_key"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.create_key()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.FileSystemStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.get_reconstruction_info()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a><ul>
@@ -115,6 +120,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#au.base.SharedMetricsMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.after_compute()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.SharedMetricsMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.before_compute()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#au.base.SharedMetricsMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.on_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.base.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.StdLibQueueBackend.launch"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.launch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.StdLibQueueBackend.shutdown"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.shutdown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.base.StdLibQueueBackend.terminate"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.terminate()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#au.base.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a><ul>
@@ -331,6 +342,12 @@ using the provided key.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.get_reconstruction_info">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/au/base.html#ComputationStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.get_reconstruction_info" title="Link to this definition"></a></dt>
+<dd><p>Get information needed to reconstruct this store in a worker process.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="au.base.ComputationStore.is_expired">
 <span class="sig-name descname"><span class="pre">is_expired</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationResult" title="au.base.ComputationResult"><span class="pre">ComputationResult</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/au/base.html#ComputationStore.is_expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.is_expired" title="Link to this definition"></a></dt>
 <dd><p>Check if a result has expired based on TTL.</p>
@@ -361,6 +378,12 @@ using the provided key.</p>
 <dt class="sig sig-object py" id="au.base.FileSystemStore.create_key">
 <span class="sig-name descname"><span class="pre">create_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/au/base.html#FileSystemStore.create_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.create_key" title="Link to this definition"></a></dt>
 <dd><p>Generate a unique filename.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.FileSystemStore.get_reconstruction_info">
+<span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/au/base.html#FileSystemStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.get_reconstruction_info" title="Link to this definition"></a></dt>
+<dd><p>Get information needed to reconstruct this FileSystemStore in a worker process.</p>
 </dd></dl>
 
 </dd></dl>
@@ -519,6 +542,32 @@ job tracking mechanisms.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">StdLibQueueBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_processes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><span class="pre">Middleware</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#StdLibQueueBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend" title="Link to this definition"></a></dt>
+<dd><p>Execute computations using Python’s standard library concurrent.futures.</p>
+<p>This backend uses ThreadPoolExecutor or ProcessPoolExecutor for in-memory
+task queuing. Not persistent across application restarts.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#StdLibQueueBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.launch" title="Link to this definition"></a></dt>
+<dd><p>Launch computation using executor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#StdLibQueueBackend.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.shutdown" title="Link to this definition"></a></dt>
+<dd><p>Shutdown the executor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/au/base.html#StdLibQueueBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.terminate" title="Link to this definition"></a></dt>
+<dd><p>Attempt to cancel a running task.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="au.base.ThreadBackend">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ThreadBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><span class="pre">Middleware</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/base.html#ThreadBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ThreadBackend" title="Link to this definition"></a></dt>
 <dd><p>Execute computations in separate threads (good for I/O-bound tasks).</p>
@@ -585,7 +634,7 @@ job tracking mechanisms.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../au.html" class="btn btn-neutral float-left" title="au" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="backends/supabase_backend.html" class="btn btn-neutral float-left" title="au.backends.supabase_backend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

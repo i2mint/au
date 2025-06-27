@@ -3,4 +3,7 @@
    :caption: Contents:
 
    module_docs/au
+   module_docs/au/backends
+   module_docs/au/backends/rq_backend
+   module_docs/au/backends/supabase_backend
    module_docs/au/base
