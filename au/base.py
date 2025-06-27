@@ -139,6 +139,25 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
 
     except Exception as e:
         logger.error(f"Worker entrypoint failed: {e}", exc_info=True)
+        # Always write a failed result to the store on error
+        try:
+            # Try to extract key and store if possible
+            key = (
+                task_data["key"]
+                if 'task_data' in locals() and "key" in task_data
+                else None
+            )
+            store = (
+                _reconstruct_store(task_data["store_reconstruction_info"])
+                if 'task_data' in locals() and "store_reconstruction_info" in task_data
+                else None
+            )
+            if key and store:
+                store[key] = ComputationResult(None, ComputationStatus.FAILED, error=e)
+        except Exception as inner_e:
+            logger.error(
+                f"Failed to write failed result in worker entrypoint: {inner_e}"
+            )
 
 
 def _reconstruct_store(store_info: Dict[str, Any]) -> "ComputationStore":
@@ -395,8 +414,10 @@ class FileSystemStore(ComputationStore):
             result.completed_at = datetime.now()
 
         try:
-            with open(path, "wb") as f:
+            tmp_path = path.with_suffix(path.suffix + ".tmp")
+            with open(tmp_path, "wb") as f:
                 f.write(self._serialize(result))
+            tmp_path.replace(path)
         except Exception as e:
             logger.error(f"Failed to write result for key {key}: {e}")
 
