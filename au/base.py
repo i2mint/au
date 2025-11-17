@@ -490,9 +490,7 @@ class LoggingMiddleware(Middleware):
     >>> middleware = LoggingMiddleware(level=logging.INFO)
     """
 
-    def __init__(
-        self, *, level: int = logging.DEBUG, logger_name: str | None = None
-    ):
+    def __init__(self, *, level: int = logging.DEBUG, logger_name: str | None = None):
         self.level = level
         self.logger = logging.getLogger(logger_name or __name__)
 
@@ -822,8 +820,8 @@ class StdLibQueueBackend(ComputationBackend):
             else concurrent.futures.ThreadPoolExecutor
         )
         self._executor: None | (
-                concurrent.futures.ThreadPoolExecutor |
-                concurrent.futures.ProcessPoolExecutor
+            concurrent.futures.ThreadPoolExecutor
+            | concurrent.futures.ProcessPoolExecutor
         ) = None
         self._futures: dict[str, concurrent.futures.Future] = {}
         self._started = False
