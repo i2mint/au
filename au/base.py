@@ -55,7 +55,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Generic, Optional, TypeVar, Union, List, Dict
+from typing import Any, Generic, Optional, TypeVar, Union, List, Dict
+from collections.abc import Callable
 import json
 import logging
 import multiprocessing
@@ -160,7 +161,7 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
             )
 
 
-def _reconstruct_store(store_info: Dict[str, Any]) -> "ComputationStore":
+def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
     """Reconstruct a ComputationStore from reconstruction info."""
     store_class = store_info["class"]
 
@@ -178,8 +179,8 @@ def _reconstruct_store(store_info: Dict[str, Any]) -> "ComputationStore":
 
 
 def _reconstruct_middleware(
-    middleware_configs: List[Dict[str, Any]],
-) -> List["Middleware"]:
+    middleware_configs: list[dict[str, Any]],
+) -> list["Middleware"]:
     """Reconstruct middleware instances from configuration."""
     middleware_instances = []
     for config in middleware_configs:
@@ -224,10 +225,10 @@ class ComputationResult:
 
     value: Any
     status: ComputationStatus
-    error: Optional[Exception] = None
+    error: Exception | None = None
     created_at: datetime = field(default_factory=datetime.now)
-    completed_at: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    completed_at: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def is_ready(self) -> bool:
@@ -235,7 +236,7 @@ class ComputationResult:
         return self.status in (ComputationStatus.COMPLETED, ComputationStatus.FAILED)
 
     @property
-    def duration(self) -> Optional[timedelta]:
+    def duration(self) -> timedelta | None:
         """Get computation duration if completed."""
         if self.completed_at:
             return self.completed_at - self.created_at
@@ -252,7 +253,7 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
     Stores should implement cleanup of expired results.
     """
 
-    def __init__(self, *, ttl_seconds: Optional[int] = None):
+    def __init__(self, *, ttl_seconds: int | None = None):
         """
         Initialize store with optional TTL.
 
@@ -267,7 +268,7 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         pass
 
     @abstractmethod
-    def get_reconstruction_info(self) -> Dict[str, Any]:
+    def get_reconstruction_info(self) -> dict[str, Any]:
         """Get information needed to reconstruct this store in a worker process."""
         pass
 
@@ -300,10 +301,10 @@ class FileSystemStore(ComputationStore):
 
     def __init__(
         self,
-        base_path: Union[str, Path],
+        base_path: str | Path,
         *,
         suffix: str = ".json",
-        ttl_seconds: Optional[int] = None,
+        ttl_seconds: int | None = None,
         serialization: SerializationFormat = SerializationFormat.JSON,
         auto_cleanup: bool = True,
         cleanup_probability: float = 0.1,
@@ -320,7 +321,7 @@ class FileSystemStore(ComputationStore):
         """Generate a unique filename."""
         return str(uuid.uuid4())
 
-    def get_reconstruction_info(self) -> Dict[str, Any]:
+    def get_reconstruction_info(self) -> dict[str, Any]:
         """Get information needed to reconstruct this FileSystemStore in a worker process."""
         return {
             "class": "FileSystemStore",
@@ -430,7 +431,7 @@ class FileSystemStore(ComputationStore):
     def __len__(self) -> int:
         return sum(1 for _ in self)
 
-    def get_reconstruction_info(self) -> Dict[str, Any]:
+    def get_reconstruction_info(self) -> dict[str, Any]:
         """Get information needed to reconstruct this FileSystemStore in a worker process."""
         return {
             "class": "FileSystemStore",
@@ -490,7 +491,7 @@ class LoggingMiddleware(Middleware):
     """
 
     def __init__(
-        self, *, level: int = logging.DEBUG, logger_name: Optional[str] = None
+        self, *, level: int = logging.DEBUG, logger_name: str | None = None
     ):
         self.level = level
         self.logger = logging.getLogger(logger_name or __name__)
@@ -547,7 +548,7 @@ class MetricsMiddleware(Middleware):
         with self._lock:
             self.failed_computations += 1
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get current metrics."""
         with self._lock:
             avg_duration = (
@@ -624,7 +625,7 @@ class SharedMetricsMiddleware(Middleware):
 class ComputationBackend(ABC):
     """Abstract base for computation execution backends."""
 
-    def __init__(self, middleware: Optional[List[Middleware]] = None):
+    def __init__(self, middleware: list[Middleware] | None = None):
         self.middleware = middleware or []
 
     @abstractmethod
@@ -678,7 +679,7 @@ def _worker_function(
     kwargs: dict,
     store: ComputationStore,
     key: str,
-    middleware_configs: List[Dict[str, Any]],
+    middleware_configs: list[dict[str, Any]],
 ) -> None:
     """Global worker function for multiprocessing with middleware support."""
     # Recreate middleware instances in the worker process
@@ -731,7 +732,7 @@ class ProcessBackend(ComputationBackend):
     """Execute computations in separate processes with middleware support."""
 
     def __init__(
-        self, store: ComputationStore, middleware: Optional[List[Middleware]] = None
+        self, store: ComputationStore, middleware: list[Middleware] | None = None
     ):
         super().__init__(middleware)
         self.store = store
@@ -748,7 +749,7 @@ class ProcessBackend(ComputationBackend):
             # Start method already set, which is fine
             pass
 
-    def _serialize_middleware(self) -> List[Dict[str, Any]]:
+    def _serialize_middleware(self) -> list[dict[str, Any]]:
         """Serialize middleware for worker process."""
         configs = []
         for mw in self.middleware:
@@ -809,7 +810,7 @@ class StdLibQueueBackend(ComputationBackend):
         store: ComputationStore,
         max_workers: int = 5,
         use_processes: bool = True,
-        middleware: Optional[List[Middleware]] = None,
+        middleware: list[Middleware] | None = None,
     ):
         super().__init__(middleware)
         self.store = store
@@ -820,13 +821,11 @@ class StdLibQueueBackend(ComputationBackend):
             if use_processes
             else concurrent.futures.ThreadPoolExecutor
         )
-        self._executor: Optional[
-            Union[
-                concurrent.futures.ThreadPoolExecutor,
-                concurrent.futures.ProcessPoolExecutor,
-            ]
-        ] = None
-        self._futures: Dict[str, concurrent.futures.Future] = {}
+        self._executor: None | (
+                concurrent.futures.ThreadPoolExecutor |
+                concurrent.futures.ProcessPoolExecutor
+        ) = None
+        self._futures: dict[str, concurrent.futures.Future] = {}
         self._started = False
 
     def _ensure_started(self) -> None:
@@ -867,7 +866,7 @@ class StdLibQueueBackend(ComputationBackend):
             self._executor.shutdown(wait=True)
             self._started = False
 
-    def _serialize_middleware(self) -> List[Dict[str, Any]]:
+    def _serialize_middleware(self) -> list[dict[str, Any]]:
         """Serialize middleware for worker process."""
         configs = []
         for mw in self.middleware:
@@ -910,7 +909,7 @@ class ComputationHandle(Generic[T]):
 
     key: str
     store: ComputationStore
-    backend: Optional[ComputationBackend] = None  # Add this
+    backend: ComputationBackend | None = None  # Add this
 
     def is_ready(self) -> bool:
         """Check if the computation is complete."""
@@ -920,7 +919,7 @@ class ComputationHandle(Generic[T]):
         """Get the current status of the computation."""
         return self.store[self.key].status
 
-    def get_result(self, *, timeout: Optional[float] = None) -> T:
+    def get_result(self, *, timeout: float | None = None) -> T:
         """
         Get the computation result, optionally waiting for completion.
 
@@ -981,19 +980,19 @@ class ComputationHandle(Generic[T]):
         return False
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> dict[str, Any]:
         """Get computation metadata."""
         return self.store[self.key].metadata
 
 
 def async_compute(
-    backend: Optional[ComputationBackend] = None,
-    store: Optional[ComputationStore] = None,
+    backend: ComputationBackend | None = None,
+    store: ComputationStore | None = None,
     *,
     base_path: str = "/tmp/computations",
-    ttl_seconds: Optional[int] = 3600,
+    ttl_seconds: int | None = 3600,
     serialization: SerializationFormat = SerializationFormat.JSON,
-    middleware: Optional[List[Middleware]] = None,
+    middleware: list[Middleware] | None = None,
 ) -> Callable:
     """
     Decorator to make functions asynchronous with status tracking.
@@ -1054,7 +1053,7 @@ class ThreadBackend(ComputationBackend):
     """
 
     def __init__(
-        self, store: ComputationStore, middleware: Optional[List[Middleware]] = None
+        self, store: ComputationStore, middleware: list[Middleware] | None = None
     ):
         super().__init__(middleware)
         self.store = store
@@ -1097,7 +1096,7 @@ class RemoteAPIBackend(ComputationBackend):
         *,
         api_url: str,
         api_key: str = "",
-        middleware: Optional[List[Middleware]] = None,
+        middleware: list[Middleware] | None = None,
     ):
         super().__init__(middleware)
         self.store = store
@@ -1168,7 +1167,7 @@ if __name__ == "__main__":
         middleware=[logging_mw, metrics_mw],
         serialization=SerializationFormat.PICKLE,  # For complex objects
     )
-    def expensive_calculation(n: int) -> Dict[str, Any]:
+    def expensive_calculation(n: int) -> dict[str, Any]:
         """Calculate factorial with metadata."""
         result = 1
         for i in range(1, n + 1):

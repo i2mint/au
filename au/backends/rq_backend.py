@@ -7,7 +7,8 @@ It requires the 'rq' and 'redis' packages to be installed.
 
 import contextlib
 import pickle
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Callable, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from collections.abc import Callable
 
 # Import for type checking only
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class RQBackend(ComputationBackend):
         self,
         store: "ComputationStore",
         rq_queue: "Queue",
-        middleware: Optional[List["Middleware"]] = None,
+        middleware: list["Middleware"] | None = None,
     ):
         super().__init__(middleware)
         if not _HAS_RQ:
@@ -96,7 +97,7 @@ class RQBackend(ComputationBackend):
             logger = logging.getLogger(__name__)
             logger.warning(f"Could not terminate RQ job {key}: {e}")
 
-    def _serialize_middleware(self) -> List[Dict[str, Any]]:
+    def _serialize_middleware(self) -> list[dict[str, Any]]:
         """Serialize middleware for worker process."""
         configs = []
         for mw in self.middleware:

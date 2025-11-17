@@ -11,7 +11,8 @@ import pickle
 import time
 import threading
 import uuid
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Callable, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from collections.abc import Callable
 import logging
 
 # Import for type checking only
@@ -68,7 +69,7 @@ class SupabaseQueueBackend(ComputationBackend):
         queue_table_name: str = "au_task_queue",
         max_concurrent_tasks: int = 2,
         polling_interval_seconds: float = 1.0,
-        middleware: Optional[List["Middleware"]] = None,
+        middleware: list["Middleware"] | None = None,
     ):
         super().__init__(middleware)
         if not _HAS_SUPABASE:
@@ -84,7 +85,7 @@ class SupabaseQueueBackend(ComputationBackend):
         self.polling_interval_seconds = polling_interval_seconds
 
         # Internal worker management
-        self._worker_threads: List[threading.Thread] = []
+        self._worker_threads: list[threading.Thread] = []
         self._stop_polling_event = threading.Event()
         self._started = False
         self._worker_id = str(uuid.uuid4())[:8]  # Short worker ID
@@ -167,7 +168,7 @@ class SupabaseQueueBackend(ComputationBackend):
                 logger.error(f"Error in polling worker: {e}", exc_info=True)
                 time.sleep(self.polling_interval_seconds)
 
-    def _claim_next_task(self) -> Optional[Dict[str, Any]]:
+    def _claim_next_task(self) -> dict[str, Any] | None:
         """Atomically claim the next pending task."""
         try:
             # Use a transaction-like approach to claim a task
@@ -214,7 +215,7 @@ class SupabaseQueueBackend(ComputationBackend):
             logger.error(f"Error claiming task: {e}")
             return None
 
-    def _process_task(self, task: Dict[str, Any]) -> None:
+    def _process_task(self, task: dict[str, Any]) -> None:
         """Process a claimed task."""
         task_id = task["task_id"]
         try:
@@ -258,7 +259,7 @@ class SupabaseQueueBackend(ComputationBackend):
             self._started = False
             logger.info("Supabase polling workers shut down")
 
-    def _serialize_middleware(self) -> List[Dict[str, Any]]:
+    def _serialize_middleware(self) -> list[dict[str, Any]]:
         """Serialize middleware for worker process."""
         configs = []
         for mw in self.middleware:
