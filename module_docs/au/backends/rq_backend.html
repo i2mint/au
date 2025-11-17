@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.backends.rq_backend &mdash; au 0.0.14 documentation</title>
+  <title>au.backends.rq_backend &mdash; au 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../../_static/documentation_options.js?v=f0357c94"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -94,7 +94,7 @@
 It requires the ‘rq’ and ‘redis’ packages to be installed.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="au.backends.rq_backend.RQBackend">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.backends.rq_backend.</span></span><span class="sig-name descname"><span class="pre">RQBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base.html#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rq_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../base.html#au.base.Middleware" title="au.base.Middleware"><span class="pre">Middleware</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/au/backends/rq_backend.html#RQBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.backends.rq_backend.RQBackend" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">au.backends.rq_backend.</span></span><span class="sig-name descname"><span class="pre">RQBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base.html#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rq_queue</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../base.html#au.base.Middleware" title="au.base.Middleware"><span class="pre">Middleware</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/au/backends/rq_backend.html#RQBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.backends.rq_backend.RQBackend" title="Link to this definition"></a></dt>
 <dd><p>Backend that uses RQ (Redis Queue) for distributed task processing.</p>
 <p>This backend enqueues tasks to Redis and relies on RQ workers to process them.</p>
 <p class="rubric">Example</p>

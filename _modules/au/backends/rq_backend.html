@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.backends.rq_backend &mdash; au 0.0.14 documentation</title>
+  <title>au.backends.rq_backend &mdash; au 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../../_static/documentation_options.js?v=f0357c94"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -87,7 +87,8 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="c1"># Import for type checking only</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -131,7 +132,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">store</span><span class="p">:</span> <span class="s2">&quot;ComputationStore&quot;</span><span class="p">,</span>
         <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">&quot;Queue&quot;</span><span class="p">,</span>
-        <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">&quot;Middleware&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Middleware&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_RQ</span><span class="p">:</span>
@@ -184,20 +185,20 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not terminate RQ job </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_middleware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize middleware for worker process.&quot;&quot;&quot;</span>
         <span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">mw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">:</span>
             <span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">mw</span><span class="p">)}</span>
             <span class="c1"># Add specific configs for known middleware types</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;logger&#39;</span><span class="p">):</span>  <span class="c1"># LoggingMiddleware</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s2">&quot;level&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s2">&quot;logger&quot;</span><span class="p">):</span>  <span class="c1"># LoggingMiddleware</span>
                 <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">mw</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
                     <span class="s2">&quot;logger_name&quot;</span><span class="p">:</span> <span class="p">(</span>
                         <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">mw</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="vm">__name__</span> <span class="k">else</span> <span class="kc">None</span>
                     <span class="p">),</span>
                 <span class="p">}</span>
-            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s1">&#39;get_shared_state&#39;</span><span class="p">):</span>  <span class="c1"># SharedMetricsMiddleware</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mw</span><span class="p">,</span> <span class="s2">&quot;get_shared_state&quot;</span><span class="p">):</span>  <span class="c1"># SharedMetricsMiddleware</span>
                 <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mw</span><span class="o">.</span><span class="n">get_shared_state</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># Basic middleware like MetricsMiddleware</span>
                 <span class="n">config</span><span class="p">[</span><span class="s2">&quot;kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
