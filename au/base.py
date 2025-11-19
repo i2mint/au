@@ -946,7 +946,8 @@ class ComputationHandle(Generic[T]):
             if result.status == ComputationStatus.COMPLETED:
                 return result.value
             elif result.status == ComputationStatus.FAILED:
-                raise result.error or Exception("Computation failed")
+                error_msg = result.error or "Computation failed"
+                raise RuntimeError(error_msg)
 
             if timeout is None:
                 break

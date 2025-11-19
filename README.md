@@ -1,613 +1,535 @@
-# au - Asynchronous Computation Framework
+# AU - Async Utils
 
-A Python framework for transforming synchronous functions into asynchronous ones with status tracking, result persistence, and pluggable backends.
+**A lightweight, convention-over-configuration async framework for Python.**
 
-## Features
+AU makes async task execution simple and powerful. Transform any Python function into an async task with a single decorator, or use the simple API for even more flexibility.
 
-- 🚀 **Simple decorator-based API** - Transform any function into an async computation
-- 💾 **Pluggable storage backends** - File system, Redis, databases, etc.
-- 🔄 **Multiple execution backends** - Processes, threads, distributed queues (RQ, Supabase)
-- 🌐 **Queue backends** - Standard library, Redis Queue, Supabase PostgreSQL
-- 🛡️ **Middleware system** - Logging, metrics, authentication, rate limiting
-- 🧹 **Automatic cleanup** - TTL-based expiration of old results
-- 📦 **Flexible serialization** - JSON, Pickle, or custom formats
-- 🔍 **Status tracking** - Monitor computation state and progress
-- ❌ **Cancellation support** - Stop long-running computations
-- 🏭 **Distributed processing** - Scale across multiple machines
+## ✨ Features
 
-## Installation
+- 🎯 **Convention Over Configuration** - Works out of the box with smart defaults
+- 🚀 **Simple APIs** - Decorator pattern or direct function calls
+- 💾 **Pluggable Storage** - Filesystem, in-memory, Redis, databases
+- 🔄 **Multiple Backends** - Threads, processes, Redis Queue, Supabase
+- 🌐 **HTTP Interface** - Built-in REST API with FastAPI or Flask
+- 🔁 **Retry Logic** - Configurable retry policies with backoff
+- 🔗 **Task Dependencies** - DAG-based workflow orchestration
+- 🧪 **Testing Utilities** - Synchronous test backends and mocks
+- 📊 **Observability** - Logging, metrics, tracing, and hooks
+- 🛡️ **Zero Dependencies** - Core uses only Python stdlib
+
+## 📦 Installation
 
 ```bash
+# Core (no dependencies)
 pip install au
+
+# With HTTP support (FastAPI)
+pip install au[http]
+
+# With Redis backend
+pip install au[redis]
+
+# All features
+pip install au[all]
 ```
 
-## Quick Start
+## 🚀 Quick Start
+
+### Simple Decorator Pattern
 
 ```python
 from au import async_compute
-# For queue backends:
-# from au import StdLibQueueBackend
-# from au.backends.rq_backend import RQBackend
-# from au.backends.supabase_backend import SupabaseQueueBackend
 
-@async_compute()
-def expensive_computation(n: int) -> int:
-    """Calculate factorial."""
-    result = 1
-    for i in range(1, n + 1):
-        result *= i
-    return result
+@async_compute
+def expensive_task(n: int) -> int:
+    """This runs asynchronously!"""
+    return sum(i * i for i in range(n))
 
-# Launch computation (returns immediately)
-handle = expensive_computation(100)
+# Launch task (returns immediately)
+handle = expensive_task(1000000)
 
-# Check status
-print(handle.get_status())  # ComputationStatus.RUNNING
-
-# Get result (blocks with timeout)
+# Get result (blocks until complete)
 result = handle.get_result(timeout=30)
-print(f"100! = {result}")
+print(f"Result: {result}")
 ```
 
-## Use Cases
+### Simplified API (No Decorator Required)
 
-### 1. **Long-Running Computations**
-Perfect for computations that take minutes or hours:
-- Machine learning model training
-- Data processing pipelines
-- Scientific simulations
-- Report generation
-
-### 2. **Web Application Background Tasks**
-Offload heavy work from request handlers:
 ```python
-@app.route('/analyze')
-def analyze_data():
-    handle = analyze_large_dataset(request.files['data'])
-    return {'job_id': handle.key}
+from au import submit_task, get_result
 
-@app.route('/status/<job_id>')
-def check_status(job_id):
-    handle = ComputationHandle(job_id, store)
-    return {'status': handle.get_status().value}
+def my_function(x, y):
+    return x + y
+
+# Submit task
+task_id = submit_task(my_function, 10, y=20)
+
+# Get result
+result = get_result(task_id, timeout=10)
+print(f"Result: {result}")  # 30
 ```
 
-### 3. **Distributed Computing**
-Use queue backends to distribute work across multiple machines:
+### Context Manager Pattern
+
 ```python
-# Using Redis Queue backend
-import redis
-from rq import Queue
-from au.backends.rq_backend import RQBackend
+from au import async_task
 
-redis_conn = redis.Redis()
-rq_queue = Queue('tasks', connection=redis_conn)
-backend = RQBackend(store, rq_queue)
+with async_task(expensive_task, 1000000) as handle:
+    # Do other work while task runs
+    print("Working...")
 
-@async_compute(backend=backend, store=store)
-def distributed_task(data):
-    return complex_analysis(data)
-
-# Task will be processed by RQ workers on any machine
-handle = distributed_task(large_dataset)
+# Result ready here
+print(f"Result: {handle.result}")
 ```
 
-### 4. **Batch Processing**
-Process multiple items with shared infrastructure:
+## 🎛️ Configuration
+
+AU supports multiple configuration layers:
+
+### 1. Environment Variables
+
+```bash
+export AU_BACKEND=redis
+export AU_REDIS_URL=redis://localhost:6379
+export AU_STORAGE_PATH=/var/au/tasks
+export AU_TTL_SECONDS=7200
+export AU_MAX_WORKERS=8
+```
+
+### 2. Config File (au.toml)
+
+```toml
+[au]
+backend = "redis"
+redis_url = "redis://localhost:6379"
+storage_path = "/var/au/tasks"
+ttl_seconds = 7200
+max_workers = 8
+```
+
+### 3. Explicit Configuration
+
 ```python
-store = FileSystemStore("/var/computations", ttl_seconds=3600)
-backend = ProcessBackend(store)
+from au import get_config, set_global_config
 
-@async_compute(backend=backend, store=store)
-def process_item(item_id):
-    return transform_item(item_id)
-
-# Launch multiple computations
-handles = [process_item(i) for i in range(1000)]
+config = get_config(
+    backend='redis',
+    redis_url='redis://localhost:6379',
+    max_workers=16
+)
+set_global_config(config)
 ```
 
-## Usage Patterns
+## 🔄 Backends
 
-### Basic Usage
+### Thread Backend (Default)
 
 ```python
 from au import async_compute
 
-# Simple async function with default settings
-@async_compute()
-def my_function(x):
-    return x * 2
-
-handle = my_function(21)
-result = handle.get_result(timeout=10)  # Returns 42
+@async_compute  # Uses ThreadBackend by default
+def io_bound_task(url):
+    return requests.get(url).text
 ```
 
-### Custom Configuration
+### Process Backend
 
 ```python
-from au import async_compute, FileSystemStore, ProcessBackend
-from au import LoggingMiddleware, MetricsMiddleware, SerializationFormat
+from au import async_compute, ProcessBackend
 
-# Configure store with TTL and serialization
-store = FileSystemStore(
-    "/var/computations",
-    ttl_seconds=3600,  # 1 hour TTL
-    serialization=SerializationFormat.PICKLE  # For complex objects
-)
-
-# Add middleware
-middleware = [
-    LoggingMiddleware(level=logging.INFO),
-    MetricsMiddleware()
-]
-
-# Create backend with middleware
-backend = ProcessBackend(store, middleware=middleware)
-
-# Apply to function
-@async_compute(backend=backend, store=store)
-def complex_computation(data):
-    return analyze(data)
+@async_compute(backend=ProcessBackend())
+def cpu_bound_task(n):
+    return sum(i * i for i in range(n))
 ```
 
-### Shared Infrastructure
+### Redis Queue Backend
 
 ```python
-# Create shared components
-store = FileSystemStore("/var/shared", ttl_seconds=7200)
-backend = ProcessBackend(store)
-
-# Multiple functions share the same infrastructure
-@async_compute(backend=backend, store=store)
-def step1(x):
-    return preprocess(x)
-
-@async_compute(backend=backend, store=store)
-def step2(x):
-    return transform(x)
-
-# Chain computations
-data = load_data()
-h1 = step1(data)
-preprocessed = h1.get_result(timeout=60)
-h2 = step2(preprocessed)
-final_result = h2.get_result(timeout=60)
-```
-
-### Temporary Computations
-
-```python
-from au import temporary_async_compute
-
-# Automatic cleanup when context exits
-with temporary_async_compute(ttl_seconds=60) as async_func:
-    @async_func
-    def quick_job(x):
-        return x ** 2
-    
-    handle = quick_job(10)
-    result = handle.get_result(timeout=5)
-    # Temporary directory cleaned up automatically
-```
-
-### Thread Backend for I/O-Bound Tasks
-
-```python
-from au import ThreadBackend
-
-# Use threads for I/O-bound operations
-store = FileSystemStore("/tmp/io_tasks")
-backend = ThreadBackend(store)
-
-@async_compute(backend=backend, store=store)
-def fetch_data(url):
-    return requests.get(url).json()
-
-# Launch multiple I/O operations
-handles = [fetch_data(url) for url in urls]
-```
-
-## Queue Backends
-
-The AU framework supports multiple queue backends for different distributed computing scenarios:
-
-### Standard Library Queue Backend
-
-Uses Python's `concurrent.futures` for in-memory task processing with no external dependencies.
-
-```python
-from au import StdLibQueueBackend
-
-store = FileSystemStore("/tmp/computations")
-
-# Use ThreadPoolExecutor for I/O-bound tasks
-with StdLibQueueBackend(store, max_workers=4, use_processes=False) as backend:
-    @async_compute(backend=backend, store=store)
-    def fetch_data(url):
-        return requests.get(url).text
-
-# Use ProcessPoolExecutor for CPU-bound tasks  
-with StdLibQueueBackend(store, max_workers=4, use_processes=True) as backend:
-    @async_compute(backend=backend, store=store)
-    def cpu_intensive(n):
-        return sum(i * i for i in range(n))
-```
-
-**Features:**
-- No external dependencies
-- Context manager support for clean shutdown
-- Choice between threads and processes
-- In-memory queuing (not persistent)
-
-### Redis Queue (RQ) Backend
-
-Distributed task processing using Redis and RQ workers.
-
-**Installation:**
-```bash
-pip install redis rq
-```
-
-**Usage:**
-```python
-import redis
-from rq import Queue
+from au import async_compute
 from au.backends.rq_backend import RQBackend
 
-# Setup Redis and RQ
-redis_conn = redis.Redis(host='localhost', port=6379, db=0)
-rq_queue = Queue('au_tasks', connection=redis_conn)
+backend = RQBackend(redis_url='redis://localhost:6379')
 
-# Create backend
-store = FileSystemStore("/tmp/computations")
-backend = RQBackend(store, rq_queue)
-
-@async_compute(backend=backend, store=store)
-def heavy_computation(data):
-    # This will be processed by RQ workers
-    return process_data(data)
-
-# Launch task (enqueued to Redis)
-handle = heavy_computation(my_data)
-
-# Start RQ worker in separate process/machine:
-# rq worker au_tasks
-```
-
-**Features:**
-- Distributed processing across multiple machines
-- Persistent task queue (survives restarts)
-- Built-in job monitoring and management
-- Fault tolerance and retry mechanisms
-
-### Supabase Queue Backend
-
-PostgreSQL-based task queue using Supabase with internal polling workers.
-
-**Installation:**
-```bash
-pip install supabase
-```
-
-**Database Setup:**
-```sql
-CREATE TABLE au_task_queue (
-    task_id UUID PRIMARY KEY,
-    func_data BYTEA NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    started_at TIMESTAMP WITH TIME ZONE,
-    completed_at TIMESTAMP WITH TIME ZONE,
-    worker_id TEXT
-);
-```
-
-**Usage:**
-```python
-from supabase import create_client
-from au.backends.supabase_backend import SupabaseQueueBackend
-
-# Setup Supabase client
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# Create backend with internal polling workers
-store = FileSystemStore("/tmp/computations")
-with SupabaseQueueBackend(
-    store, 
-    supabase, 
-    max_concurrent_tasks=3,
-    polling_interval_seconds=2.0
-) as backend:
-    
-    @async_compute(backend=backend, store=store)
-    def analyze_data(dataset_id):
-        return run_analysis(dataset_id)
-    
-    handle = analyze_data("dataset_123")
-    result = handle.get_result(timeout=60)
-```
-
-**Features:**
-- PostgreSQL-based persistence
-- Internal polling workers (no separate worker processes needed)
-- SQL-based task management and monitoring
-- Integration with Supabase ecosystem
-
-### Backend Comparison
-
-| Backend | Persistence | Distribution | Setup Complexity | Best For |
-|---------|-------------|--------------|------------------|----------|
-| ProcessBackend | No | Single machine | Low | Development, single-machine processing |
-| StdLibQueueBackend | No | Single machine | Low | Simple queuing, testing |
-| RQBackend | Yes | Multi-machine | Medium | Production distributed systems |
-| SupabaseQueueBackend | Yes | Multi-machine | Medium | PostgreSQL-based architectures |
-
-### Function Serialization Requirements
-
-Queue backends require functions to be **pickleable**:
-
-✅ **Good:**
-```python
-# Module-level function
-def my_task(x):
-    return x * 2
-
-@async_compute(backend=queue_backend)
-def another_task(data):
+@async_compute(backend=backend)
+def distributed_task(data):
     return process(data)
 ```
 
-❌ **Bad:**
-```python
-def test_function():
-    # Local function - can't be pickled!
-    @async_compute(backend=queue_backend)
-    def local_task(x):
-        return x * 2
-```
-
-## Architecture & Design
-
-### Core Components
-
-1. **Storage Abstraction (`ComputationStore`)**
-   - Implements Python's `MutableMapping` interface
-   - Handles result persistence and retrieval
-   - Supports TTL-based expiration
-   - Extensible for any storage backend
-
-2. **Execution Abstraction (`ComputationBackend`)**
-   - Defines how computations are launched
-   - Supports different execution models
-   - Integrates middleware for cross-cutting concerns
-
-3. **Result Handling (`ComputationHandle`)**
-   - Clean API for checking status and retrieving results
-   - Supports timeouts and cancellation
-   - Provides access to metadata
-
-4. **Middleware System**
-   - Lifecycle hooks: before, after, error
-   - Composable and reusable
-   - Examples: logging, metrics, auth, rate limiting
-
-### Design Principles
-
-- **Separation of Concerns**: Storage, execution, and result handling are independent
-- **Dependency Injection**: All components are injected, avoiding hardcoded dependencies
-- **Open/Closed Principle**: Extend functionality without modifying core code
-- **Standard Interfaces**: Uses Python's `collections.abc` interfaces
-- **Functional Approach**: Decorator-based API preserves function signatures
-
-### Trade-offs & Considerations
-
-#### Pros
-- ✅ Clean abstraction allows easy swapping of implementations
-- ✅ Type hints and dataclasses provide excellent IDE support
-- ✅ Follows SOLID principles for maintainability
-- ✅ Minimal dependencies (uses only Python stdlib)
-- ✅ Flexible serialization supports complex objects
-- ✅ Middleware enables cross-cutting concerns
-
-#### Cons
-- ❌ Process-based backend has overhead for small computations
-- ❌ File-based storage might not scale for high throughput
-- ❌ Metrics middleware doesn't share state across processes by default
-- ❌ No built-in distributed coordination
-- ❌ Fork method required for ProcessBackend (platform-specific)
-
-#### When to Use
-- ✅ Long-running computations (minutes to hours)
-- ✅ Need to persist results across restarts
-- ✅ Want to separate computation from result retrieval
-- ✅ Building async APIs or job queues
-- ✅ Need cancellation or timeout support
-
-#### When NOT to Use
-- ❌ Sub-second computations (overhead too high)
-- ❌ Need distributed coordination (use Celery/Dask)
-- ❌ Require complex workflow orchestration
-- ❌ Need real-time streaming results
-
-## Advanced Features
-
-### Custom Middleware
+### Standard Library Queue Backend
 
 ```python
-from au import Middleware
+from au import StdLibQueueBackend, async_compute
 
-class RateLimitMiddleware(Middleware):
-    def __init__(self, max_per_minute: int = 60):
-        self.max_per_minute = max_per_minute
-        self.requests = []
-    
-    def before_compute(self, func, args, kwargs, key):
-        now = time.time()
-        self.requests = [t for t in self.requests if now - t < 60]
-        
-        if len(self.requests) >= self.max_per_minute:
-            raise Exception("Rate limit exceeded")
-        
-        self.requests.append(now)
-    
-    def after_compute(self, key, result):
-        pass
-    
-    def on_error(self, key, error):
-        pass
+backend = StdLibQueueBackend(max_workers=4, executor_type='thread')
 
-# Use the middleware
-@async_compute(middleware=[RateLimitMiddleware(max_per_minute=10)])
-def rate_limited_function(x):
-    return expensive_api_call(x)
-```
-
-### Custom Storage Backend
-
-```python
-from au import ComputationStore, ComputationResult
-import redis
-
-class RedisStore(ComputationStore):
-    def __init__(self, redis_client, *, ttl_seconds=None):
-        super().__init__(ttl_seconds=ttl_seconds)
-        self.redis = redis_client
-    
-    def create_key(self):
-        return f"computation:{uuid.uuid4()}"
-    
-    def __getitem__(self, key):
-        data = self.redis.get(key)
-        if data is None:
-            return ComputationResult(None, ComputationStatus.PENDING)
-        return pickle.loads(data)
-    
-    def __setitem__(self, key, result):
-        data = pickle.dumps(result)
-        if self.ttl_seconds:
-            self.redis.setex(key, self.ttl_seconds, data)
-        else:
-            self.redis.set(key, data)
-    
-    def __delitem__(self, key):
-        self.redis.delete(key)
-    
-    def __iter__(self):
-        return iter(self.redis.scan_iter("computation:*"))
-    
-    def __len__(self):
-        return len(list(self))
-    
-    def cleanup_expired(self):
-        # Redis handles expiration automatically
-        return 0
-
-# Use Redis backend
-redis_client = redis.Redis(host='localhost', port=6379)
-store = RedisStore(redis_client, ttl_seconds=3600)
-
-@async_compute(store=store)
-def distributed_computation(x):
-    return process(x)
-```
-
-### Monitoring & Metrics
-
-```python
-from au import MetricsMiddleware
-
-# Create shared metrics
-metrics = MetricsMiddleware()
-
-@async_compute(middleware=[metrics])
-def monitored_function(x):
-    return compute(x)
-
-# Launch several computations
-for i in range(10):
-    monitored_function(i)
-
-# Check metrics
-stats = metrics.get_stats()
-print(f"Total: {stats['total']}")
-print(f"Completed: {stats['completed']}")
-print(f"Failed: {stats['failed']}")
-print(f"Avg Duration: {stats['avg_duration']:.2f}s")
-```
-
-## Error Handling
-
-```python
-@async_compute()
-def may_fail(x):
-    if x < 0:
-        raise ValueError("x must be positive")
-    return x ** 2
-
-handle = may_fail(-5)
-
-try:
-    result = handle.get_result(timeout=5)
-except Exception as e:
-    print(f"Computation failed: {e}")
-    print(f"Status: {handle.get_status()}")  # ComputationStatus.FAILED
-```
-
-## Cleanup Strategies
-
-```python
-# Manual cleanup
-@async_compute(ttl_seconds=3600)
-def my_func(x):
+@async_compute(backend=backend)
+def task(x):
     return x * 2
-
-# Clean up expired results
-removed = my_func.cleanup_expired()
-print(f"Removed {removed} expired results")
-
-# Automatic cleanup with probability
-store = FileSystemStore(
-    "/tmp/computations",
-    ttl_seconds=3600,
-    auto_cleanup=True,
-    cleanup_probability=0.1  # 10% chance on each access
-)
 ```
 
-## API Reference
+## 🌐 HTTP Interface
 
-### Main Decorator
+Create a REST API for your tasks with one line:
 
 ```python
-@async_compute(
-    backend=None,           # Execution backend (default: ProcessBackend)
-    store=None,            # Storage backend (default: FileSystemStore)
-    base_path="/tmp/computations",  # Path for default file store
-    ttl_seconds=3600,      # Time-to-live for results
-    serialization=SerializationFormat.JSON,  # JSON or PICKLE
-    middleware=None        # List of middleware components
+from au import async_compute
+from au.http import mk_http_interface
+
+@async_compute
+def process_data(data: dict) -> dict:
+    # Process data
+    return {"result": data["value"] * 2}
+
+# Create FastAPI app
+app = mk_http_interface([process_data])
+
+# Run with: uvicorn main:app
+```
+
+### API Endpoints
+
+```bash
+# Submit task
+curl -X POST http://localhost:8000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"function_name": "process_data", "args": [], "kwargs": {"data": {"value": 5}}}'
+
+# Get status
+curl http://localhost:8000/tasks/{task_id}/status
+
+# Get result (wait for completion)
+curl http://localhost:8000/tasks/{task_id}/result?wait=true&timeout=30
+
+# List all tasks
+curl http://localhost:8000/tasks
+
+# Cancel task
+curl -X DELETE http://localhost:8000/tasks/{task_id}
+```
+
+## 🔁 Retry Logic
+
+Add automatic retry with backoff:
+
+```python
+from au import async_compute, RetryPolicy, BackoffStrategy
+
+retry_policy = RetryPolicy(
+    max_attempts=5,
+    backoff=BackoffStrategy.EXPONENTIAL,
+    initial_delay=1.0,
+    retry_on=[ConnectionError, TimeoutError],
+)
+
+from au.api import submit_task
+
+task_id = submit_task(
+    flaky_function,
+    retry_policy=retry_policy
 )
 ```
 
-### ComputationHandle Methods
+### Predefined Policies
 
-- `is_ready() -> bool`: Check if computation is complete
-- `get_status() -> ComputationStatus`: Get current status
-- `get_result(timeout=None) -> T`: Get result, optionally wait
-- `cancel() -> bool`: Attempt to cancel computation
-- `metadata -> Dict[str, Any]`: Access computation metadata
+```python
+from au.retry import (
+    DEFAULT_RETRY_POLICY,       # 3 attempts, exponential
+    AGGRESSIVE_RETRY_POLICY,    # 5 attempts, fast
+    CONSERVATIVE_RETRY_POLICY,  # 2 attempts, slow
+    NETWORK_RETRY_POLICY,       # Retries network errors only
+)
+```
 
-### ComputationStatus Enum
+## 🔗 Task Dependencies & Workflows
 
-- `PENDING`: Not started yet
-- `RUNNING`: Currently executing
-- `COMPLETED`: Successfully finished
-- `FAILED`: Failed with error
+Build complex workflows with dependencies:
 
-## Contributing
+```python
+from au import TaskGraph
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+graph = TaskGraph()
 
-## License
+# Define tasks
+t1 = graph.add_task(fetch_data, 'source1')
+t2 = graph.add_task(fetch_data, 'source2')
+t3 = graph.add_task(merge_data, depends_on=[t1, t2])
+t4 = graph.add_task(analyze, depends_on=[t3])
+
+# Execute workflow
+results = graph.execute()
+print(results[t4])
+```
+
+### Fluent Builder API
+
+```python
+from au import WorkflowBuilder
+
+workflow = (
+    WorkflowBuilder()
+    .add_task('fetch1', fetch_data, 'source1')
+    .add_task('fetch2', fetch_data, 'source2')
+    .add_task('merge', merge_data, depends_on=['fetch1', 'fetch2'])
+    .add_task('analyze', analyze, depends_on=['merge'])
+    .build()
+)
+
+results = workflow.execute()
+```
+
+## 📊 Observability
+
+### Logging & Metrics
+
+```python
+from au import async_compute, LoggingMiddleware, MetricsMiddleware
+
+@async_compute(middleware=[
+    LoggingMiddleware(level='INFO'),
+    MetricsMiddleware(),
+])
+def monitored_task(x):
+    return x * 2
+```
+
+### Custom Hooks
+
+```python
+from au.hooks import create_observability_middleware
+
+middleware = create_observability_middleware(
+    logging_level='INFO',
+    enable_metrics=True,
+    enable_tracing=True,
+    on_start=lambda task_id, **kw: print(f"Task {task_id} started"),
+    on_complete=lambda task_id, **kw: print(f"Task {task_id} completed"),
+    on_error=lambda task_id, error, **kw: print(f"Task {task_id} failed: {error}"),
+)
+```
+
+## 🧪 Testing
+
+AU provides synchronous test backends for easy testing:
+
+```python
+from au.testing import SyncTestBackend, InMemoryStore, mock_async
+
+def test_my_task():
+    backend = SyncTestBackend()
+    store = InMemoryStore()
+
+    # Tasks execute synchronously for testing
+    from au import async_compute
+
+    @async_compute(backend=backend, store=store)
+    def task(x):
+        return x * 2
+
+    handle = task(5)
+    assert handle.get_result() == 10
+```
+
+### Mocking Context Manager
+
+```python
+from au.testing import mock_async
+
+def test_with_mock():
+    with mock_async() as mock:
+        @async_compute
+        def task(x):
+            return x * 2
+
+        handle = task(5)
+
+        assert mock.task_count == 1
+        assert handle.get_result() == 10
+```
+
+## 📚 API Reference
+
+### Core Functions
+
+- `async_compute(backend=None, store=None, ...)` - Decorator for async tasks
+- `submit_task(func, *args, **kwargs)` - Submit task without decorator
+- `get_result(task_id, timeout=None)` - Get task result
+- `get_status(task_id)` - Get task status
+- `is_ready(task_id)` - Check if task is complete
+- `cancel_task(task_id)` - Cancel running task
+- `async_task(func, *args, **kwargs)` - Context manager for tasks
+
+### Configuration
+
+- `get_config(**overrides)` - Get configuration
+- `get_global_config()` - Get global configuration
+- `set_global_config(config)` - Set global configuration
+- `AUConfig` - Configuration dataclass
+
+### Retry
+
+- `RetryPolicy(max_attempts, backoff, ...)` - Retry configuration
+- `retry_with_policy(func, args, kwargs, policy)` - Execute with retry
+- `BackoffStrategy` - EXPONENTIAL, LINEAR, CONSTANT
+
+### Workflow
+
+- `TaskGraph()` - Create task graph
+- `WorkflowBuilder()` - Fluent workflow builder
+- `depends_on(*funcs)` - Decorator for dependencies
+
+### Testing
+
+- `SyncTestBackend()` - Synchronous test backend
+- `InMemoryStore()` - In-memory result store
+- `mock_async()` - Context manager for testing
+- `create_test_backend()` - Create test backend
+- `create_test_store()` - Create test store
+
+### HTTP
+
+- `mk_http_interface(functions, ...)` - Create FastAPI app
+- `mk_flask_interface(functions, ...)` - Create Flask app
+
+## 🎯 Use Cases
+
+### Web Application Background Tasks
+
+```python
+from flask import Flask, request, jsonify
+from au import async_compute, submit_task, get_status, get_result
+
+app = Flask(__name__)
+
+@async_compute
+def process_upload(file_path):
+    # Heavy processing
+    return analyze_file(file_path)
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    file_path = save_uploaded_file(request.files['file'])
+    handle = process_upload(file_path)
+    return jsonify({'task_id': handle.key})
+
+@app.route('/status/<task_id>')
+def status(task_id):
+    return jsonify({'status': get_status(task_id).value})
+
+@app.route('/result/<task_id>')
+def result(task_id):
+    try:
+        result = get_result(task_id, timeout=0.1)
+        return jsonify({'result': result})
+    except TimeoutError:
+        return jsonify({'status': 'pending'}), 202
+```
+
+### Distributed Data Processing
+
+```python
+from au import async_compute
+from au.backends.rq_backend import RQBackend
+
+backend = RQBackend(redis_url='redis://queue:6379')
+
+@async_compute(backend=backend)
+def process_chunk(data_chunk):
+    return [transform(item) for item in data_chunk]
+
+# Submit many tasks
+chunks = split_data(large_dataset, chunk_size=1000)
+handles = [process_chunk(chunk) for chunk in chunks]
+
+# Collect results
+results = [h.get_result() for h in handles]
+final_result = merge_results(results)
+```
+
+### ML Model Training Pipeline
+
+```python
+from au import TaskGraph
+
+def load_data():
+    return load_dataset()
+
+def preprocess(data):
+    return clean_and_transform(data)
+
+def train_model(data):
+    return fit_model(data)
+
+def evaluate(model):
+    return compute_metrics(model)
+
+# Build pipeline
+graph = TaskGraph()
+t1 = graph.add_task(load_data)
+t2 = graph.add_task(preprocess, depends_on=[t1])
+t3 = graph.add_task(train_model, depends_on=[t2])
+t4 = graph.add_task(evaluate, depends_on=[t3])
+
+results = graph.execute(timeout=3600)
+metrics = results[t4]
+```
+
+## 🏗️ Architecture
+
+AU follows a clean, modular architecture:
+
+```
+┌─────────────────────────────────────────┐
+│          User Application               │
+└─────────────────┬───────────────────────┘
+                  │
+      ┌───────────┴──────────┐
+      │   Decorator/API       │
+      │   (async_compute)     │
+      └───────────┬───────────┘
+                  │
+      ┌───────────┴──────────┐
+      │   ComputationHandle   │
+      │   (Result tracking)   │
+      └───────────┬───────────┘
+                  │
+      ┌───────────┴──────────┐
+      │   Backend Layer       │
+      │   (Execution)         │
+      └───────────┬───────────┘
+                  │
+      ┌───────────┴──────────┐
+      │   Storage Layer       │
+      │   (Persistence)       │
+      └───────────────────────┘
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please check out the [GitHub repository](https://github.com/i2mint/au).
+
+## 📄 License
 
 MIT License - see LICENSE file for details.
+
+## 🔗 Related Projects
+
+- **[qh](https://github.com/i2mint/qh)** - HTTP services built on AU
+- **[i2mint](https://github.com/i2mint)** - Ecosystem of Python tools
+
+## 📖 Documentation
+
+For more detailed documentation, see the [docs folder](./docs) or visit our [documentation site](https://github.com/i2mint/au).
+
+## 🎓 Examples
+
+Check out the [examples folder](./examples) for more use cases:
+
+- Simple tasks
+- Web API integration
+- Distributed processing
+- Workflow orchestration
+- Testing strategies
+
+---
+
+**Made with ❤️ by the i2mint team**

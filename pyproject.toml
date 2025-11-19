@@ -1,0 +1,175 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "au"
+version = "0.1.0"
+description = "Async Utils - A lightweight, convention-over-configuration async framework for Python"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "i2mint", email = ""},
+]
+keywords = ["async", "tasks", "queue", "worker", "distributed", "http", "api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
+]
+requires-python = ">=3.10"
+
+# No required dependencies - core uses only stdlib!
+dependencies = []
+
+[project.optional-dependencies]
+# HTTP interface with FastAPI
+http = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+]
+
+# HTTP interface with Flask
+flask = [
+    "flask>=3.0.0",
+]
+
+# Redis backend
+redis = [
+    "redis>=5.0.0",
+    "rq>=1.15.0",
+]
+
+# Supabase backend
+supabase = [
+    "supabase>=2.0.0",
+]
+
+# Type validation with Pydantic
+validation = [
+    "pydantic>=2.0.0",
+]
+
+# TOML config file support
+toml = [
+    "tomli>=2.0.0; python_version<'3.11'",
+]
+
+# YAML config file support
+yaml = [
+    "pyyaml>=6.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+    "pylint>=2.17.0",
+]
+
+# Testing dependencies
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+]
+
+# All optional features
+all = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.0.0",
+    "flask>=3.0.0",
+    "redis>=5.0.0",
+    "rq>=1.15.0",
+    "supabase>=2.0.0",
+    "tomli>=2.0.0; python_version<'3.11'",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/i2mint/au"
+Repository = "https://github.com/i2mint/au"
+Documentation = "https://github.com/i2mint/au#readme"
+Issues = "https://github.com/i2mint/au/issues"
+
+[tool.setuptools]
+packages = ["au", "au.backends"]
+
+[tool.setuptools.package-data]
+au = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["au/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--ignore=examples",
+    "--ignore=scrap",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pylint.messages_control]
+disable = [
+    "C0103",  # Invalid name
+    "C0114",  # Missing module docstring (we have them now!)
+    "C0115",  # Missing class docstring
+    "C0116",  # Missing function docstring
+    "R0913",  # Too many arguments
+    "R0914",  # Too many local variables
+]
+
+[tool.coverage.run]
+source = ["au"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
