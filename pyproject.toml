@@ -9,7 +9,7 @@ description = "Async Utils - A lightweight, convention-over-configuration async 
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "i2mint", email = ""},
+    {name = "i2mint"},
 ]
 keywords = ["async", "tasks", "queue", "worker", "distributed", "http", "api"]
 classifiers = [
