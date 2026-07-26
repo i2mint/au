@@ -204,6 +204,16 @@ class ComputationStatus(Enum):
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class ComputationCancelledError(Exception):
+    """Raised by :meth:`ComputationHandle.get_result` when a computation was cancelled.
+
+    This lets callers distinguish a deliberate user cancellation (a first-class
+    :attr:`ComputationStatus.CANCELLED`) from a genuine computation failure
+    (:attr:`ComputationStatus.FAILED`) without string-sniffing the error message.
+    """
 
 
 class SerializationFormat(Enum):
@@ -229,11 +239,16 @@ class ComputationResult:
     created_at: datetime = field(default_factory=datetime.now)
     completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    terminal_reason: str | None = None
 
     @property
     def is_ready(self) -> bool:
-        """Check if computation is complete (success or failure)."""
-        return self.status in (ComputationStatus.COMPLETED, ComputationStatus.FAILED)
+        """Check if computation reached a terminal state (success, failure, or cancellation)."""
+        return self.status in (
+            ComputationStatus.COMPLETED,
+            ComputationStatus.FAILED,
+            ComputationStatus.CANCELLED,
+        )
 
     @property
     def duration(self) -> timedelta | None:
@@ -356,6 +371,7 @@ class FileSystemStore(ComputationStore):
                 result.completed_at.isoformat() if result.completed_at else None
             ),
             "metadata": result.metadata,
+            "terminal_reason": result.terminal_reason,
         }
 
         if self.serialization == SerializationFormat.JSON:
@@ -381,6 +397,7 @@ class FileSystemStore(ComputationStore):
                 else None
             ),
             metadata=obj.get("metadata", {}),
+            terminal_reason=obj.get("terminal_reason"),
         )
 
     def __getitem__(self, key: str) -> ComputationResult:
@@ -627,14 +644,41 @@ class ComputationBackend(ABC):
         self.middleware = middleware or []
 
     @abstractmethod
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: "ComputationStore | None" = None,
+    ) -> None:
         """
         Launch the computation asynchronously.
 
-        The backend should execute func(*args, **kwargs) and store the result
-        using the provided key.
+        The backend should execute ``func(*args, **kwargs)`` and store the result
+        under ``key``. The result store is resolved by :meth:`_resolve_store`:
+        ``store`` (passed per-launch by the simple ``au.api`` surface) takes
+        precedence, falling back to the backend's own ``self.store`` (set at
+        construction by the ``async_compute`` decorator path).
         """
         pass
+
+    def _resolve_store(
+        self, store: "ComputationStore | None" = None
+    ) -> "ComputationStore":
+        """Resolve the effective result store for a launch.
+
+        Prefers the per-launch ``store`` argument, then the backend's own
+        ``self.store``. Raises if neither is available so the failure is
+        immediate and legible rather than a later ``AttributeError``.
+        """
+        store = store if store is not None else getattr(self, "store", None)
+        if store is None:
+            raise ValueError(
+                f"{type(self).__name__}.launch requires a result store: pass one "
+                f"to launch(..., store=...) or construct the backend with a store."
+            )
+        return store
 
     def terminate(self, key: str) -> None:
         """Attempt to terminate the computation. Default: do nothing."""
@@ -730,7 +774,9 @@ class ProcessBackend(ComputationBackend):
     """Execute computations in separate processes with middleware support."""
 
     def __init__(
-        self, store: ComputationStore, middleware: list[Middleware] | None = None
+        self,
+        store: ComputationStore | None = None,
+        middleware: list[Middleware] | None = None,
     ):
         super().__init__(middleware)
         self.store = store
@@ -768,8 +814,17 @@ class ProcessBackend(ComputationBackend):
             configs.append(config)
         return configs
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: ComputationStore | None = None,
+    ) -> None:
         """Launch computation in a new process."""
+        store = self._resolve_store(store)
+
         # Only run non-metrics middleware in the main process
         for mw in self.middleware:
             if not isinstance(mw, SharedMetricsMiddleware):
@@ -783,7 +838,7 @@ class ProcessBackend(ComputationBackend):
         middleware_configs = self._serialize_middleware()
         process = multiprocessing.Process(
             target=_worker_function,
-            args=(func, args, kwargs, self.store, key, middleware_configs),
+            args=(func, args, kwargs, store, key, middleware_configs),
         )
         self._processes[key] = process
         process.start()
@@ -805,7 +860,7 @@ class StdLibQueueBackend(ComputationBackend):
 
     def __init__(
         self,
-        store: ComputationStore,
+        store: ComputationStore | None = None,
         max_workers: int = 5,
         use_processes: bool = True,
         middleware: list[Middleware] | None = None,
@@ -832,8 +887,16 @@ class StdLibQueueBackend(ComputationBackend):
             self._executor = self.executor_cls(max_workers=self.max_workers)
             self._started = True
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: ComputationStore | None = None,
+    ) -> None:
         """Launch computation using executor."""
+        store = self._resolve_store(store)
         self._ensure_started()
 
         # Serialize task data
@@ -842,7 +905,7 @@ class StdLibQueueBackend(ComputationBackend):
             "args": args,
             "kwargs": kwargs,
             "key": key,
-            "store_reconstruction_info": self.store.get_reconstruction_info(),
+            "store_reconstruction_info": store.get_reconstruction_info(),
             "middleware_configs": self._serialize_middleware(),
         }
         serialized_data = pickle.dumps(task_data)
@@ -948,6 +1011,9 @@ class ComputationHandle(Generic[T]):
             elif result.status == ComputationStatus.FAILED:
                 error_msg = result.error or "Computation failed"
                 raise RuntimeError(error_msg)
+            elif result.status == ComputationStatus.CANCELLED:
+                reason = result.terminal_reason or "Computation cancelled"
+                raise ComputationCancelledError(reason)
 
             if timeout is None:
                 break
@@ -960,18 +1026,28 @@ class ComputationHandle(Generic[T]):
 
         raise RuntimeError("Result not ready and no timeout specified")
 
-    def cancel(self) -> bool:
+    def cancel(self, *, reason: str = "Computation cancelled") -> bool:
         """
         Attempt to cancel the computation.
 
+        Writes a first-class :attr:`ComputationStatus.CANCELLED` result (not a
+        ``FAILED`` one), so callers can tell a deliberate cancellation apart from
+        a genuine failure via :meth:`get_status` without inspecting error text.
+
+        Args:
+            reason: Human-readable reason stored on the result's
+                ``terminal_reason`` (surfaced by
+                :class:`ComputationCancelledError` from :meth:`get_result`).
+
         Returns:
-            True if cancelled, False if already completed
+            True if cancelled, False if already in a terminal state.
         """
         result = self.store[self.key]
         if not result.is_ready:
-            # Mark as failed with cancellation
             self.store[self.key] = ComputationResult(
-                None, ComputationStatus.FAILED, error=Exception("Computation cancelled")
+                None,
+                ComputationStatus.CANCELLED,
+                terminal_reason=reason,
             )
             if self.backend:
                 self.backend.terminate(self.key)
@@ -1028,8 +1104,8 @@ def async_compute(
         @wraps(func)
         def wrapper(*args, **kwargs) -> ComputationHandle[T]:
             key = store.create_key()
-            backend.launch(func, args, kwargs, key)
-            return ComputationHandle(key, store)
+            backend.launch(func, args, kwargs, key, store)
+            return ComputationHandle(key, store, backend)
 
         # Attach utility methods
         wrapper.cleanup_expired = lambda: store.cleanup_expired()
@@ -1052,29 +1128,40 @@ class ThreadBackend(ComputationBackend):
     """
 
     def __init__(
-        self, store: ComputationStore, middleware: list[Middleware] | None = None
+        self,
+        store: ComputationStore | None = None,
+        middleware: list[Middleware] | None = None,
     ):
         super().__init__(middleware)
         self.store = store
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: ComputationStore | None = None,
+    ) -> None:
         """Launch computation in a new thread."""
         import threading
 
+        store = self._resolve_store(store)
+
         def _worker():
             self._run_middleware_before(func, args, kwargs, key)
-            self.store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+            store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
             try:
                 result = func(*args, **kwargs)
                 final_result = ComputationResult(result, ComputationStatus.COMPLETED)
-                self.store[key] = final_result
+                store[key] = final_result
                 self._run_middleware_after(key, final_result)
             except Exception as e:
                 final_result = ComputationResult(
                     None, ComputationStatus.FAILED, error=e
                 )
-                self.store[key] = final_result
+                store[key] = final_result
                 self._run_middleware_error(key, e)
 
         thread = threading.Thread(target=_worker)
@@ -1102,7 +1189,14 @@ class RemoteAPIBackend(ComputationBackend):
         self.api_url = api_url
         self.api_key = api_key
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: ComputationStore | None = None,
+    ) -> None:
         """
         Launch computation via remote API.
 

@@ -79,8 +79,8 @@ class TaskGraph:
             backend: Optional backend for task execution
             store: Optional store for results
         """
-        self.backend = backend or _get_default_backend()
-        self.store = store or _get_default_store()
+        self.backend = backend if backend is not None else _get_default_backend()
+        self.store = store if store is not None else _get_default_store()
         self.tasks: dict[str, WorkflowTask] = {}
         self._task_counter = 0
 

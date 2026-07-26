@@ -92,10 +92,11 @@ def test_cancellation_and_termination(tmp_path):
     # Cancel and terminate the process
     cancelled = handle.cancel()
     assert cancelled is True
-    # After cancellation, status should be FAILED
+    # After cancellation, status should be CANCELLED (a first-class terminal
+    # state, distinct from FAILED) and get_result should raise.
     with pytest.raises(Exception):
         handle.get_result(timeout=1)
-    assert handle.get_status() == ComputationStatus.FAILED
+    assert handle.get_status() == ComputationStatus.CANCELLED
     # The process should be terminated (no zombie)
     if hasattr(handle.backend, "terminate"):
         handle.backend.terminate(handle.key)  # Should be a no-op if already terminated

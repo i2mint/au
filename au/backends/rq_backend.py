@@ -48,8 +48,8 @@ class RQBackend(ComputationBackend):
 
     def __init__(
         self,
-        store: "ComputationStore",
-        rq_queue: "Queue",
+        store: "ComputationStore | None" = None,
+        rq_queue: "Queue | None" = None,
         middleware: list["Middleware"] | None = None,
     ):
         super().__init__(middleware)
@@ -61,15 +61,23 @@ class RQBackend(ComputationBackend):
         self.store = store
         self.rq_queue = rq_queue
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: "ComputationStore | None" = None,
+    ) -> None:
         """Enqueue computation task to RQ."""
+        store = self._resolve_store(store)
         # Serialize task data
         task_data = {
             "func": func,
             "args": args,
             "kwargs": kwargs,
             "key": key,
-            "store_reconstruction_info": self.store.get_reconstruction_info(),
+            "store_reconstruction_info": store.get_reconstruction_info(),
             "middleware_configs": self._serialize_middleware(),
         }
         serialized_data = pickle.dumps(task_data)
