@@ -173,3 +173,31 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    "**/*.ipynb",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "scrap",
+    "examples",
+]
+
+[tool.ruff.lint]
+# Match the i2mint ecosystem norm (reelee/nw pin the same minimal select) —
+# module docstrings only — rather than ruff's full default ruleset. au had no
+# ruff config, so CI's `ruff check au` ran all defaults (254 findings) and
+# failed, which gated Publish. This brings au in line with the ecosystem
+# without reformatting a foundation package.
+select = ["D100"]
+ignore = ["D203", "E501", "B905"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/*" = ["D"]
