@@ -183,6 +183,7 @@ class TestRetryWithPolicy:
 
     def test_retry_with_args_and_kwargs(self):
         """Test retry with function arguments."""
+
         def add(a, b, multiplier=1):
             return (a + b) * multiplier
 
@@ -190,7 +191,7 @@ class TestRetryWithPolicy:
         result = retry_with_policy(
             add,
             args=(5, 3),
-            kwargs={'multiplier': 2},
+            kwargs={"multiplier": 2},
             policy=policy,
         )
 

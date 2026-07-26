@@ -69,24 +69,24 @@ class TestTaskGraph:
         # step1(5) -> 10
         # step2(5) -> 15
         # step3(10, 15) -> 25
-        t1 = graph.add_task(step1, 5, task_id='step1')
-        t2 = graph.add_task(step2, 5, task_id='step2')
-        t3 = graph.add_task(step3, depends_on=['step1', 'step2'], task_id='step3')
+        t1 = graph.add_task(step1, 5, task_id="step1")
+        t2 = graph.add_task(step2, 5, task_id="step2")
+        t3 = graph.add_task(step3, depends_on=["step1", "step2"], task_id="step3")
 
         # Note: The current implementation doesn't pass results automatically
         # This is a simplified test
         results = graph.execute()
 
-        assert 'step1' in results
-        assert 'step2' in results
+        assert "step1" in results
+        assert "step2" in results
 
     def test_circular_dependency_detection(self):
         """Test detection of circular dependencies."""
         graph = TaskGraph()
 
-        t1 = graph.add_task(step1, 5, task_id='t1')
-        t2 = graph.add_task(step2, 10, task_id='t2', depends_on=['t3'])
-        t3 = graph.add_task(step3, task_id='t3', depends_on=['t2'])
+        t1 = graph.add_task(step1, 5, task_id="t1")
+        t2 = graph.add_task(step2, 10, task_id="t2", depends_on=["t3"])
+        t3 = graph.add_task(step3, task_id="t3", depends_on=["t2"])
 
         with pytest.raises(ValueError, match="Circular dependency"):
             graph.execute()
@@ -129,17 +129,17 @@ class TestWorkflowBuilder:
 
         workflow = (
             WorkflowBuilder(backend=backend, store=store)
-            .add_task('step1', step1, 5)
-            .add_task('step2', step2, 10)
+            .add_task("step1", step1, 5)
+            .add_task("step2", step2, 10)
             .build()
         )
 
-        assert 'step1' in workflow.tasks
-        assert 'step2' in workflow.tasks
+        assert "step1" in workflow.tasks
+        assert "step2" in workflow.tasks
 
         results = workflow.execute()
-        assert results['step1'] == 10
-        assert results['step2'] == 20
+        assert results["step1"] == 10
+        assert results["step2"] == 20
 
     def test_builder_with_dependencies(self):
         """Test builder with task dependencies."""
@@ -148,15 +148,15 @@ class TestWorkflowBuilder:
 
         workflow = (
             WorkflowBuilder(backend=backend, store=store)
-            .add_task('step1', step1, 5)
-            .add_task('step2', step2, 10)
+            .add_task("step1", step1, 5)
+            .add_task("step2", step2, 10)
             .build()
         )
 
         results = workflow.execute()
 
-        assert 'step1' in results
-        assert 'step2' in results
+        assert "step1" in results
+        assert "step2" in results
 
 
 class TestWorkflowTask:
@@ -172,14 +172,14 @@ class TestWorkflowTask:
         """Test task ready with dependencies."""
         task = WorkflowTask(
             func=step3,
-            depends_on=['t1', 't2'],
+            depends_on=["t1", "t2"],
         )
 
         # Not ready when dependencies not complete
-        assert task.is_ready_to_run({'t1'}) is False
+        assert task.is_ready_to_run({"t1"}) is False
 
         # Ready when all dependencies complete
-        assert task.is_ready_to_run({'t1', 't2'}) is True
+        assert task.is_ready_to_run({"t1", "t2"}) is True
 
     def test_task_state_transitions(self):
         """Test task state transitions."""

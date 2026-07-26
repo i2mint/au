@@ -122,9 +122,9 @@ def test_submit_many():
     set_default_store(store)
 
     tasks = [
-        (simple_function, (2,), {'y': 3}),
-        (simple_function, (4,), {'y': 5}),
-        (simple_function, (6,), {'y': 7}),
+        (simple_function, (2,), {"y": 3}),
+        (simple_function, (4,), {"y": 5}),
+        (simple_function, (6,), {"y": 7}),
     ]
 
     task_ids = submit_many(tasks)
@@ -142,9 +142,9 @@ def test_get_many():
     set_default_store(store)
 
     tasks = [
-        (simple_function, (2,), {'y': 3}),
-        (simple_function, (4,), {'y': 5}),
-        (simple_function, (6,), {'y': 7}),
+        (simple_function, (2,), {"y": 3}),
+        (simple_function, (4,), {"y": 5}),
+        (simple_function, (6,), {"y": 7}),
     ]
 
     task_ids = submit_many(tasks)

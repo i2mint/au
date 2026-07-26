@@ -12,18 +12,37 @@ try:
     from fastapi import FastAPI, HTTPException, Query, Body
     from fastapi.responses import JSONResponse
     from pydantic import BaseModel, Field
+
     HAS_FASTAPI = True
 except ImportError:
     HAS_FASTAPI = False
-    # Create dummy classes for type hints
-    class FastAPI: pass
-    class HTTPException(Exception): pass
-    class BaseModel: pass
-    def Field(*args, **kwargs): pass
-    def Query(*args, **kwargs): pass
-    def Body(*args, **kwargs): pass
 
-from au.base import ComputationStatus, ComputationHandle, ComputationBackend, ComputationStore
+    # Create dummy classes for type hints
+    class FastAPI:
+        pass
+
+    class HTTPException(Exception):
+        pass
+
+    class BaseModel:
+        pass
+
+    def Field(*args, **kwargs):
+        pass
+
+    def Query(*args, **kwargs):
+        pass
+
+    def Body(*args, **kwargs):
+        pass
+
+
+from au.base import (
+    ComputationStatus,
+    ComputationHandle,
+    ComputationBackend,
+    ComputationStore,
+)
 from au.api import (
     submit_task,
     get_result,
@@ -43,7 +62,9 @@ class TaskSubmitRequest(BaseModel):
 
     function_name: str = Field(..., description="Name of the function to execute")
     args: list[Any] = Field(default_factory=list, description="Positional arguments")
-    kwargs: dict[str, Any] = Field(default_factory=dict, description="Keyword arguments")
+    kwargs: dict[str, Any] = Field(
+        default_factory=dict, description="Keyword arguments"
+    )
 
 
 class TaskSubmitResponse(BaseModel):
@@ -125,8 +146,7 @@ def mk_http_interface(
     """
     if not HAS_FASTAPI:
         raise ImportError(
-            "FastAPI is required for HTTP interface. "
-            "Install with: pip install au[http]"
+            "FastAPI is required for HTTP interface. Install with: pip install au[http]"
         )
 
     app = FastAPI(
@@ -174,24 +194,18 @@ def mk_http_interface(
             raise HTTPException(
                 status_code=404,
                 detail=f"Function '{request.function_name}' not registered. "
-                       f"Available functions: {list(registered_functions.keys())}"
+                f"Available functions: {list(registered_functions.keys())}",
             )
 
         func = registered_functions[request.function_name]
 
         try:
             task_id = submit_task(
-                func,
-                *request.args,
-                backend=_backend,
-                store=_store,
-                **request.kwargs
+                func, *request.args, backend=_backend, store=_store, **request.kwargs
             )
 
             return TaskSubmitResponse(
-                task_id=task_id,
-                status="pending",
-                message="Task submitted successfully"
+                task_id=task_id, status="pending", message="Task submitted successfully"
             )
 
         except Exception as e:
@@ -307,10 +321,7 @@ def mk_http_interface(
         """List all task IDs in the store."""
         try:
             task_ids = list(_store)
-            return TaskListResponse(
-                tasks=task_ids,
-                count=len(task_ids)
-            )
+            return TaskListResponse(tasks=task_ids, count=len(task_ids))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -328,7 +339,9 @@ def mk_http_interface(
             return TaskCancelResponse(
                 task_id=task_id,
                 cancelled=cancelled,
-                message="Cancellation attempted" if cancelled else "Task not cancellable"
+                message="Cancellation attempted"
+                if cancelled
+                else "Task not cancellable",
             )
 
         except HTTPException:
@@ -366,8 +379,7 @@ def create_app_from_decorator(
     """
     if not HAS_FASTAPI:
         raise ImportError(
-            "FastAPI is required for HTTP interface. "
-            "Install with: pip install au[http]"
+            "FastAPI is required for HTTP interface. Install with: pip install au[http]"
         )
 
     # For now, create empty app
@@ -382,6 +394,7 @@ def create_app_from_decorator(
 # Flask support (if available)
 try:
     from flask import Flask, request, jsonify
+
     HAS_FLASK = True
 except ImportError:
     HAS_FLASK = False
@@ -391,7 +404,7 @@ def mk_flask_interface(
     functions: Optional[list[Callable]] = None,
     backend: Optional[ComputationBackend] = None,
     store: Optional[ComputationStore] = None,
-) -> 'Flask':
+) -> "Flask":
     """Create a Flask application for task management.
 
     Args:
@@ -407,8 +420,7 @@ def mk_flask_interface(
     """
     if not HAS_FLASK:
         raise ImportError(
-            "Flask is required for Flask interface. "
-            "Install with: pip install au[flask]"
+            "Flask is required for Flask interface. Install with: pip install au[flask]"
         )
 
     from flask import Flask, request, jsonify
@@ -424,24 +436,26 @@ def mk_flask_interface(
     _backend = backend if backend is not None else _get_default_backend()
     _store = store if store is not None else _get_default_store()
 
-    @app.route('/')
+    @app.route("/")
     def root():
-        return jsonify({
-            "name": "AU Task API (Flask)",
-            "registered_functions": list(registered_functions.keys()),
-        })
+        return jsonify(
+            {
+                "name": "AU Task API (Flask)",
+                "registered_functions": list(registered_functions.keys()),
+            }
+        )
 
-    @app.route('/tasks', methods=['POST'])
+    @app.route("/tasks", methods=["POST"])
     def submit():
         data = request.get_json()
-        func_name = data.get('function_name')
+        func_name = data.get("function_name")
 
         if func_name not in registered_functions:
             return jsonify({"error": "Function not registered"}), 404
 
         func = registered_functions[func_name]
-        args = data.get('args', [])
-        kwargs = data.get('kwargs', {})
+        args = data.get("args", [])
+        kwargs = data.get("kwargs", {})
 
         try:
             task_id = submit_task(func, *args, backend=_backend, store=_store, **kwargs)
@@ -449,7 +463,7 @@ def mk_flask_interface(
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    @app.route('/tasks/<task_id>/status')
+    @app.route("/tasks/<task_id>/status")
     def status(task_id):
         try:
             status = get_status(task_id, store=_store)
@@ -457,33 +471,30 @@ def mk_flask_interface(
         except KeyError:
             return jsonify({"error": "Task not found"}), 404
 
-    @app.route('/tasks/<task_id>/result')
+    @app.route("/tasks/<task_id>/result")
     def result(task_id):
-        wait = request.args.get('wait', 'false').lower() == 'true'
-        timeout = request.args.get('timeout', type=float)
+        wait = request.args.get("wait", "false").lower() == "true"
+        timeout = request.args.get("timeout", type=float)
 
         try:
             if wait:
                 result_value = get_result(task_id, timeout=timeout, store=_store)
-                return jsonify({
-                    "task_id": task_id,
-                    "status": "completed",
-                    "result": result_value
-                })
+                return jsonify(
+                    {"task_id": task_id, "status": "completed", "result": result_value}
+                )
             else:
                 status = get_status(task_id, store=_store)
                 if status == ComputationStatus.COMPLETED:
                     result_value = get_result(task_id, store=_store)
-                    return jsonify({
-                        "task_id": task_id,
-                        "status": status.value,
-                        "result": result_value
-                    })
+                    return jsonify(
+                        {
+                            "task_id": task_id,
+                            "status": status.value,
+                            "result": result_value,
+                        }
+                    )
                 else:
-                    return jsonify({
-                        "task_id": task_id,
-                        "status": status.value
-                    })
+                    return jsonify({"task_id": task_id, "status": status.value})
         except KeyError:
             return jsonify({"error": "Task not found"}), 404
         except TimeoutError:

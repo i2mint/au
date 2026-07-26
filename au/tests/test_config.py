@@ -52,7 +52,7 @@ def test_get_config_with_overrides():
 
 def test_toml_config_file():
     """Test loading configuration from TOML file."""
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.toml', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".toml", delete=False) as f:
         f.write("""
 [au]
 backend = "redis"
@@ -76,7 +76,7 @@ retry_enabled = true
 
 def test_json_config_file():
     """Test loading configuration from JSON file."""
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         f.write("""
 {
     "au": {

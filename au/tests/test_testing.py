@@ -143,7 +143,7 @@ class TestTrackingTestBackend:
         backend.launch(simple_func, (5,), {}, key1, store)
 
         assert backend.tracker.task_count == 1
-        assert backend.tracker.call_count('simple_func') == 1
+        assert backend.tracker.call_count("simple_func") == 1
 
     def test_tracks_multiple_calls(self):
         """Test tracking multiple calls."""
@@ -155,7 +155,7 @@ class TestTrackingTestBackend:
             backend.launch(simple_func, (i,), {}, key, store)
 
         assert backend.tracker.task_count == 3
-        assert backend.tracker.call_count('simple_func') == 3
+        assert backend.tracker.call_count("simple_func") == 3
 
     def test_last_call(self):
         """Test getting last call."""
@@ -166,7 +166,7 @@ class TestTrackingTestBackend:
             key = store.create_key()
             backend.launch(simple_func, (i,), {}, key, store)
 
-        last = backend.tracker.last_call('simple_func')
+        last = backend.tracker.last_call("simple_func")
         assert last is not None
         assert last.args == (2,)
 
@@ -178,20 +178,20 @@ class TestMockTaskTracker:
         """Test recording calls."""
         tracker = MockTaskTracker()
 
-        tracker.record_call('func1', (1, 2), {'key': 'value'})
+        tracker.record_call("func1", (1, 2), {"key": "value"})
 
         assert tracker.task_count == 1
-        assert tracker.call_count('func1') == 1
+        assert tracker.call_count("func1") == 1
 
     def test_get_calls(self):
         """Test getting all calls for a function."""
         tracker = MockTaskTracker()
 
-        tracker.record_call('func1', (1,), {})
-        tracker.record_call('func1', (2,), {})
-        tracker.record_call('func2', (3,), {})
+        tracker.record_call("func1", (1,), {})
+        tracker.record_call("func1", (2,), {})
+        tracker.record_call("func2", (3,), {})
 
-        calls = tracker.get_calls('func1')
+        calls = tracker.get_calls("func1")
         assert len(calls) == 2
         assert calls[0].args == (1,)
         assert calls[1].args == (2,)

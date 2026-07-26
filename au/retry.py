@@ -113,7 +113,9 @@ class RetryState:
     next_retry_at: Optional[float] = None
     retry_history: list[tuple[float, str]] = field(default_factory=list)
 
-    def add_attempt(self, error: Exception, will_retry: bool, next_retry_at: Optional[float] = None):
+    def add_attempt(
+        self, error: Exception, will_retry: bool, next_retry_at: Optional[float] = None
+    ):
         """Record a retry attempt.
 
         Args:
@@ -197,11 +199,13 @@ def retry_with_policy(
 
 class RetryableError(Exception):
     """Base class for errors that should be retried."""
+
     pass
 
 
 class NonRetryableError(Exception):
     """Base class for errors that should not be retried."""
+
     pass
 
 

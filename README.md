@@ -40,10 +40,12 @@ pip install au[all]
 ```python
 from au import async_compute
 
+
 @async_compute
 def expensive_task(n: int) -> int:
     """This runs asynchronously!"""
     return sum(i * i for i in range(n))
+
 
 # Launch task (returns immediately)
 handle = expensive_task(1000000)
@@ -58,8 +60,10 @@ print(f"Result: {result}")
 ```python
 from au import submit_task, get_result
 
+
 def my_function(x, y):
     return x + y
+
 
 # Submit task
 task_id = submit_task(my_function, 10, y=20)
@@ -112,11 +116,7 @@ max_workers = 8
 ```python
 from au import get_config, set_global_config
 
-config = get_config(
-    backend='redis',
-    redis_url='redis://localhost:6379',
-    max_workers=16
-)
+config = get_config(backend="redis", redis_url="redis://localhost:6379", max_workers=16)
 set_global_config(config)
 ```
 
@@ -127,6 +127,7 @@ set_global_config(config)
 ```python
 from au import async_compute
 
+
 @async_compute  # Uses ThreadBackend by default
 def io_bound_task(url):
     return requests.get(url).text
@@ -136,6 +137,7 @@ def io_bound_task(url):
 
 ```python
 from au import async_compute, ProcessBackend
+
 
 @async_compute(backend=ProcessBackend())
 def cpu_bound_task(n):
@@ -148,7 +150,8 @@ def cpu_bound_task(n):
 from au import async_compute
 from au.backends.rq_backend import RQBackend
 
-backend = RQBackend(redis_url='redis://localhost:6379')
+backend = RQBackend(redis_url="redis://localhost:6379")
+
 
 @async_compute(backend=backend)
 def distributed_task(data):
@@ -160,7 +163,8 @@ def distributed_task(data):
 ```python
 from au import StdLibQueueBackend, async_compute
 
-backend = StdLibQueueBackend(max_workers=4, executor_type='thread')
+backend = StdLibQueueBackend(max_workers=4, executor_type="thread")
+
 
 @async_compute(backend=backend)
 def task(x):
@@ -175,10 +179,12 @@ Create a REST API for your tasks with one line:
 from au import async_compute
 from au.http import mk_http_interface
 
+
 @async_compute
 def process_data(data: dict) -> dict:
     # Process data
     return {"result": data["value"] * 2}
+
 
 # Create FastAPI app
 app = mk_http_interface([process_data])
@@ -223,20 +229,17 @@ retry_policy = RetryPolicy(
 
 from au.api import submit_task
 
-task_id = submit_task(
-    flaky_function,
-    retry_policy=retry_policy
-)
+task_id = submit_task(flaky_function, retry_policy=retry_policy)
 ```
 
 ### Predefined Policies
 
 ```python
 from au.retry import (
-    DEFAULT_RETRY_POLICY,       # 3 attempts, exponential
-    AGGRESSIVE_RETRY_POLICY,    # 5 attempts, fast
+    DEFAULT_RETRY_POLICY,  # 3 attempts, exponential
+    AGGRESSIVE_RETRY_POLICY,  # 5 attempts, fast
     CONSERVATIVE_RETRY_POLICY,  # 2 attempts, slow
-    NETWORK_RETRY_POLICY,       # Retries network errors only
+    NETWORK_RETRY_POLICY,  # Retries network errors only
 )
 ```
 
@@ -250,8 +253,8 @@ from au import TaskGraph
 graph = TaskGraph()
 
 # Define tasks
-t1 = graph.add_task(fetch_data, 'source1')
-t2 = graph.add_task(fetch_data, 'source2')
+t1 = graph.add_task(fetch_data, "source1")
+t2 = graph.add_task(fetch_data, "source2")
 t3 = graph.add_task(merge_data, depends_on=[t1, t2])
 t4 = graph.add_task(analyze, depends_on=[t3])
 
@@ -267,10 +270,10 @@ from au import WorkflowBuilder
 
 workflow = (
     WorkflowBuilder()
-    .add_task('fetch1', fetch_data, 'source1')
-    .add_task('fetch2', fetch_data, 'source2')
-    .add_task('merge', merge_data, depends_on=['fetch1', 'fetch2'])
-    .add_task('analyze', analyze, depends_on=['merge'])
+    .add_task("fetch1", fetch_data, "source1")
+    .add_task("fetch2", fetch_data, "source2")
+    .add_task("merge", merge_data, depends_on=["fetch1", "fetch2"])
+    .add_task("analyze", analyze, depends_on=["merge"])
     .build()
 )
 
@@ -284,10 +287,13 @@ results = workflow.execute()
 ```python
 from au import async_compute, LoggingMiddleware, MetricsMiddleware
 
-@async_compute(middleware=[
-    LoggingMiddleware(level='INFO'),
-    MetricsMiddleware(),
-])
+
+@async_compute(
+    middleware=[
+        LoggingMiddleware(level="INFO"),
+        MetricsMiddleware(),
+    ]
+)
 def monitored_task(x):
     return x * 2
 ```
@@ -298,7 +304,7 @@ def monitored_task(x):
 from au.hooks import create_observability_middleware
 
 middleware = create_observability_middleware(
-    logging_level='INFO',
+    logging_level="INFO",
     enable_metrics=True,
     enable_tracing=True,
     on_start=lambda task_id, **kw: print(f"Task {task_id} started"),
@@ -313,6 +319,7 @@ AU provides synchronous test backends for easy testing:
 
 ```python
 from au.testing import SyncTestBackend, InMemoryStore, mock_async
+
 
 def test_my_task():
     backend = SyncTestBackend()
@@ -334,8 +341,10 @@ def test_my_task():
 ```python
 from au.testing import mock_async
 
+
 def test_with_mock():
     with mock_async() as mock:
+
         @async_compute
         def task(x):
             return x * 2
@@ -400,28 +409,32 @@ from au import async_compute, submit_task, get_status, get_result
 
 app = Flask(__name__)
 
+
 @async_compute
 def process_upload(file_path):
     # Heavy processing
     return analyze_file(file_path)
 
-@app.route('/upload', methods=['POST'])
+
+@app.route("/upload", methods=["POST"])
 def upload():
-    file_path = save_uploaded_file(request.files['file'])
+    file_path = save_uploaded_file(request.files["file"])
     handle = process_upload(file_path)
-    return jsonify({'task_id': handle.key})
+    return jsonify({"task_id": handle.key})
 
-@app.route('/status/<task_id>')
+
+@app.route("/status/<task_id>")
 def status(task_id):
-    return jsonify({'status': get_status(task_id).value})
+    return jsonify({"status": get_status(task_id).value})
 
-@app.route('/result/<task_id>')
+
+@app.route("/result/<task_id>")
 def result(task_id):
     try:
         result = get_result(task_id, timeout=0.1)
-        return jsonify({'result': result})
+        return jsonify({"result": result})
     except TimeoutError:
-        return jsonify({'status': 'pending'}), 202
+        return jsonify({"status": "pending"}), 202
 ```
 
 ### Distributed Data Processing
@@ -430,11 +443,13 @@ def result(task_id):
 from au import async_compute
 from au.backends.rq_backend import RQBackend
 
-backend = RQBackend(redis_url='redis://queue:6379')
+backend = RQBackend(redis_url="redis://queue:6379")
+
 
 @async_compute(backend=backend)
 def process_chunk(data_chunk):
     return [transform(item) for item in data_chunk]
+
 
 # Submit many tasks
 chunks = split_data(large_dataset, chunk_size=1000)
@@ -450,17 +465,22 @@ final_result = merge_results(results)
 ```python
 from au import TaskGraph
 
+
 def load_data():
     return load_dataset()
+
 
 def preprocess(data):
     return clean_and_transform(data)
 
+
 def train_model(data):
     return fit_model(data)
 
+
 def evaluate(model):
     return compute_metrics(model)
+
 
 # Build pipeline
 graph = TaskGraph()

@@ -91,12 +91,12 @@ class HooksMiddleware(Middleware):
 
         event = TaskEvent(
             task_id=key,
-            event_type='start',
+            event_type="start",
             data={
-                'func_name': func_name,
-                'args': args,
-                'kwargs': kwargs,
-            }
+                "func_name": func_name,
+                "args": args,
+                "kwargs": kwargs,
+            },
         )
         self._events.append(event)
 
@@ -115,11 +115,11 @@ class HooksMiddleware(Middleware):
 
         event = TaskEvent(
             task_id=key,
-            event_type='complete',
+            event_type="complete",
             data={
-                'result': result.value,
-                'duration': duration,
-            }
+                "result": result.value,
+                "duration": duration,
+            },
         )
         self._events.append(event)
 
@@ -135,11 +135,11 @@ class HooksMiddleware(Middleware):
         """Called when computation fails (base.Middleware protocol)."""
         event = TaskEvent(
             task_id=key,
-            event_type='error',
+            event_type="error",
             data={
-                'error': str(error),
-                'error_type': type(error).__name__,
-            }
+                "error": str(error),
+                "error_type": type(error).__name__,
+            },
         )
         self._events.append(event)
 
@@ -185,15 +185,16 @@ class TracingMiddleware(Middleware):
     ) -> None:
         """Start a new trace span (base.Middleware protocol)."""
         import uuid
+
         trace_id = str(uuid.uuid4())
         span_id = str(uuid.uuid4())
         func_name = _func_name(func)
 
         self._spans[key] = {
-            'trace_id': trace_id,
-            'span_id': span_id,
-            'start_time': time.time(),
-            'func_name': func_name,
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "start_time": time.time(),
+            "func_name": func_name,
         }
 
         logging.debug(f"[TRACE] Started span {span_id} for {func_name} ({key})")
@@ -203,25 +204,21 @@ class TracingMiddleware(Middleware):
         if key in self._spans:
             span = self._spans[key]
             duration = _duration_seconds(result)
-            span['end_time'] = time.time()
-            span['duration'] = duration
-            span['status'] = 'success'
+            span["end_time"] = time.time()
+            span["duration"] = duration
+            span["status"] = "success"
 
-            logging.debug(
-                f"[TRACE] Completed span {span['span_id']} for {key}"
-            )
+            logging.debug(f"[TRACE] Completed span {span['span_id']} for {key}")
 
     def on_error(self, key: str, error: Exception) -> None:
         """Mark span as failed (base.Middleware protocol)."""
         if key in self._spans:
             span = self._spans[key]
-            span['end_time'] = time.time()
-            span['status'] = 'error'
-            span['error'] = str(error)
+            span["end_time"] = time.time()
+            span["status"] = "error"
+            span["error"] = str(error)
 
-            logging.debug(
-                f"[TRACE] Span {span['span_id']} failed for {key}: {error}"
-            )
+            logging.debug(f"[TRACE] Span {span['span_id']} failed for {key}: {error}")
 
 
 class MetricsCollectorMiddleware(Middleware):
@@ -239,8 +236,8 @@ class MetricsCollectorMiddleware(Middleware):
         self.metrics_backend = metrics_backend
         self._durations: list[float] = []
         self._status_counts: dict[str, int] = {
-            'success': 0,
-            'error': 0,
+            "success": 0,
+            "error": 0,
         }
         self._function_counts: dict[str, int] = {}
 
@@ -255,14 +252,14 @@ class MetricsCollectorMiddleware(Middleware):
 
     def after_compute(self, key: str, result: "ComputationResult") -> None:
         """Record successful completion metrics (base.Middleware protocol)."""
-        self._status_counts['success'] += 1
+        self._status_counts["success"] += 1
         duration = _duration_seconds(result)
         if duration is not None:
             self._durations.append(duration)
 
     def on_error(self, key: str, error: Exception) -> None:
         """Record error metrics (base.Middleware protocol)."""
-        self._status_counts['error'] += 1
+        self._status_counts["error"] += 1
 
     def get_metrics(self) -> dict[str, Any]:
         """Get collected metrics.
@@ -271,19 +268,19 @@ class MetricsCollectorMiddleware(Middleware):
             Dictionary of metrics
         """
         metrics = {
-            'total_tasks': sum(self._status_counts.values()),
-            'successful_tasks': self._status_counts['success'],
-            'failed_tasks': self._status_counts['error'],
-            'function_counts': self._function_counts.copy(),
+            "total_tasks": sum(self._status_counts.values()),
+            "successful_tasks": self._status_counts["success"],
+            "failed_tasks": self._status_counts["error"],
+            "function_counts": self._function_counts.copy(),
         }
 
         if self._durations:
-            metrics['duration'] = {
-                'count': len(self._durations),
-                'min': min(self._durations),
-                'max': max(self._durations),
-                'avg': sum(self._durations) / len(self._durations),
-                'total': sum(self._durations),
+            metrics["duration"] = {
+                "count": len(self._durations),
+                "min": min(self._durations),
+                "max": max(self._durations),
+                "avg": sum(self._durations) / len(self._durations),
+                "total": sum(self._durations),
             }
 
         return metrics
@@ -361,11 +358,13 @@ def create_observability_middleware(
 
     # Add hooks if provided
     if on_start or on_complete or on_error:
-        middlewares.append(HooksMiddleware(
-            on_start=on_start,
-            on_complete=on_complete,
-            on_error=on_error,
-        ))
+        middlewares.append(
+            HooksMiddleware(
+                on_start=on_start,
+                on_complete=on_complete,
+                on_error=on_error,
+            )
+        )
 
     # Add metrics
     if enable_metrics:

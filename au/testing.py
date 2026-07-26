@@ -315,7 +315,7 @@ def mock_async(backend: Optional[ComputationBackend] = None):
     from au.base import async_compute
 
     # Store original defaults
-    original_backend = getattr(async_compute, '_default_backend', None)
+    original_backend = getattr(async_compute, "_default_backend", None)
 
     # Set test backend as default
     async_compute._default_backend = backend
@@ -331,8 +331,8 @@ def mock_async(backend: Optional[ComputationBackend] = None):
         # Restore original backend
         if original_backend is not None:
             async_compute._default_backend = original_backend
-        elif hasattr(async_compute, '_default_backend'):
-            delattr(async_compute, '_default_backend')
+        elif hasattr(async_compute, "_default_backend"):
+            delattr(async_compute, "_default_backend")
 
 
 def create_test_backend(**kwargs) -> SyncTestBackend:
@@ -344,7 +344,7 @@ def create_test_backend(**kwargs) -> SyncTestBackend:
     Returns:
         SyncTestBackend instance
     """
-    return SyncTestBackend(middleware=kwargs.get('middleware'))
+    return SyncTestBackend(middleware=kwargs.get("middleware"))
 
 
 def create_test_store(**kwargs) -> InMemoryStore:
@@ -356,4 +356,4 @@ def create_test_store(**kwargs) -> InMemoryStore:
     Returns:
         InMemoryStore instance
     """
-    return InMemoryStore(ttl_seconds=kwargs.get('ttl_seconds', 3600))
+    return InMemoryStore(ttl_seconds=kwargs.get("ttl_seconds", 3600))

@@ -90,7 +90,7 @@ class TaskGraph:
         *args,
         depends_on: Optional[list[str]] = None,
         task_id: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> str:
         """Add a task to the graph.
 
@@ -191,14 +191,16 @@ class TaskGraph:
 
             # Find tasks ready to run
             for task_id, task in self.tasks.items():
-                if task.state == TaskState.PENDING and task.is_ready_to_run(completed_tasks):
+                if task.state == TaskState.PENDING and task.is_ready_to_run(
+                    completed_tasks
+                ):
                     # Submit task
                     execution_id = submit_task(
                         task.func,
                         *task.args,
                         backend=self.backend,
                         store=self.store,
-                        **task.kwargs
+                        **task.kwargs,
                     )
                     running_tasks[task_id] = execution_id
                     task.state = TaskState.RUNNING
@@ -299,6 +301,7 @@ def depends_on(*dependency_funcs):
     Returns:
         Decorator function
     """
+
     def decorator(func: Callable) -> Callable:
         # Store dependencies as function attribute
         func._au_dependencies = dependency_funcs
@@ -338,8 +341,8 @@ class WorkflowBuilder:
         func: Callable,
         *args,
         depends_on: Optional[list[str]] = None,
-        **kwargs
-    ) -> 'WorkflowBuilder':
+        **kwargs,
+    ) -> "WorkflowBuilder":
         """Add a task to the workflow.
 
         Args:
@@ -353,11 +356,7 @@ class WorkflowBuilder:
             Self for chaining
         """
         self.graph.add_task(
-            func,
-            *args,
-            depends_on=depends_on,
-            task_id=task_id,
-            **kwargs
+            func, *args, depends_on=depends_on, task_id=task_id, **kwargs
         )
         return self
 

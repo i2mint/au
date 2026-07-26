@@ -73,17 +73,17 @@ def load_config_from_env() -> dict[str, Any]:
 
     # Simple string mappings
     env_mappings = {
-        'AU_BACKEND': 'backend',
-        'AU_REDIS_URL': 'redis_url',
-        'AU_SUPABASE_URL': 'supabase_url',
-        'AU_SUPABASE_KEY': 'supabase_key',
-        'AU_STORAGE': 'storage',
-        'AU_STORAGE_PATH': 'storage_path',
-        'AU_SERIALIZATION': 'serialization',
-        'AU_RETRY_BACKOFF': 'retry_backoff',
-        'AU_LOGGING_LEVEL': 'logging_level',
-        'AU_HTTP_HOST': 'http_host',
-        'AU_HTTP_FRAMEWORK': 'http_framework',
+        "AU_BACKEND": "backend",
+        "AU_REDIS_URL": "redis_url",
+        "AU_SUPABASE_URL": "supabase_url",
+        "AU_SUPABASE_KEY": "supabase_key",
+        "AU_STORAGE": "storage",
+        "AU_STORAGE_PATH": "storage_path",
+        "AU_SERIALIZATION": "serialization",
+        "AU_RETRY_BACKOFF": "retry_backoff",
+        "AU_LOGGING_LEVEL": "logging_level",
+        "AU_HTTP_HOST": "http_host",
+        "AU_HTTP_FRAMEWORK": "http_framework",
     }
 
     for env_var, config_key in env_mappings.items():
@@ -93,10 +93,10 @@ def load_config_from_env() -> dict[str, Any]:
 
     # Integer mappings
     int_mappings = {
-        'AU_MAX_WORKERS': 'max_workers',
-        'AU_TTL_SECONDS': 'ttl_seconds',
-        'AU_RETRY_MAX_ATTEMPTS': 'retry_max_attempts',
-        'AU_HTTP_PORT': 'http_port',
+        "AU_MAX_WORKERS": "max_workers",
+        "AU_TTL_SECONDS": "ttl_seconds",
+        "AU_RETRY_MAX_ATTEMPTS": "retry_max_attempts",
+        "AU_HTTP_PORT": "http_port",
     }
 
     for env_var, config_key in int_mappings.items():
@@ -109,7 +109,7 @@ def load_config_from_env() -> dict[str, Any]:
 
     # Float mappings
     float_mappings = {
-        'AU_RETRY_INITIAL_DELAY': 'retry_initial_delay',
+        "AU_RETRY_INITIAL_DELAY": "retry_initial_delay",
     }
 
     for env_var, config_key in float_mappings.items():
@@ -122,15 +122,15 @@ def load_config_from_env() -> dict[str, Any]:
 
     # Boolean mappings
     bool_mappings = {
-        'AU_RETRY_ENABLED': 'retry_enabled',
-        'AU_LOGGING_ENABLED': 'logging_enabled',
-        'AU_METRICS_ENABLED': 'metrics_enabled',
+        "AU_RETRY_ENABLED": "retry_enabled",
+        "AU_LOGGING_ENABLED": "logging_enabled",
+        "AU_METRICS_ENABLED": "metrics_enabled",
     }
 
     for env_var, config_key in bool_mappings.items():
         value = os.environ.get(env_var)
         if value is not None:
-            config[config_key] = value.lower() in ('true', '1', 'yes', 'on')
+            config[config_key] = value.lower() in ("true", "1", "yes", "on")
 
     return config
 
@@ -183,38 +183,41 @@ def _load_config_file(path: Path) -> dict[str, Any]:
     suffix = path.suffix.lower()
 
     try:
-        if suffix == '.toml':
+        if suffix == ".toml":
             # Try to use tomllib (Python 3.11+) or tomli
             try:
                 import tomllib
-                with open(path, 'rb') as f:
+
+                with open(path, "rb") as f:
                     data = tomllib.load(f)
             except ImportError:
                 try:
                     import tomli
-                    with open(path, 'rb') as f:
+
+                    with open(path, "rb") as f:
                         data = tomli.load(f)
                 except ImportError:
                     # Fallback to simple parsing for basic TOML
                     data = _simple_toml_parse(path)
 
             # Extract au section
-            return data.get('au', data)
+            return data.get("au", data)
 
-        elif suffix in ('.yaml', '.yml'):
+        elif suffix in (".yaml", ".yml"):
             try:
                 import yaml
+
                 with open(path) as f:
                     data = yaml.safe_load(f)
-                return data.get('au', data)
+                return data.get("au", data)
             except ImportError:
                 # YAML requires external library
                 return {}
 
-        elif suffix == '.json':
+        elif suffix == ".json":
             with open(path) as f:
                 data = json.load(f)
-            return data.get('au', data)
+            return data.get("au", data)
 
     except Exception:
         # If we can't load the file, return empty config
@@ -243,28 +246,28 @@ def _simple_toml_parse(path: Path) -> dict[str, Any]:
             line = line.strip()
 
             # Skip comments and empty lines
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
 
             # Section header
-            if line.startswith('[') and line.endswith(']'):
+            if line.startswith("[") and line.endswith("]"):
                 current_section = line[1:-1].strip()
                 if current_section not in result:
                     result[current_section] = {}
                 continue
 
             # Key-value pair
-            if '=' in line and current_section:
-                key, value = line.split('=', 1)
+            if "=" in line and current_section:
+                key, value = line.split("=", 1)
                 key = key.strip()
                 value = value.strip().strip('"').strip("'")
 
                 # Try to parse value type
-                if value.lower() in ('true', 'false'):
-                    value = value.lower() == 'true'
+                if value.lower() in ("true", "false"):
+                    value = value.lower() == "true"
                 elif value.isdigit():
                     value = int(value)
-                elif value.replace('.', '', 1).isdigit():
+                elif value.replace(".", "", 1).isdigit():
                     value = float(value)
 
                 result[current_section][key] = value
@@ -272,10 +275,7 @@ def _simple_toml_parse(path: Path) -> dict[str, Any]:
     return result
 
 
-def get_config(
-    config_file: Optional[Path] = None,
-    **overrides
-) -> AUConfig:
+def get_config(config_file: Optional[Path] = None, **overrides) -> AUConfig:
     """Get configuration with cascade: env vars → config file → defaults → overrides.
 
     Args:

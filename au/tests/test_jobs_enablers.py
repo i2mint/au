@@ -410,9 +410,7 @@ def test_default_key_mints_unique_ids(tmp_path):
     """Without an explicit key, each submission gets a fresh unique id."""
     store = InMemoryStore()
     backend = SyncTestBackend()
-    ids = {
-        submit_task(_mul, i, 2, backend=backend, store=store) for i in range(3)
-    }
+    ids = {submit_task(_mul, i, 2, backend=backend, store=store) for i in range(3)}
     assert len(ids) == 3
 
 

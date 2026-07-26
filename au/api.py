@@ -22,7 +22,7 @@ from au.base import (
 from au.config import get_global_config
 from au.retry import RetryPolicy, retry_with_policy
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 # Global default backend and store
@@ -50,8 +50,11 @@ def _get_default_backend() -> ComputationBackend:
 
         elif config.backend == "supabase":
             from au.backends.supabase_backend import SupabaseQueueBackend
+
             if not config.supabase_url or not config.supabase_key:
-                raise ValueError("Supabase backend requires AU_SUPABASE_URL and AU_SUPABASE_KEY")
+                raise ValueError(
+                    "Supabase backend requires AU_SUPABASE_URL and AU_SUPABASE_KEY"
+                )
             from supabase import create_client
 
             client = create_client(config.supabase_url, config.supabase_key)
@@ -59,10 +62,12 @@ def _get_default_backend() -> ComputationBackend:
 
         elif config.backend == "process":
             from au.base import ProcessBackend
+
             _default_backend = ProcessBackend()
 
         elif config.backend == "stdlib":
             from au.base import StdLibQueueBackend
+
             _default_backend = StdLibQueueBackend(
                 max_workers=config.max_workers,
                 use_processes=False,
@@ -70,6 +75,7 @@ def _get_default_backend() -> ComputationBackend:
 
         else:  # Default to thread
             from au.base import ThreadBackend
+
             _default_backend = ThreadBackend()
 
     return _default_backend
@@ -84,6 +90,7 @@ def _get_default_store() -> ComputationStore:
 
         if config.storage == "memory":
             from au.testing import InMemoryStore
+
             _default_store = InMemoryStore(ttl_seconds=config.ttl_seconds)
         else:  # filesystem
             serialization = SerializationFormat.JSON
@@ -119,9 +126,7 @@ def set_default_store(store: ComputationStore) -> None:
     _default_store = store
 
 
-def _inflight_record(
-    store: ComputationStore, key: str
-) -> Optional[ComputationResult]:
+def _inflight_record(store: ComputationStore, key: str) -> Optional[ComputationResult]:
     """Return an existing in-flight (RUNNING, non-expired) record for ``key``, else None.
 
     Used for idempotent submission: a matching in-flight record means the work is
@@ -154,7 +159,7 @@ def submit_task(
     backend: Optional[ComputationBackend] = None,
     store: Optional[ComputationStore] = None,
     retry_policy: Optional[RetryPolicy] = None,
-    **kwargs
+    **kwargs,
 ) -> str:
     """Submit a task for async execution without decorator.
 
@@ -320,7 +325,7 @@ def async_task(
     backend: Optional[ComputationBackend] = None,
     store: Optional[ComputationStore] = None,
     timeout: Optional[float] = None,
-    **kwargs
+    **kwargs,
 ):
     """Context manager for async task execution.
 
