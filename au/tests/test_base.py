@@ -11,6 +11,7 @@ from au.base import (
     SerializationFormat,
     ComputationHandle,
     ComputationStatus,
+    ComputationCancelledError,
 )
 
 
@@ -94,7 +95,7 @@ def test_cancellation_and_termination(tmp_path):
     assert cancelled is True
     # After cancellation, status should be CANCELLED (a first-class terminal
     # state, distinct from FAILED) and get_result should raise.
-    with pytest.raises(Exception):
+    with pytest.raises(ComputationCancelledError):
         handle.get_result(timeout=1)
     assert handle.get_status() == ComputationStatus.CANCELLED
     # The process should be terminated (no zombie)
