@@ -108,7 +108,7 @@ class SyncTestBackend(ComputationBackend):
         args: tuple,
         kwargs: dict,
         key: str,
-        store: ComputationStore,
+        store: ComputationStore | None = None,
     ) -> None:
         """Execute function synchronously and store result immediately.
 
@@ -117,41 +117,42 @@ class SyncTestBackend(ComputationBackend):
             args: Positional arguments
             kwargs: Keyword arguments
             key: Result key
-            store: Store for results
+            store: Store for results (falls back to the backend's own store)
         """
+        store = self._resolve_store(store)
+
         # Track execution
         self._executions[key] = (func, args, kwargs)
 
-        # Execute with middleware
+        # Execute with middleware (base.Middleware protocol:
+        # before_compute(func, args, kwargs, key) / after_compute(key, result) /
+        # on_error(key, error) — driven via the _run_middleware_* helpers).
         try:
             # Before middleware
             self._run_middleware_before(func, args, kwargs, key)
 
             # Execute function
-            result = func(*args, **kwargs)
+            value = func(*args, **kwargs)
 
-            # After middleware
-            self._run_middleware_after(func, result, None, key)
-
-            # Store successful result
-            store[key] = ComputationResult(
-                value=result,
+            # Store successful result, then run after middleware with it
+            result = ComputationResult(
+                value=value,
                 status=ComputationStatus.COMPLETED,
                 error=None,
                 completed_at=datetime.now(),
             )
+            store[key] = result
+            self._run_middleware_after(key, result)
 
         except Exception as e:
-            # Error middleware
-            self._run_middleware_error(func, e, key)
-
-            # Store failed result
+            # Store failed result, then run error middleware
             store[key] = ComputationResult(
                 value=None,
                 status=ComputationStatus.FAILED,
                 error=str(e),
                 completed_at=datetime.now(),
             )
+            self._run_middleware_error(key, e)
 
     def terminate(self, key: str) -> None:
         """No-op for synchronous backend (already completed).
@@ -269,7 +270,7 @@ class TrackingTestBackend(SyncTestBackend):
         args: tuple,
         kwargs: dict,
         key: str,
-        store: ComputationStore,
+        store: ComputationStore | None = None,
     ) -> None:
         """Execute and track function call.
 
@@ -278,7 +279,7 @@ class TrackingTestBackend(SyncTestBackend):
             args: Positional arguments
             kwargs: Keyword arguments
             key: Result key
-            store: Store for results
+            store: Store for results (falls back to the backend's own store)
         """
         # Record the call
         self.tracker.record_call(func.__name__, args, kwargs)

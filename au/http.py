@@ -142,8 +142,8 @@ def mk_http_interface(
             registered_functions[func.__name__] = func
 
     # Get backend and store
-    _backend = backend or _get_default_backend()
-    _store = store or _get_default_store()
+    _backend = backend if backend is not None else _get_default_backend()
+    _store = store if store is not None else _get_default_store()
 
     # Root endpoint
     @app.get("/")
@@ -421,8 +421,8 @@ def mk_flask_interface(
         for func in functions:
             registered_functions[func.__name__] = func
 
-    _backend = backend or _get_default_backend()
-    _store = store or _get_default_store()
+    _backend = backend if backend is not None else _get_default_backend()
+    _store = store if store is not None else _get_default_store()
 
     @app.route('/')
     def root():

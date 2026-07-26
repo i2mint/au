@@ -10,7 +10,18 @@ from datetime import datetime
 import time
 import logging
 
-from au.base import Middleware
+from au.base import Middleware, ComputationResult
+
+
+def _func_name(func: Any) -> str:
+    """Best-effort readable name for a function-or-callable."""
+    return getattr(func, "__name__", str(func))
+
+
+def _duration_seconds(result: "ComputationResult") -> Optional[float]:
+    """Duration of a computation in seconds, if known."""
+    duration = getattr(result, "duration", None)
+    return duration.total_seconds() if duration is not None else None
 
 
 class TaskEventHandler(Protocol):
@@ -64,18 +75,22 @@ class HooksMiddleware(Middleware):
             on_error: Callback when task fails
             on_retry: Callback when task is retried
         """
-        self.on_start = on_start
-        self.on_complete = on_complete
-        self.on_error = on_error
-        self.on_retry = on_retry
+        # Stored under private names so they don't shadow the on_error() protocol
+        # method the backends invoke (name collision otherwise).
+        self._cb_start = on_start
+        self._cb_complete = on_complete
+        self._cb_error = on_error
+        self._cb_retry = on_retry
         self._events: list[TaskEvent] = []
 
-    def before_compute(self, func_name: str, args: tuple, kwargs: dict):
-        """Called before computation starts."""
-        task_id = kwargs.get('__task_id', 'unknown')
+    def before_compute(
+        self, func: Callable, args: tuple, kwargs: dict, key: str
+    ) -> None:
+        """Called before computation starts (base.Middleware protocol)."""
+        func_name = _func_name(func)
 
         event = TaskEvent(
-            task_id=task_id,
+            task_id=key,
             event_type='start',
             data={
                 'func_name': func_name,
@@ -85,58 +100,52 @@ class HooksMiddleware(Middleware):
         )
         self._events.append(event)
 
-        if self.on_start:
-            self.on_start(
-                task_id,
+        if self._cb_start:
+            self._cb_start(
+                key,
                 func_name=func_name,
                 args=args,
                 kwargs=kwargs,
                 timestamp=event.timestamp,
             )
 
-    def after_compute(self, func_name: str, result: Any, duration: Optional[float]):
-        """Called after successful computation."""
-        task_id = 'unknown'  # Would need to be passed in
+    def after_compute(self, key: str, result: "ComputationResult") -> None:
+        """Called after successful computation (base.Middleware protocol)."""
+        duration = _duration_seconds(result)
 
         event = TaskEvent(
-            task_id=task_id,
+            task_id=key,
             event_type='complete',
             data={
-                'func_name': func_name,
-                'result': result,
+                'result': result.value,
                 'duration': duration,
             }
         )
         self._events.append(event)
 
-        if self.on_complete:
-            self.on_complete(
-                task_id,
-                func_name=func_name,
-                result=result,
+        if self._cb_complete:
+            self._cb_complete(
+                key,
+                result=result.value,
                 duration=duration,
                 timestamp=event.timestamp,
             )
 
-    def on_error_hook(self, func_name: str, error: Exception):
-        """Called when computation fails."""
-        task_id = 'unknown'
-
+    def on_error(self, key: str, error: Exception) -> None:
+        """Called when computation fails (base.Middleware protocol)."""
         event = TaskEvent(
-            task_id=task_id,
+            task_id=key,
             event_type='error',
             data={
-                'func_name': func_name,
                 'error': str(error),
                 'error_type': type(error).__name__,
             }
         )
         self._events.append(event)
 
-        if self.on_error:
-            self.on_error(
-                task_id,
-                func_name=func_name,
+        if self._cb_error:
+            self._cb_error(
+                key,
                 error=error,
                 timestamp=event.timestamp,
             )
@@ -171,45 +180,47 @@ class TracingMiddleware(Middleware):
         self.trace_backend = trace_backend
         self._spans: dict[str, dict[str, Any]] = {}
 
-    def before_compute(self, func_name: str, args: tuple, kwargs: dict):
-        """Start a new trace span."""
+    def before_compute(
+        self, func: Callable, args: tuple, kwargs: dict, key: str
+    ) -> None:
+        """Start a new trace span (base.Middleware protocol)."""
         import uuid
         trace_id = str(uuid.uuid4())
         span_id = str(uuid.uuid4())
+        func_name = _func_name(func)
 
-        self._spans[func_name] = {
+        self._spans[key] = {
             'trace_id': trace_id,
             'span_id': span_id,
             'start_time': time.time(),
             'func_name': func_name,
         }
 
-        logging.debug(f"[TRACE] Started span {span_id} for {func_name}")
+        logging.debug(f"[TRACE] Started span {span_id} for {func_name} ({key})")
 
-    def after_compute(self, func_name: str, result: Any, duration: Optional[float]):
-        """Complete the trace span."""
-        if func_name in self._spans:
-            span = self._spans[func_name]
+    def after_compute(self, key: str, result: "ComputationResult") -> None:
+        """Complete the trace span (base.Middleware protocol)."""
+        if key in self._spans:
+            span = self._spans[key]
+            duration = _duration_seconds(result)
             span['end_time'] = time.time()
             span['duration'] = duration
             span['status'] = 'success'
 
             logging.debug(
-                f"[TRACE] Completed span {span['span_id']} "
-                f"for {func_name} in {duration:.3f}s"
+                f"[TRACE] Completed span {span['span_id']} for {key}"
             )
 
-    def on_error_hook(self, func_name: str, error: Exception):
-        """Mark span as failed."""
-        if func_name in self._spans:
-            span = self._spans[func_name]
+    def on_error(self, key: str, error: Exception) -> None:
+        """Mark span as failed (base.Middleware protocol)."""
+        if key in self._spans:
+            span = self._spans[key]
             span['end_time'] = time.time()
             span['status'] = 'error'
             span['error'] = str(error)
 
             logging.debug(
-                f"[TRACE] Span {span['span_id']} failed "
-                f"for {func_name}: {error}"
+                f"[TRACE] Span {span['span_id']} failed for {key}: {error}"
             )
 
 
@@ -233,20 +244,24 @@ class MetricsCollectorMiddleware(Middleware):
         }
         self._function_counts: dict[str, int] = {}
 
-    def before_compute(self, func_name: str, args: tuple, kwargs: dict):
-        """Track function invocation."""
+    def before_compute(
+        self, func: Callable, args: tuple, kwargs: dict, key: str
+    ) -> None:
+        """Track function invocation (base.Middleware protocol)."""
+        func_name = _func_name(func)
         if func_name not in self._function_counts:
             self._function_counts[func_name] = 0
         self._function_counts[func_name] += 1
 
-    def after_compute(self, func_name: str, result: Any, duration: Optional[float]):
-        """Record successful completion metrics."""
+    def after_compute(self, key: str, result: "ComputationResult") -> None:
+        """Record successful completion metrics (base.Middleware protocol)."""
         self._status_counts['success'] += 1
+        duration = _duration_seconds(result)
         if duration is not None:
             self._durations.append(duration)
 
-    def on_error_hook(self, func_name: str, error: Exception):
-        """Record error metrics."""
+    def on_error(self, key: str, error: Exception) -> None:
+        """Record error metrics (base.Middleware protocol)."""
         self._status_counts['error'] += 1
 
     def get_metrics(self) -> dict[str, Any]:
@@ -288,20 +303,22 @@ class CompositeMiddleware(Middleware):
         """
         self.middlewares = middlewares
 
-    def before_compute(self, func_name: str, args: tuple, kwargs: dict):
-        """Call before_compute on all middleware."""
+    def before_compute(
+        self, func: Callable, args: tuple, kwargs: dict, key: str
+    ) -> None:
+        """Call before_compute on all middleware (base.Middleware protocol)."""
         for middleware in self.middlewares:
-            middleware.before_compute(func_name, args, kwargs)
+            middleware.before_compute(func, args, kwargs, key)
 
-    def after_compute(self, func_name: str, result: Any, duration: Optional[float]):
-        """Call after_compute on all middleware."""
+    def after_compute(self, key: str, result: "ComputationResult") -> None:
+        """Call after_compute on all middleware (base.Middleware protocol)."""
         for middleware in self.middlewares:
-            middleware.after_compute(func_name, result, duration)
+            middleware.after_compute(key, result)
 
-    def on_error_hook(self, func_name: str, error: Exception):
-        """Call on_error on all middleware."""
+    def on_error(self, key: str, error: Exception) -> None:
+        """Call on_error on all middleware (base.Middleware protocol)."""
         for middleware in self.middlewares:
-            middleware.on_error_hook(func_name, error)
+            middleware.on_error(key, error)
 
 
 # Pre-configured middleware combinations
@@ -330,10 +347,17 @@ def create_observability_middleware(
     """
     from au.base import LoggingMiddleware
 
+    # LoggingMiddleware.log() needs an int level; accept a level name too.
+    level = (
+        getattr(logging, logging_level.upper(), logging.INFO)
+        if isinstance(logging_level, str)
+        else logging_level
+    )
+
     middlewares = []
 
     # Add logging
-    middlewares.append(LoggingMiddleware(level=logging_level))
+    middlewares.append(LoggingMiddleware(level=level))
 
     # Add hooks if provided
     if on_start or on_complete or on_error:

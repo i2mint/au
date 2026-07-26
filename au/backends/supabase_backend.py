@@ -64,8 +64,8 @@ class SupabaseQueueBackend(ComputationBackend):
 
     def __init__(
         self,
-        store: "ComputationStore",
-        supabase_client: "SupabaseClient",
+        store: "ComputationStore | None" = None,
+        supabase_client: "SupabaseClient | None" = None,
         queue_table_name: str = "au_task_queue",
         max_concurrent_tasks: int = 2,
         polling_interval_seconds: float = 1.0,
@@ -110,15 +110,23 @@ class SupabaseQueueBackend(ComputationBackend):
                 f"Please ensure it's created with the required schema. Error: {e}"
             )
 
-    def launch(self, func: Callable, args: tuple, kwargs: dict, key: str) -> None:
+    def launch(
+        self,
+        func: Callable,
+        args: tuple,
+        kwargs: dict,
+        key: str,
+        store: "ComputationStore | None" = None,
+    ) -> None:
         """Enqueue task to Supabase PostgreSQL table."""
+        store = self._resolve_store(store)
         # Serialize task data
         task_data = {
             "func": func,
             "args": args,
             "kwargs": kwargs,
             "key": key,
-            "store_reconstruction_info": self.store.get_reconstruction_info(),
+            "store_reconstruction_info": store.get_reconstruction_info(),
             "middleware_configs": self._serialize_middleware(),
         }
         serialized_data = pickle.dumps(task_data)

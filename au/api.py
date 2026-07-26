@@ -37,20 +37,25 @@ def _get_default_backend() -> ComputationBackend:
     if _default_backend is None:
         config = get_global_config()
 
-        # Create backend based on config
+        # Create backend based on config. Backends take the result store
+        # per-launch (submit_task passes it), so no store is bound here.
         if config.backend == "redis":
             from au.backends.rq_backend import RQBackend
+            import redis
+            from rq import Queue
+
             redis_url = config.redis_url or "redis://localhost:6379"
-            _default_backend = RQBackend(redis_url=redis_url)
+            connection = redis.Redis.from_url(redis_url)
+            _default_backend = RQBackend(rq_queue=Queue(connection=connection))
 
         elif config.backend == "supabase":
             from au.backends.supabase_backend import SupabaseQueueBackend
             if not config.supabase_url or not config.supabase_key:
                 raise ValueError("Supabase backend requires AU_SUPABASE_URL and AU_SUPABASE_KEY")
-            _default_backend = SupabaseQueueBackend(
-                url=config.supabase_url,
-                key=config.supabase_key,
-            )
+            from supabase import create_client
+
+            client = create_client(config.supabase_url, config.supabase_key)
+            _default_backend = SupabaseQueueBackend(supabase_client=client)
 
         elif config.backend == "process":
             from au.base import ProcessBackend
@@ -60,7 +65,7 @@ def _get_default_backend() -> ComputationBackend:
             from au.base import StdLibQueueBackend
             _default_backend = StdLibQueueBackend(
                 max_workers=config.max_workers,
-                executor_type="thread",
+                use_processes=False,
             )
 
         else:  # Default to thread
@@ -114,9 +119,38 @@ def set_default_store(store: ComputationStore) -> None:
     _default_store = store
 
 
+def _inflight_record(
+    store: ComputationStore, key: str
+) -> Optional[ComputationResult]:
+    """Return an existing in-flight (RUNNING, non-expired) record for ``key``, else None.
+
+    Used for idempotent submission: a matching in-flight record means the work is
+    already running, so a resubmit with the same key should not launch a
+    duplicate. Missing, terminal (COMPLETED / FAILED / CANCELLED), or expired
+    records return None so the work is (re-)launched.
+
+    Note: filesystem stores synthesize a ``PENDING`` result for absent keys, so
+    only ``RUNNING`` is treated as a live claim (submit_task reserves the key
+    with a RUNNING record before launching, closing the reserve→launch race).
+    """
+    try:
+        existing = store[key]
+    except KeyError:
+        return None
+    if existing.status != ComputationStatus.RUNNING:
+        return None
+    try:
+        if store.is_expired(existing):
+            return None
+    except Exception:
+        pass
+    return existing
+
+
 def submit_task(
     func: Callable,
     *args,
+    key: Optional[str] = None,
     backend: Optional[ComputationBackend] = None,
     store: Optional[ComputationStore] = None,
     retry_policy: Optional[RetryPolicy] = None,
@@ -127,6 +161,12 @@ def submit_task(
     Args:
         func: Function to execute
         *args: Positional arguments for function
+        key: Optional caller-supplied idempotency key. When omitted, a fresh key
+            is minted per call. When supplied and a live (in-flight) computation
+            already exists for that key, the existing task is returned instead of
+            launching a duplicate — so a resubmit runs the work at most once while
+            it is in flight. A terminal (completed/failed/cancelled) or expired
+            key re-runs.
         backend: Optional backend (uses default if not provided)
         store: Optional store (uses default if not provided)
         retry_policy: Optional retry policy
@@ -138,12 +178,24 @@ def submit_task(
     Example:
         >>> task_id = submit_task(my_func, 5, multiplier=2)
         >>> result = get_result(task_id, timeout=10)
-    """
-    backend = backend or _get_default_backend()
-    store = store or _get_default_store()
 
-    # Create unique key
-    key = store.create_key()
+        >>> # Idempotent submission: resubmitting the same key while in flight
+        >>> # returns the running task rather than launching a duplicate.
+        >>> task_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP
+        >>> same_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP
+    """
+    backend = backend if backend is not None else _get_default_backend()
+    store = store if store is not None else _get_default_store()
+
+    if key is None:
+        # No idempotency requested: mint a fresh key per call.
+        key = store.create_key()
+    else:
+        # Idempotency: dedup against a live in-flight computation, otherwise
+        # reserve the key so a concurrent/sequential resubmit dedups too.
+        if _inflight_record(store, key) is not None:
+            return key
+        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
     # If retry policy provided, wrap function
     if retry_policy:
@@ -183,7 +235,7 @@ def get_result(
         >>> task_id = submit_task(my_func, 5)
         >>> result = get_result(task_id, timeout=10)
     """
-    store = store or _get_default_store()
+    store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
     return handle.get_result(timeout=timeout)
 
@@ -207,7 +259,7 @@ def get_status(
         >>> if status == ComputationStatus.COMPLETED:
         >>>     result = get_result(task_id)
     """
-    store = store or _get_default_store()
+    store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
     return handle.get_status()
 
@@ -231,7 +283,7 @@ def is_ready(
         >>>     time.sleep(0.1)
         >>> result = get_result(task_id)
     """
-    store = store or _get_default_store()
+    store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
     return handle.is_ready()
 
@@ -255,8 +307,8 @@ def cancel_task(
         >>> task_id = submit_task(long_running_func)
         >>> cancel_task(task_id)
     """
-    backend = backend or _get_default_backend()
-    store = store or _get_default_store()
+    backend = backend if backend is not None else _get_default_backend()
+    store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store, backend)
     return handle.cancel()
 
@@ -292,8 +344,8 @@ def async_task(
         >>> # Result is ready here
         >>> print(f"Result: {handle.result}")
     """
-    backend = backend or _get_default_backend()
-    store = store or _get_default_store()
+    backend = backend if backend is not None else _get_default_backend()
+    store = store if store is not None else _get_default_store()
 
     # Submit task
     task_id = submit_task(func, *args, backend=backend, store=store, **kwargs)
@@ -332,8 +384,8 @@ def get_handle(
         >>> handle = get_handle(task_id)
         >>> result = handle.get_result(timeout=10)
     """
-    backend = backend or _get_default_backend()
-    store = store or _get_default_store()
+    backend = backend if backend is not None else _get_default_backend()
+    store = store if store is not None else _get_default_store()
     return ComputationHandle(task_id, store, backend)
 
 
@@ -359,8 +411,8 @@ def submit_many(
         >>> ]
         >>> task_ids = submit_many(tasks)
     """
-    backend = backend or _get_default_backend()
-    store = store or _get_default_store()
+    backend = backend if backend is not None else _get_default_backend()
+    store = store if store is not None else _get_default_store()
 
     task_ids = []
     for func, args, kwargs in tasks:
@@ -389,7 +441,7 @@ def get_many(
         >>> task_ids = submit_many(tasks)
         >>> results = get_many(task_ids, timeout=10)
     """
-    store = store or _get_default_store()
+    store = store if store is not None else _get_default_store()
 
     results = []
     for task_id in task_ids:
