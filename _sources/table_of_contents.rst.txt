@@ -3,7 +3,14 @@
    :caption: Contents:
 
    module_docs/au
+   module_docs/au/api
    module_docs/au/backends
    module_docs/au/backends/rq_backend
    module_docs/au/backends/supabase_backend
    module_docs/au/base
+   module_docs/au/config
+   module_docs/au/hooks
+   module_docs/au/http
+   module_docs/au/retry
+   module_docs/au/testing
+   module_docs/au/workflow

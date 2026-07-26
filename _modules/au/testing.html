@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.testing &mdash; au 0.0.16 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/api.html">au.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/workflow.html">au.workflow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">au.testing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for au.testing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Testing utilities for AU.</span>
+
+<span class="sd">Provides test backends, mocking utilities, and helpers for testing async code.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ComputationBackend</span><span class="p">,</span>
+    <span class="n">ComputationStore</span><span class="p">,</span>
+    <span class="n">ComputationResult</span><span class="p">,</span>
+    <span class="n">ComputationStatus</span><span class="p">,</span>
+    <span class="n">Middleware</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="InMemoryStore">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.InMemoryStore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InMemoryStore</span><span class="p">(</span><span class="n">ComputationStore</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;In-memory store for testing.</span>
+
+<span class="sd">    Stores results in a dictionary without any persistence.</span>
+<span class="sd">    Useful for testing without filesystem dependencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize in-memory store.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ttl_seconds: Time-to-live for results (not enforced in memory)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ComputationResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="InMemoryStore.create_key">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.InMemoryStore.create_key">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a unique key for a computation.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get result by key.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No result found for key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ComputationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Store result by key.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete result by key.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate over keys.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of stored results.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InMemoryStore.cleanup_expired">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.InMemoryStore.cleanup_expired">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op for in-memory store (no automatic expiration).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            0 (nothing cleaned up)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="InMemoryStore.get_reconstruction_info">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.InMemoryStore.get_reconstruction_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_reconstruction_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get info needed to reconstruct this store.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with store type and parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;in_memory&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ttl_seconds&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttl_seconds</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="InMemoryStore.clear">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.InMemoryStore.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all stored results.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SyncTestBackend">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.SyncTestBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SyncTestBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Synchronous test backend that executes immediately.</span>
+
+<span class="sd">    This backend runs computations synchronously in the current process/thread,</span>
+<span class="sd">    making it ideal for testing without the complexity of actual async execution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize synchronous test backend.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            middleware: Optional list of middleware</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="SyncTestBackend.launch">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.SyncTestBackend.launch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute function synchronously and store result immediately.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: Function to execute</span>
+<span class="sd">            args: Positional arguments</span>
+<span class="sd">            kwargs: Keyword arguments</span>
+<span class="sd">            key: Result key</span>
+<span class="sd">            store: Store for results (falls back to the backend&#39;s own store)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+
+        <span class="c1"># Track execution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Execute with middleware (base.Middleware protocol:</span>
+        <span class="c1"># before_compute(func, args, kwargs, key) / after_compute(key, result) /</span>
+        <span class="c1"># on_error(key, error) — driven via the _run_middleware_* helpers).</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Before middleware</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_before</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+            <span class="c1"># Execute function</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="c1"># Store successful result, then run after middleware with it</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">completed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_after</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Store failed result, then run error middleware</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
+                <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="n">completed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_error</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SyncTestBackend.terminate">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.SyncTestBackend.terminate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;No-op for synchronous backend (already completed).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key: Computation key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SyncTestBackend.get_execution">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.SyncTestBackend.get_execution">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get recorded execution for a key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key: Computation key</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (function, args, kwargs) or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TaskCallRecord">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.TaskCallRecord">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskCallRecord</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record of a task call for testing/mocking.&quot;&quot;&quot;</span>
+
+    <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="MockTaskTracker">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.MockTaskTracker">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockTaskTracker</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks task executions for testing.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        task_count: Total number of tasks executed</span>
+<span class="sd">        tasks_by_name: Dictionary mapping function names to call records</span>
+<span class="sd">        all_tasks: List of all task call records</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">task_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tasks_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">all_tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockTaskTracker.record_call">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.MockTaskTracker.record_call">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a task call.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name: Name of the function</span>
+<span class="sd">            args: Positional arguments</span>
+<span class="sd">            kwargs: Keyword arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">TaskCallRecord</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockTaskTracker.get_calls">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.MockTaskTracker.get_calls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all calls for a specific function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name: Name of the function</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of call records</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="MockTaskTracker.call_count">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.MockTaskTracker.call_count">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">call_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get call count for a specific function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name: Name of the function</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Number of calls</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="MockTaskTracker.last_call">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.MockTaskTracker.last_call">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get last call for a specific function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func_name: Name of the function</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Last call record or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">calls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">calls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="kc">None</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TrackingTestBackend">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.TrackingTestBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrackingTestBackend</span><span class="p">(</span><span class="n">SyncTestBackend</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test backend that tracks all executions.</span>
+
+<span class="sd">    Extends SyncTestBackend with detailed tracking for testing/debugging.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize tracking test backend.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            middleware: Optional list of middleware</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span> <span class="o">=</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TrackingTestBackend.launch">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.TrackingTestBackend.launch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute and track function call.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: Function to execute</span>
+<span class="sd">            args: Positional arguments</span>
+<span class="sd">            kwargs: Keyword arguments</span>
+<span class="sd">            key: Result key</span>
+<span class="sd">            store: Store for results (falls back to the backend&#39;s own store)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Record the call</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">record_call</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Execute normally</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="mock_async">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.mock_async">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_async</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager for mocking async execution.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        with mock_async() as mock:</span>
+<span class="sd">            @async_compute</span>
+<span class="sd">            def my_func(n: int) -&gt; int:</span>
+<span class="sd">                return n * 2</span>
+
+<span class="sd">            handle = my_func.async_run(n=5)</span>
+<span class="sd">            assert mock.task_count == 1</span>
+<span class="sd">            assert handle.get_result() == 10</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        backend: Optional custom backend (defaults to TrackingTestBackend)</span>
+
+<span class="sd">    Yields:</span>
+<span class="sd">        MockTaskTracker instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">backend</span> <span class="o">=</span> <span class="n">TrackingTestBackend</span><span class="p">()</span>
+
+    <span class="c1"># Import here to avoid circular dependency</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+
+    <span class="c1"># Store original defaults</span>
+    <span class="n">original_backend</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s1">&#39;_default_backend&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Set test backend as default</span>
+    <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">backend</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Yield tracker if backend has one</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">TrackingTestBackend</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">backend</span><span class="o">.</span><span class="n">tracker</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Restore original backend</span>
+        <span class="k">if</span> <span class="n">original_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">original_backend</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s1">&#39;_default_backend&#39;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s1">&#39;_default_backend&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_test_backend">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.create_test_backend">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_test_backend</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SyncTestBackend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a test backend with optional configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Configuration options (currently accepts &#39;middleware&#39;)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SyncTestBackend instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SyncTestBackend</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;middleware&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="create_test_store">
+<a class="viewcode-back" href="../../module_docs/au/testing.html#au.create_test_store">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_test_store</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InMemoryStore</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a test store with optional configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Configuration options (accepts &#39;ttl_seconds&#39;)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        InMemoryStore instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">InMemoryStore</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ttl_seconds&#39;</span><span class="p">,</span> <span class="mi">3600</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

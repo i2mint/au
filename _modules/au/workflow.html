@@ -1,0 +1,523 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.workflow &mdash; au 0.0.16 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/api.html">au.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/workflow.html">au.workflow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">au.workflow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for au.workflow</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Workflow and task dependency management for AU.</span>
+
+<span class="sd">Provides DAG-based task orchestration with dependency tracking.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComputationHandle</span><span class="p">,</span> <span class="n">ComputationStore</span><span class="p">,</span> <span class="n">ComputationBackend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">au.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_task</span><span class="p">,</span> <span class="n">get_result</span><span class="p">,</span> <span class="n">_get_default_backend</span><span class="p">,</span> <span class="n">_get_default_store</span>
+
+
+<div class="viewcode-block" id="TaskState">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;State of a task in a workflow.&quot;&quot;&quot;</span>
+
+    <span class="n">PENDING</span> <span class="o">=</span> <span class="s2">&quot;pending&quot;</span>
+    <span class="n">WAITING</span> <span class="o">=</span> <span class="s2">&quot;waiting&quot;</span>  <span class="c1"># Waiting for dependencies</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
+    <span class="n">COMPLETED</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span>
+    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="WorkflowTask">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.WorkflowTask">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowTask</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A task in a workflow with dependencies.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        func: Function to execute</span>
+<span class="sd">        args: Positional arguments</span>
+<span class="sd">        kwargs: Keyword arguments</span>
+<span class="sd">        depends_on: List of task IDs this task depends on</span>
+<span class="sd">        task_id: Unique task ID</span>
+<span class="sd">        state: Current state</span>
+<span class="sd">        result: Result value (when completed)</span>
+<span class="sd">        error: Error message (when failed)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">tuple</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">depends_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">TaskState</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">PENDING</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="WorkflowTask.is_ready_to_run">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.WorkflowTask.is_ready_to_run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_ready_to_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">completed_tasks</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if all dependencies are completed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            completed_tasks: Set of completed task IDs</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if ready to run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">TaskState</span><span class="o">.</span><span class="n">PENDING</span><span class="p">,</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">WAITING</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">dep_id</span> <span class="ow">in</span> <span class="n">completed_tasks</span> <span class="k">for</span> <span class="n">dep_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">depends_on</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TaskGraph">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskGraph">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TaskGraph</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Directed Acyclic Graph (DAG) for task execution.</span>
+
+<span class="sd">    Manages task dependencies and orchestrates execution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize task graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            backend: Optional backend for task execution</span>
+<span class="sd">            store: Optional store for results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">WorkflowTask</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="TaskGraph.add_task">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskGraph.add_task">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_task</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">depends_on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a task to the graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: Function to execute</span>
+<span class="sd">            *args: Positional arguments</span>
+<span class="sd">            depends_on: Optional list of task IDs this depends on</span>
+<span class="sd">            task_id: Optional custom task ID</span>
+<span class="sd">            **kwargs: Keyword arguments</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Task ID</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; graph = TaskGraph()</span>
+<span class="sd">            &gt;&gt;&gt; t1 = graph.add_task(step1, 5)</span>
+<span class="sd">            &gt;&gt;&gt; t2 = graph.add_task(step2, 10)</span>
+<span class="sd">            &gt;&gt;&gt; t3 = graph.add_task(step3, depends_on=[t1, t2])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_task_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">task_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;task_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_task_counter</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task ID </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> already exists&quot;</span><span class="p">)</span>
+
+        <span class="n">task</span> <span class="o">=</span> <span class="n">WorkflowTask</span><span class="p">(</span>
+            <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">depends_on</span><span class="o">=</span><span class="n">depends_on</span> <span class="ow">or</span> <span class="p">[],</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
+        <span class="k">return</span> <span class="n">task_id</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_for_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for circular dependencies.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If circular dependency detected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">rec_stack</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">has_cycle</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="n">rec_stack</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+
+            <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dep_id</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">depends_on</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">dep_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">has_cycle</span><span class="p">(</span><span class="n">dep_id</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">dep_id</span> <span class="ow">in</span> <span class="n">rec_stack</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">rec_stack</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">has_cycle</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Circular dependency detected in task graph&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TaskGraph.execute">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskGraph.execute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute all tasks in dependency order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout: Optional overall timeout in seconds</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary mapping task IDs to results</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If circular dependencies detected</span>
+<span class="sd">            TimeoutError: If overall timeout exceeded</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; graph = TaskGraph()</span>
+<span class="sd">            &gt;&gt;&gt; t1 = graph.add_task(step1, 5)</span>
+<span class="sd">            &gt;&gt;&gt; t2 = graph.add_task(step2, depends_on=[t1])</span>
+<span class="sd">            &gt;&gt;&gt; results = graph.execute()</span>
+<span class="sd">            &gt;&gt;&gt; print(results[t2])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for cycles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_for_cycles</span><span class="p">()</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">completed_tasks</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">running_tasks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># workflow_task_id -&gt; execution_task_id</span>
+        <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">):</span>
+            <span class="c1"># Check timeout</span>
+            <span class="k">if</span> <span class="n">timeout</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Workflow execution timed out&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Find tasks ready to run</span>
+            <span class="k">for</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">PENDING</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">is_ready_to_run</span><span class="p">(</span><span class="n">completed_tasks</span><span class="p">):</span>
+                    <span class="c1"># Submit task</span>
+                    <span class="n">execution_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span>
+                        <span class="n">task</span><span class="o">.</span><span class="n">func</span><span class="p">,</span>
+                        <span class="o">*</span><span class="n">task</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                        <span class="n">store</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">task</span><span class="o">.</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+                    <span class="n">running_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">execution_id</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">RUNNING</span>
+
+            <span class="c1"># Check running tasks</span>
+            <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">running_tasks</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">execution_id</span> <span class="o">=</span> <span class="n">running_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Try to get result (with short timeout to avoid blocking)</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">execution_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">)</span>
+
+                    <span class="c1"># Task completed</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">COMPLETED</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+                    <span class="n">results</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+                    <span class="n">completed_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">running_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+
+                <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+                    <span class="c1"># Still running</span>
+                    <span class="k">continue</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># Task failed</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">FAILED</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">running_tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+
+                    <span class="c1"># Could choose to continue or abort workflow</span>
+                    <span class="c1"># For now, we&#39;ll mark as failed but continue</span>
+                    <span class="n">completed_tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+
+            <span class="c1"># Small sleep to avoid busy waiting</span>
+            <span class="k">if</span> <span class="n">running_tasks</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="TaskGraph.get_task">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskGraph.get_task">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowTask</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a task by ID.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            task_id: Task ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            WorkflowTask instance</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: If task ID not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TaskGraph.get_task_result">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.TaskGraph.get_task_result">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get result for a task.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            task_id: Task ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Task result</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If task not completed or failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">[</span><span class="n">task_id</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">TaskState</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not yet completed (state: </span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">state</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="depends_on">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.depends_on">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">depends_on</span><span class="p">(</span><span class="o">*</span><span class="n">dependency_funcs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to specify task dependencies.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        @async_compute</span>
+<span class="sd">        def step1(n): return n * 2</span>
+
+<span class="sd">        @async_compute</span>
+<span class="sd">        def step2(n): return n + 10</span>
+
+<span class="sd">        @async_compute</span>
+<span class="sd">        @depends_on(step1, step2)</span>
+<span class="sd">        def step3(result1, result2):</span>
+<span class="sd">            return result1 + result2</span>
+
+<span class="sd">    Note: This is a simplified version. Full implementation would</span>
+<span class="sd">    require integration with the async_compute decorator.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *dependency_funcs: Functions this task depends on</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Decorator function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+        <span class="c1"># Store dependencies as function attribute</span>
+        <span class="n">func</span><span class="o">.</span><span class="n">_au_dependencies</span> <span class="o">=</span> <span class="n">dependency_funcs</span>
+        <span class="k">return</span> <span class="n">func</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="WorkflowBuilder">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.WorkflowBuilder">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowBuilder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fluent interface for building workflows.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; workflow = (WorkflowBuilder()</span>
+<span class="sd">        &gt;&gt;&gt;     .add_task(&#39;step1&#39;, process_data, data)</span>
+<span class="sd">        &gt;&gt;&gt;     .add_task(&#39;step2&#39;, transform, depends_on=[&#39;step1&#39;])</span>
+<span class="sd">        &gt;&gt;&gt;     .add_task(&#39;step3&#39;, aggregate, depends_on=[&#39;step2&#39;])</span>
+<span class="sd">        &gt;&gt;&gt;     .build())</span>
+<span class="sd">        &gt;&gt;&gt; results = workflow.execute()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize workflow builder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            backend: Optional backend</span>
+<span class="sd">            store: Optional store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WorkflowBuilder.add_task">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.WorkflowBuilder.add_task">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_task</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">depends_on</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;WorkflowBuilder&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a task to the workflow.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            task_id: Task ID</span>
+<span class="sd">            func: Function to execute</span>
+<span class="sd">            *args: Positional arguments</span>
+<span class="sd">            depends_on: Optional dependencies</span>
+<span class="sd">            **kwargs: Keyword arguments</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Self for chaining</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span>
+            <span class="n">func</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">depends_on</span><span class="o">=</span><span class="n">depends_on</span><span class="p">,</span>
+            <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="WorkflowBuilder.build">
+<a class="viewcode-back" href="../../module_docs/au/workflow.html#au.WorkflowBuilder.build">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TaskGraph</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and return the task graph.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TaskGraph instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

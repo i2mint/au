@@ -5,18 +5,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; au 0.0.15 documentation</title>
+  <title>Index &mdash; au 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f0357c94"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -47,10 +47,17 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/api.html">au.api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/workflow.html">au.workflow</a></li>
 </ul>
 
         </div>
@@ -84,21 +91,42 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.add_attempt">add_attempt() (au.retry.RetryState method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.add_attempt">(au.RetryState method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TaskGraph.add_task">add_task() (au.TaskGraph method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskGraph.add_task">(au.workflow.TaskGraph method)</a>
+</li>
+        <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowBuilder.add_task">(au.workflow.WorkflowBuilder method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.WorkflowBuilder.add_task">(au.WorkflowBuilder method)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.LoggingMiddleware.after_compute">after_compute() (au.base.LoggingMiddleware method)</a>
 
       <ul>
@@ -108,9 +136,61 @@
 </li>
         <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware.after_compute">(au.base.SharedMetricsMiddleware method)</a>
 </li>
-      </ul></li>
-      <li><a href="module_docs/au/base.html#au.base.async_compute">async_compute() (in module au.base)</a>
+        <li><a href="module_docs/au.html#au.CompositeMiddleware.after_compute">(au.CompositeMiddleware method)</a>
 </li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware.after_compute">(au.hooks.CompositeMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.HooksMiddleware.after_compute">(au.hooks.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware.after_compute">(au.hooks.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.TracingMiddleware.after_compute">(au.hooks.TracingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.HooksMiddleware.after_compute">(au.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.LoggingMiddleware.after_compute">(au.LoggingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsCollectorMiddleware.after_compute">(au.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsMiddleware.after_compute">(au.MetricsMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.Middleware.after_compute">(au.Middleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.TracingMiddleware.after_compute">(au.TracingMiddleware method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.all_tasks">all_tasks (au.MockTaskTracker attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.all_tasks">(au.testing.MockTaskTracker attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.args">args (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.args">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.async_compute">async_compute() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.async_compute">(in module au.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.async_task">async_task() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.async_task">(in module au.api)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.attempt_count">attempt_count (au.retry.RetryState attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.attempt_count">(au.RetryState attribute)</a>
+</li>
+      </ul></li>
       <li>
     au
 
@@ -118,8 +198,13 @@
         <li><a href="module_docs/au.html#module-au">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    au.api
+
+      <ul>
+        <li><a href="module_docs/au/api.html#module-au.api">module</a>
+</li>
+      </ul></li>
       <li>
     au.backends
 
@@ -148,12 +233,72 @@
         <li><a href="module_docs/au/base.html#module-au.base">module</a>
 </li>
       </ul></li>
+      <li>
+    au.config
+
+      <ul>
+        <li><a href="module_docs/au/config.html#module-au.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.hooks
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#module-au.hooks">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.http
+
+      <ul>
+        <li><a href="module_docs/au/http.html#module-au.http">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.retry
+
+      <ul>
+        <li><a href="module_docs/au/retry.html#module-au.retry">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.testing
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#module-au.testing">module</a>
+</li>
+      </ul></li>
+      <li>
+    au.workflow
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#module-au.workflow">module</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.AUConfig">AUConfig (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/config.html#au.config.AUConfig">(class in au.config)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.backoff">backoff (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.backoff">(au.RetryPolicy attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.BackoffStrategy">BackoffStrategy (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/retry.html#au.retry.BackoffStrategy">(class in au.retry)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.LoggingMiddleware.before_compute">before_compute() (au.base.LoggingMiddleware method)</a>
 
       <ul>
@@ -163,6 +308,36 @@
 </li>
         <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware.before_compute">(au.base.SharedMetricsMiddleware method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.CompositeMiddleware.before_compute">(au.CompositeMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware.before_compute">(au.hooks.CompositeMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.HooksMiddleware.before_compute">(au.hooks.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware.before_compute">(au.hooks.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.TracingMiddleware.before_compute">(au.hooks.TracingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.HooksMiddleware.before_compute">(au.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.LoggingMiddleware.before_compute">(au.LoggingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsCollectorMiddleware.before_compute">(au.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsMiddleware.before_compute">(au.MetricsMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.Middleware.before_compute">(au.Middleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.TracingMiddleware.before_compute">(au.TracingMiddleware method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowBuilder.build">build() (au.workflow.WorkflowBuilder method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowBuilder.build">(au.WorkflowBuilder method)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -170,30 +345,116 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationHandle.cancel">cancel() (au.base.ComputationHandle method)</a>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.call_count">call_count() (au.MockTaskTracker method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.call_count">(au.testing.MockTaskTracker method)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au/base.html#au.base.ComputationHandle.cancel">cancel() (au.base.ComputationHandle method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationHandle.cancel">(au.ComputationHandle method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.cancel_task">cancel_task() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.cancel_task">(in module au.api)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationStore.cleanup_expired">cleanup_expired() (au.base.ComputationStore method)</a>
 
       <ul>
         <li><a href="module_docs/au/base.html#au.base.FileSystemStore.cleanup_expired">(au.base.FileSystemStore method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.ComputationStore.cleanup_expired">(au.ComputationStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.FileSystemStore.cleanup_expired">(au.FileSystemStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.InMemoryStore.cleanup_expired">(au.InMemoryStore method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.InMemoryStore.cleanup_expired">(au.testing.InMemoryStore method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.InMemoryStore.clear">clear() (au.InMemoryStore method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.InMemoryStore.clear">(au.testing.InMemoryStore method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.CompositeMiddleware">CompositeMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware">(class in au.hooks)</a>
+</li>
       </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationBackend">ComputationBackend (class in au.base)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.ComputationHandle">ComputationHandle (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.ComputationCancelledError">ComputationCancelledError</a>, <a href="module_docs/au/base.html#au.base.ComputationCancelledError">[1]</a>
 </li>
+      <li><a href="module_docs/au.html#au.ComputationHandle">ComputationHandle (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ComputationHandle">(class in au.base)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationResult">ComputationResult (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.ComputationResult">ComputationResult (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ComputationResult">(class in au.base)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.ComputationStatus">ComputationStatus (class in au.base)</a>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.ComputationStatus">ComputationStatus (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ComputationStatus">(class in au.base)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.ComputationStore">ComputationStore (class in au.base)</a>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.ComputationStore">ComputationStore (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ComputationStore">(class in au.base)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.create_app_from_decorator">create_app_from_decorator() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/http.html#au.http.create_app_from_decorator">(in module au.http)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationStore.create_key">create_key() (au.base.ComputationStore method)</a>
 
       <ul>
         <li><a href="module_docs/au/base.html#au.base.FileSystemStore.create_key">(au.base.FileSystemStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.ComputationStore.create_key">(au.ComputationStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.FileSystemStore.create_key">(au.FileSystemStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.InMemoryStore.create_key">(au.InMemoryStore method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.InMemoryStore.create_key">(au.testing.InMemoryStore method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.create_observability_middleware">create_observability_middleware() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.create_observability_middleware">(in module au.hooks)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.create_test_backend">create_test_backend() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.create_test_backend">(in module au.testing)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.create_test_store">create_test_store() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.create_test_store">(in module au.testing)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -202,35 +463,213 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationResult.duration">duration (au.base.ComputationResult property)</a>
+      <li><a href="module_docs/au/hooks.html#au.hooks.TaskEvent.data">data (au.hooks.TaskEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.TaskEvent.data">(au.TaskEvent attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.depends_on">depends_on (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.depends_on">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.depends_on">depends_on() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.depends_on">(in module au.workflow)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.dont_retry_on">dont_retry_on (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.dont_retry_on">(au.RetryPolicy attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/base.html#au.base.ComputationResult.duration">duration (au.base.ComputationResult property)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationResult.duration">(au.ComputationResult property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.error">error (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.error">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.TaskEvent.event_type">event_type (au.hooks.TaskEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.TaskEvent.event_type">(au.TaskEvent attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.TaskGraph.execute">execute() (au.TaskGraph method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskGraph.execute">(au.workflow.TaskGraph method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.FileSystemStore">FileSystemStore (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.FileSystemStore">FileSystemStore (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.FileSystemStore">(class in au.base)</a>
 </li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.func">func (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.func">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.get_calls">get_calls() (au.MockTaskTracker method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.get_calls">(au.testing.MockTaskTracker method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.get_config">get_config() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/config.html#au.config.get_config">(in module au.config)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.get_delay">get_delay() (au.retry.RetryPolicy method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.get_delay">(au.RetryPolicy method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.HooksMiddleware.get_events">get_events() (au.hooks.HooksMiddleware method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.HooksMiddleware.get_events">(au.HooksMiddleware method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.SyncTestBackend.get_execution">get_execution() (au.SyncTestBackend method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.SyncTestBackend.get_execution">(au.testing.SyncTestBackend method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.get_global_config">get_global_config() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/config.html#au.config.get_global_config">(in module au.config)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.get_handle">get_handle() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.get_handle">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.get_many">get_many() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.get_many">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware.get_metrics">get_metrics() (au.hooks.MetricsCollectorMiddleware method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.MetricsCollectorMiddleware.get_metrics">(au.MetricsCollectorMiddleware method)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationStore.get_reconstruction_info">get_reconstruction_info() (au.base.ComputationStore method)</a>
 
       <ul>
         <li><a href="module_docs/au/base.html#au.base.FileSystemStore.get_reconstruction_info">(au.base.FileSystemStore method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.ComputationStore.get_reconstruction_info">(au.ComputationStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.FileSystemStore.get_reconstruction_info">(au.FileSystemStore method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.InMemoryStore.get_reconstruction_info">(au.InMemoryStore method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.InMemoryStore.get_reconstruction_info">(au.testing.InMemoryStore method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/au/base.html#au.base.ComputationHandle.get_result">get_result() (au.base.ComputationHandle method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationHandle.get_result">(au.ComputationHandle method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.get_result">(in module au)</a>
+</li>
+        <li><a href="module_docs/au/api.html#au.api.get_result">(in module au.api)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.MetricsMiddleware.get_stats">get_stats() (au.base.MetricsMiddleware method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.MetricsMiddleware.get_stats">(au.MetricsMiddleware method)</a>
 </li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationHandle.get_status">get_status() (au.base.ComputationHandle method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationHandle.get_status">(au.ComputationHandle method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.get_status">(in module au)</a>
+</li>
+        <li><a href="module_docs/au/api.html#au.api.get_status">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TaskGraph.get_task">get_task() (au.TaskGraph method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskGraph.get_task">(au.workflow.TaskGraph method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TaskGraph.get_task_result">get_task_result() (au.TaskGraph method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskGraph.get_task_result">(au.workflow.TaskGraph method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.HooksMiddleware">HooksMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.HooksMiddleware">(class in au.hooks)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/http.html#au.http.HTTPException">HTTPException</a>
 </li>
   </ul></td>
 </tr></table>
@@ -238,20 +677,78 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationStore.is_expired">is_expired() (au.base.ComputationStore method)</a>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.initial_delay">initial_delay (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.initial_delay">(au.RetryPolicy attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.InMemoryStore">InMemoryStore (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.InMemoryStore">(class in au.testing)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/base.html#au.base.ComputationStore.is_expired">is_expired() (au.base.ComputationStore method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationStore.is_expired">(au.ComputationStore method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/base.html#au.base.ComputationResult.is_ready">is_ready (au.base.ComputationResult property)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationResult.is_ready">(au.ComputationResult property)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ComputationResult.is_ready">is_ready (au.base.ComputationResult property)</a>
-</li>
       <li><a href="module_docs/au/base.html#au.base.ComputationHandle.is_ready">is_ready() (au.base.ComputationHandle method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationHandle.is_ready">(au.ComputationHandle method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.is_ready">(in module au)</a>
+</li>
+        <li><a href="module_docs/au/api.html#au.api.is_ready">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.is_ready_to_run">is_ready_to_run() (au.workflow.WorkflowTask method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.is_ready_to_run">(au.WorkflowTask method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.kwargs">kwargs (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.kwargs">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.last_call">last_call() (au.MockTaskTracker method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.last_call">(au.testing.MockTaskTracker method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.last_error">last_error (au.retry.RetryState attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.last_error">(au.RetryState attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.launch">launch() (au.backends.rq_backend.RQBackend method)</a>
 
       <ul>
@@ -267,28 +764,108 @@
 </li>
         <li><a href="module_docs/au/base.html#au.base.ThreadBackend.launch">(au.base.ThreadBackend method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.ProcessBackend.launch">(au.ProcessBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.StdLibQueueBackend.launch">(au.StdLibQueueBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.SyncTestBackend.launch">(au.SyncTestBackend method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.SyncTestBackend.launch">(au.testing.SyncTestBackend method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.TrackingTestBackend.launch">(au.testing.TrackingTestBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.ThreadBackend.launch">(au.ThreadBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.TrackingTestBackend.launch">(au.TrackingTestBackend method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.LoggingMiddleware">LoggingMiddleware (class in au.base)</a>
+      <li><a href="module_docs/au/config.html#au.config.load_config_from_env">load_config_from_env() (in module au.config)</a>
 </li>
+      <li><a href="module_docs/au/config.html#au.config.load_config_from_file">load_config_from_file() (in module au.config)</a>
+</li>
+      <li><a href="module_docs/au.html#au.LoggingMiddleware">LoggingMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.LoggingMiddleware">(class in au.base)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.max_attempts">max_attempts (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.max_attempts">(au.RetryPolicy attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.max_delay">max_delay (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.max_delay">(au.RetryPolicy attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.ComputationHandle.metadata">metadata (au.base.ComputationHandle property)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.ComputationHandle.metadata">(au.ComputationHandle property)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.MetricsMiddleware">MetricsMiddleware (class in au.base)</a>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.MetricsCollectorMiddleware">MetricsCollectorMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware">(class in au.hooks)</a>
 </li>
-      <li><a href="module_docs/au/base.html#au.base.Middleware">Middleware (class in au.base)</a>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.MetricsMiddleware">MetricsMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.MetricsMiddleware">(class in au.base)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.Middleware">Middleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.Middleware">(class in au.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.mk_flask_interface">mk_flask_interface() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/http.html#au.http.mk_flask_interface">(in module au.http)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.mk_http_interface">mk_http_interface() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/http.html#au.http.mk_http_interface">(in module au.http)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.mock_async">mock_async() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.mock_async">(in module au.testing)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.MockTaskTracker">MockTaskTracker (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker">(class in au.testing)</a>
+</li>
+      </ul></li>
       <li>
     module
 
       <ul>
         <li><a href="module_docs/au.html#module-au">au</a>
+</li>
+        <li><a href="module_docs/au/api.html#module-au.api">au.api</a>
 </li>
         <li><a href="module_docs/au/backends.html#module-au.backends">au.backends</a>
 </li>
@@ -298,7 +875,35 @@
 </li>
         <li><a href="module_docs/au/base.html#module-au.base">au.base</a>
 </li>
+        <li><a href="module_docs/au/config.html#module-au.config">au.config</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#module-au.hooks">au.hooks</a>
+</li>
+        <li><a href="module_docs/au/http.html#module-au.http">au.http</a>
+</li>
+        <li><a href="module_docs/au/retry.html#module-au.retry">au.retry</a>
+</li>
+        <li><a href="module_docs/au/testing.html#module-au.testing">au.testing</a>
+</li>
+        <li><a href="module_docs/au/workflow.html#module-au.workflow">au.workflow</a>
+</li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.next_retry_at">next_retry_at (au.retry.RetryState attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.next_retry_at">(au.RetryState attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.NonRetryableError">NonRetryableError</a>, <a href="module_docs/au/retry.html#au.retry.NonRetryableError">[1]</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -314,6 +919,36 @@
 </li>
         <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware.on_error">(au.base.SharedMetricsMiddleware method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.CompositeMiddleware.on_error">(au.CompositeMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware.on_error">(au.hooks.CompositeMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.HooksMiddleware.on_error">(au.hooks.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware.on_error">(au.hooks.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au/hooks.html#au.hooks.TracingMiddleware.on_error">(au.hooks.TracingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.HooksMiddleware.on_error">(au.HooksMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.LoggingMiddleware.on_error">(au.LoggingMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsCollectorMiddleware.on_error">(au.MetricsCollectorMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.MetricsMiddleware.on_error">(au.MetricsMiddleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.Middleware.on_error">(au.Middleware method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.TracingMiddleware.on_error">(au.TracingMiddleware method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.on_retry">on_retry (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.on_retry">(au.RetryPolicy attribute)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -321,18 +956,72 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ProcessBackend">ProcessBackend (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.ProcessBackend">ProcessBackend (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ProcessBackend">(class in au.base)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.record_call">record_call() (au.MockTaskTracker method)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.record_call">(au.testing.MockTaskTracker method)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.RemoteAPIBackend">RemoteAPIBackend (class in au.base)</a>
 </li>
+      <li><a href="module_docs/au.html#au.reset_global_config">reset_global_config() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/config.html#au.config.reset_global_config">(in module au.config)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.result">result (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.result">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.retry_history">retry_history (au.retry.RetryState attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.retry_history">(au.RetryState attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.retry_on">retry_on (au.retry.RetryPolicy attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.retry_on">(au.RetryPolicy attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.retry_with_policy">retry_with_policy() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/retry.html#au.retry.retry_with_policy">(in module au.retry)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.RetryableError">RetryableError</a>, <a href="module_docs/au/retry.html#au.retry.RetryableError">[1]</a>
+</li>
+      <li><a href="module_docs/au.html#au.RetryPolicy">RetryPolicy (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy">(class in au.retry)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.RetryState">RetryState (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/retry.html#au.retry.RetryState">(class in au.retry)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend">RQBackend (class in au.backends.rq_backend)</a>
 </li>
   </ul></td>
@@ -341,30 +1030,150 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.SerializationFormat">SerializationFormat (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.SerializationFormat">SerializationFormat (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.SerializationFormat">(class in au.base)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.set_default_backend">set_default_backend() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.set_default_backend">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.set_default_store">set_default_store() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.set_default_store">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.set_global_config">set_global_config() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/config.html#au.config.set_global_config">(in module au.config)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/base.html#au.base.SharedMetricsMiddleware">SharedMetricsMiddleware (class in au.base)</a>
 </li>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryPolicy.should_retry">should_retry() (au.retry.RetryPolicy method)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryPolicy.should_retry">(au.RetryPolicy method)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend.shutdown">shutdown() (au.backends.supabase_backend.SupabaseQueueBackend method)</a>
 
       <ul>
         <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend.shutdown">(au.base.StdLibQueueBackend method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.StdLibQueueBackend.shutdown">(au.StdLibQueueBackend method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend">StdLibQueueBackend (class in au.base)</a>
+      <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.state">state (au.workflow.WorkflowTask attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.WorkflowTask.state">(au.WorkflowTask attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.StdLibQueueBackend">StdLibQueueBackend (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend">(class in au.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.submit_many">submit_many() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.submit_many">(in module au.api)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.submit_task">submit_task() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/api.html#au.api.submit_task">(in module au.api)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend">SupabaseQueueBackend (class in au.backends.supabase_backend)</a>
 </li>
+      <li><a href="module_docs/au.html#au.SyncTestBackend">SyncTestBackend (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.SyncTestBackend">(class in au.testing)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.temporary_async_compute">temporary_async_compute() (in module au.base)</a>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.task_count">task_count (au.MockTaskTracker attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.task_count">(au.testing.MockTaskTracker attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.TaskEvent.task_id">task_id (au.hooks.TaskEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.TaskEvent.task_id">(au.TaskEvent attribute)</a>
+</li>
+        <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask.task_id">(au.workflow.WorkflowTask attribute)</a>
+</li>
+        <li><a href="module_docs/au.html#au.WorkflowTask.task_id">(au.WorkflowTask attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/testing.html#au.testing.TaskCallRecord">TaskCallRecord (class in au.testing)</a>
+</li>
+      <li><a href="module_docs/au/http.html#au.http.TaskCancelResponse">TaskCancelResponse (class in au.http)</a>
+</li>
+      <li><a href="module_docs/au.html#au.TaskEvent">TaskEvent (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.TaskEvent">(class in au.hooks)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.TaskEventHandler">TaskEventHandler (class in au.hooks)</a>
+</li>
+      <li><a href="module_docs/au.html#au.TaskGraph">TaskGraph (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskGraph">(class in au.workflow)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/http.html#au.http.TaskListResponse">TaskListResponse (class in au.http)</a>
+</li>
+      <li><a href="module_docs/au/http.html#au.http.TaskResultResponse">TaskResultResponse (class in au.http)</a>
+</li>
+      <li><a href="module_docs/au.html#au.MockTaskTracker.tasks_by_name">tasks_by_name (au.MockTaskTracker attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.MockTaskTracker.tasks_by_name">(au.testing.MockTaskTracker attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TaskState">TaskState (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.TaskState">(class in au.workflow)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/http.html#au.http.TaskStatusResponse">TaskStatusResponse (class in au.http)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/http.html#au.http.TaskSubmitRequest">TaskSubmitRequest (class in au.http)</a>
+</li>
+      <li><a href="module_docs/au/http.html#au.http.TaskSubmitResponse">TaskSubmitResponse (class in au.http)</a>
+</li>
+      <li><a href="module_docs/au.html#au.temporary_async_compute">temporary_async_compute() (in module au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.temporary_async_compute">(in module au.base)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.terminate">terminate() (au.backends.rq_backend.RQBackend method)</a>
 
       <ul>
@@ -376,11 +1185,65 @@
 </li>
         <li><a href="module_docs/au/base.html#au.base.StdLibQueueBackend.terminate">(au.base.StdLibQueueBackend method)</a>
 </li>
+        <li><a href="module_docs/au.html#au.ProcessBackend.terminate">(au.ProcessBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.StdLibQueueBackend.terminate">(au.StdLibQueueBackend method)</a>
+</li>
+        <li><a href="module_docs/au.html#au.SyncTestBackend.terminate">(au.SyncTestBackend method)</a>
+</li>
+        <li><a href="module_docs/au/testing.html#au.testing.SyncTestBackend.terminate">(au.testing.SyncTestBackend method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.ThreadBackend">ThreadBackend (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/base.html#au.base.ThreadBackend">(class in au.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au/hooks.html#au.hooks.TaskEvent.timestamp">timestamp (au.hooks.TaskEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.TaskEvent.timestamp">(au.TaskEvent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TracingMiddleware">TracingMiddleware (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/hooks.html#au.hooks.TracingMiddleware">(class in au.hooks)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.TrackingTestBackend">TrackingTestBackend (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/testing.html#au.testing.TrackingTestBackend">(class in au.testing)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/au/retry.html#au.retry.RetryState.will_retry">will_retry (au.retry.RetryState attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/au.html#au.RetryState.will_retry">(au.RetryState attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/au.html#au.WorkflowBuilder">WorkflowBuilder (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowBuilder">(class in au.workflow)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/au/base.html#au.base.ThreadBackend">ThreadBackend (class in au.base)</a>
+      <li><a href="module_docs/au.html#au.WorkflowTask">WorkflowTask (class in au)</a>
+
+      <ul>
+        <li><a href="module_docs/au/workflow.html#au.workflow.WorkflowTask">(class in au.workflow)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -393,7 +1256,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

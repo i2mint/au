@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.workflow &mdash; au 0.0.16 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="au.testing" href="testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">au.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">au.testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">au.workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#au.workflow.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.TaskGraph.add_task"><code class="docutils literal notranslate"><span class="pre">TaskGraph.add_task()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.TaskGraph.execute"><code class="docutils literal notranslate"><span class="pre">TaskGraph.execute()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.TaskGraph.get_task"><code class="docutils literal notranslate"><span class="pre">TaskGraph.get_task()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.TaskGraph.get_task_result"><code class="docutils literal notranslate"><span class="pre">TaskGraph.get_task_result()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.workflow.TaskState"><code class="docutils literal notranslate"><span class="pre">TaskState</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#au.workflow.WorkflowBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowBuilder.add_task"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder.add_task()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowBuilder.build"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder.build()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.workflow.WorkflowTask"><code class="docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.func"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.func</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.args"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.args</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.kwargs"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.kwargs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.depends_on"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.depends_on</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.task_id"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.task_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.state"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.state</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.result"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.result</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.error"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.workflow.WorkflowTask.is_ready_to_run"><code class="docutils literal notranslate"><span class="pre">WorkflowTask.is_ready_to_run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.workflow.depends_on"><code class="docutils literal notranslate"><span class="pre">depends_on()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">au.workflow</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/au/workflow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-au.workflow">
+<span id="au-workflow"></span><h1>au.workflow<a class="headerlink" href="#module-au.workflow" title="Link to this heading"></a></h1>
+<p>Workflow and task dependency management for AU.</p>
+<p>Provides DAG-based task orchestration with dependency tracking.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="au.workflow.TaskGraph">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">TaskGraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><span class="pre">ComputationBackend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/workflow.html#TaskGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskGraph" title="Link to this definition"></a></dt>
+<dd><p>Directed Acyclic Graph (DAG) for task execution.</p>
+<p>Manages task dependencies and orchestrates execution.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.TaskGraph.add_task">
+<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/au/workflow.html#TaskGraph.add_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskGraph.add_task" title="Link to this definition"></a></dt>
+<dd><p>Add a task to the graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function to execute</p></li>
+<li><p><strong>*args</strong> – Positional arguments</p></li>
+<li><p><strong>depends_on</strong> – Optional list of task IDs this depends on</p></li>
+<li><p><strong>task_id</strong> – Optional custom task ID</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Task ID</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step3</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.TaskGraph.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/au/workflow.html#TaskGraph.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskGraph.execute" title="Link to this definition"></a></dt>
+<dd><p>Execute all tasks in dependency order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> – Optional overall timeout in seconds</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary mapping task IDs to results</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If circular dependencies detected</p></li>
+<li><p><strong>TimeoutError</strong> – If overall timeout exceeded</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">t2</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.TaskGraph.get_task">
+<span class="sig-name descname"><span class="pre">get_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#au.workflow.WorkflowTask" title="au.workflow.WorkflowTask"><span class="pre">WorkflowTask</span></a></span></span><a class="reference internal" href="../../_modules/au/workflow.html#TaskGraph.get_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskGraph.get_task" title="Link to this definition"></a></dt>
+<dd><p>Get a task by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>task_id</strong> – Task ID</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>WorkflowTask instance</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – If task ID not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.TaskGraph.get_task_result">
+<span class="sig-name descname"><span class="pre">get_task_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../../_modules/au/workflow.html#TaskGraph.get_task_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskGraph.get_task_result" title="Link to this definition"></a></dt>
+<dd><p>Get result for a task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>task_id</strong> – Task ID</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Task result</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If task not completed or failed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.workflow.TaskState">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">TaskState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/workflow.html#TaskState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.TaskState" title="Link to this definition"></a></dt>
+<dd><p>State of a task in a workflow.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.workflow.WorkflowBuilder">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><span class="pre">ComputationBackend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#au.base.ComputationStore" title="au.base.ComputationStore"><span class="pre">ComputationStore</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/workflow.html#WorkflowBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowBuilder" title="Link to this definition"></a></dt>
+<dd><p>Fluent interface for building workflows.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">workflow</span> <span class="o">=</span> <span class="p">(</span><span class="n">WorkflowBuilder</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">&#39;step1&#39;</span><span class="p">,</span> <span class="n">process_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">&#39;step2&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;step1&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">&#39;step3&#39;</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;step2&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">build</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.WorkflowBuilder.add_task">
+<span class="sig-name descname"><span class="pre">add_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#au.workflow.WorkflowBuilder" title="au.workflow.WorkflowBuilder"><span class="pre">WorkflowBuilder</span></a></span></span><a class="reference internal" href="../../_modules/au/workflow.html#WorkflowBuilder.add_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowBuilder.add_task" title="Link to this definition"></a></dt>
+<dd><p>Add a task to the workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task_id</strong> – Task ID</p></li>
+<li><p><strong>func</strong> – Function to execute</p></li>
+<li><p><strong>*args</strong> – Positional arguments</p></li>
+<li><p><strong>depends_on</strong> – Optional dependencies</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self for chaining</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.WorkflowBuilder.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#au.workflow.TaskGraph" title="au.workflow.TaskGraph"><span class="pre">TaskGraph</span></a></span></span><a class="reference internal" href="../../_modules/au/workflow.html#WorkflowBuilder.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowBuilder.build" title="Link to this definition"></a></dt>
+<dd><p>Build and return the task graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TaskGraph instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.workflow.TaskState" title="au.workflow.TaskState"><span class="pre">TaskState</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">TaskState.PENDING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/workflow.html#WorkflowTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowTask" title="Link to this definition"></a></dt>
+<dd><p>A task in a workflow with dependencies.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.func">
+<span class="sig-name descname"><span class="pre">func</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.func" title="Link to this definition"></a></dt>
+<dd><p>Function to execute</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.args" title="Link to this definition"></a></dt>
+<dd><p>Positional arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.kwargs" title="Link to this definition"></a></dt>
+<dd><p>Keyword arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.depends_on">
+<span class="sig-name descname"><span class="pre">depends_on</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.depends_on" title="Link to this definition"></a></dt>
+<dd><p>List of task IDs this task depends on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.task_id">
+<span class="sig-name descname"><span class="pre">task_id</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.task_id" title="Link to this definition"></a></dt>
+<dd><p>Unique task ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.state" title="Link to this definition"></a></dt>
+<dd><p>Current state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#au.workflow.TaskState" title="au.workflow.TaskState">au.workflow.TaskState</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.result">
+<span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.result" title="Link to this definition"></a></dt>
+<dd><p>Result value (when completed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.error">
+<span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.error" title="Link to this definition"></a></dt>
+<dd><p>Error message (when failed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.workflow.WorkflowTask.is_ready_to_run">
+<span class="sig-name descname"><span class="pre">is_ready_to_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">completed_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/au/workflow.html#WorkflowTask.is_ready_to_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowTask.is_ready_to_run" title="Link to this definition"></a></dt>
+<dd><p>Check if all dependencies are completed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>completed_tasks</strong> – Set of completed task IDs</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if ready to run</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.workflow.depends_on">
+<span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">depends_on</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dependency_funcs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/workflow.html#depends_on"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.depends_on" title="Link to this definition"></a></dt>
+<dd><p>Decorator to specify task dependencies.</p>
+<dl>
+<dt>Usage:</dt><dd><p>&#64;async_compute
+def step1(n): return n * 2</p>
+<p>&#64;async_compute
+def step2(n): return n + 10</p>
+<p>&#64;async_compute
+&#64;depends_on(step1, step2)
+def step3(result1, result2):</p>
+<blockquote>
+<div><p>return result1 + result2</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Note: This is a simplified version. Full implementation would
+require integration with the async_compute decorator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*dependency_funcs</strong> – Functions this task depends on</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Decorator function</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="testing.html" class="btn btn-neutral float-left" title="au.testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to au’s documentation! &mdash; au 0.0.15 documentation</title>
+  <title>Welcome to au’s documentation! &mdash; au 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f0357c94"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -49,10 +49,17 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/api.html">au.api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/workflow.html">au.workflow</a></li>
 </ul>
 
         </div>
@@ -84,7 +91,81 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.AUConfig"><code class="docutils literal notranslate"><span class="pre">AUConfig</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.BackoffStrategy"><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.CompositeMiddleware"><code class="docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationCancelledError"><code class="docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationResult"><code class="docutils literal notranslate"><span class="pre">ComputationResult</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.HooksMiddleware"><code class="docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MetricsCollectorMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.Middleware"><code class="docutils literal notranslate"><span class="pre">Middleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MockTaskTracker"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.NonRetryableError"><code class="docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ProcessBackend"><code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryPolicy"><code class="docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryState"><code class="docutils literal notranslate"><span class="pre">RetryState</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.SerializationFormat"><code class="docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskEvent"><code class="docutils literal notranslate"><span class="pre">TaskEvent</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskState"><code class="docutils literal notranslate"><span class="pre">TaskState</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TracingMiddleware"><code class="docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TrackingTestBackend"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.WorkflowBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.WorkflowTask"><code class="docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.async_task"><code class="docutils literal notranslate"><span class="pre">async_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.cancel_task"><code class="docutils literal notranslate"><span class="pre">cancel_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_app_from_decorator"><code class="docutils literal notranslate"><span class="pre">create_app_from_decorator()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_observability_middleware"><code class="docutils literal notranslate"><span class="pre">create_observability_middleware()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_test_backend"><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_test_store"><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.depends_on"><code class="docutils literal notranslate"><span class="pre">depends_on()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_global_config"><code class="docutils literal notranslate"><span class="pre">get_global_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_handle"><code class="docutils literal notranslate"><span class="pre">get_handle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_many"><code class="docutils literal notranslate"><span class="pre">get_many()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_result"><code class="docutils literal notranslate"><span class="pre">get_result()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_status"><code class="docutils literal notranslate"><span class="pre">get_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.is_ready"><code class="docutils literal notranslate"><span class="pre">is_ready()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mk_flask_interface"><code class="docutils literal notranslate"><span class="pre">mk_flask_interface()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mk_http_interface"><code class="docutils literal notranslate"><span class="pre">mk_http_interface()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mock_async"><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.reset_global_config"><code class="docutils literal notranslate"><span class="pre">reset_global_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.retry_with_policy"><code class="docutils literal notranslate"><span class="pre">retry_with_policy()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_default_backend"><code class="docutils literal notranslate"><span class="pre">set_default_backend()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_default_store"><code class="docutils literal notranslate"><span class="pre">set_default_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_global_config"><code class="docutils literal notranslate"><span class="pre">set_global_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.submit_many"><code class="docutils literal notranslate"><span class="pre">submit_many()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.submit_task"><code class="docutils literal notranslate"><span class="pre">submit_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/api.html">au.api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.async_task"><code class="docutils literal notranslate"><span class="pre">async_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.cancel_task"><code class="docutils literal notranslate"><span class="pre">cancel_task()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_handle"><code class="docutils literal notranslate"><span class="pre">get_handle()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_many"><code class="docutils literal notranslate"><span class="pre">get_many()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_result"><code class="docutils literal notranslate"><span class="pre">get_result()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_status"><code class="docutils literal notranslate"><span class="pre">get_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.is_ready"><code class="docutils literal notranslate"><span class="pre">is_ready()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.set_default_backend"><code class="docutils literal notranslate"><span class="pre">set_default_backend()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.set_default_store"><code class="docutils literal notranslate"><span class="pre">set_default_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.submit_many"><code class="docutils literal notranslate"><span class="pre">submit_many()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.submit_task"><code class="docutils literal notranslate"><span class="pre">submit_task()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend"><code class="docutils literal notranslate"><span class="pre">RQBackend</span></code></a></li>
@@ -98,6 +179,7 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#architecture-overview">Architecture Overview:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#usage-patterns">Usage Patterns:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationBackend"><code class="docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationCancelledError"><code class="docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationResult"><code class="docutils literal notranslate"><span class="pre">ComputationResult</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
@@ -116,6 +198,67 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/config.html">au.config</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.AUConfig"><code class="docutils literal notranslate"><span class="pre">AUConfig</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.get_global_config"><code class="docutils literal notranslate"><span class="pre">get_global_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.load_config_from_env"><code class="docutils literal notranslate"><span class="pre">load_config_from_env()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.load_config_from_file"><code class="docutils literal notranslate"><span class="pre">load_config_from_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.reset_global_config"><code class="docutils literal notranslate"><span class="pre">reset_global_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.set_global_config"><code class="docutils literal notranslate"><span class="pre">set_global_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/hooks.html">au.hooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware"><code class="docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.HooksMiddleware"><code class="docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TaskEvent"><code class="docutils literal notranslate"><span class="pre">TaskEvent</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TaskEventHandler"><code class="docutils literal notranslate"><span class="pre">TaskEventHandler</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TracingMiddleware"><code class="docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.create_observability_middleware"><code class="docutils literal notranslate"><span class="pre">create_observability_middleware()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/http.html">au.http</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.HTTPException"><code class="docutils literal notranslate"><span class="pre">HTTPException</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskCancelResponse"><code class="docutils literal notranslate"><span class="pre">TaskCancelResponse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskListResponse"><code class="docutils literal notranslate"><span class="pre">TaskListResponse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskResultResponse"><code class="docutils literal notranslate"><span class="pre">TaskResultResponse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskStatusResponse"><code class="docutils literal notranslate"><span class="pre">TaskStatusResponse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskSubmitRequest"><code class="docutils literal notranslate"><span class="pre">TaskSubmitRequest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskSubmitResponse"><code class="docutils literal notranslate"><span class="pre">TaskSubmitResponse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.create_app_from_decorator"><code class="docutils literal notranslate"><span class="pre">create_app_from_decorator()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.mk_flask_interface"><code class="docutils literal notranslate"><span class="pre">mk_flask_interface()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.mk_http_interface"><code class="docutils literal notranslate"><span class="pre">mk_http_interface()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/retry.html">au.retry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.BackoffStrategy"><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.NonRetryableError"><code class="docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryPolicy"><code class="docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryState"><code class="docutils literal notranslate"><span class="pre">RetryState</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.retry_with_policy"><code class="docutils literal notranslate"><span class="pre">retry_with_policy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/testing.html">au.testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.MockTaskTracker"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.TaskCallRecord"><code class="docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.TrackingTestBackend"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.create_test_backend"><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.create_test_store"><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.mock_async"><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/au/workflow.html">au.workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.TaskState"><code class="docutils literal notranslate"><span class="pre">TaskState</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.WorkflowBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.WorkflowTask"><code class="docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.depends_on"><code class="docutils literal notranslate"><span class="pre">depends_on()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -126,8 +269,8 @@
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-<p>Release: 0.0.15</p>
-<p>Last change: Nov 17, 2025</p>
+<p>Release: 0.0.16</p>
+<p>Last change: Jul 26, 2026</p>
 </section>
 
 
@@ -140,7 +283,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

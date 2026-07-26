@@ -5,18 +5,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.backends.rq_backend &mdash; au 0.0.15 documentation</title>
+  <title>au.backends.rq_backend &mdash; au 0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=f0357c94"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -47,10 +47,17 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/api.html">au.api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends.html">au.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/au/workflow.html">au.workflow</a></li>
 </ul>
 
         </div>
@@ -130,8 +137,8 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">store</span><span class="p">:</span> <span class="s2">&quot;ComputationStore&quot;</span><span class="p">,</span>
-        <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">&quot;Queue&quot;</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="s2">&quot;ComputationStore | None&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">&quot;Queue | None&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Middleware&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
@@ -145,15 +152,23 @@
 
 <div class="viewcode-block" id="RQBackend.launch">
 <a class="viewcode-back" href="../../../module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend.launch">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">store</span><span class="p">:</span> <span class="s2">&quot;ComputationStore | None&quot;</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Enqueue computation task to RQ.&quot;&quot;&quot;</span>
+        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
         <span class="c1"># Serialize task data</span>
         <span class="n">task_data</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;func&quot;</span><span class="p">:</span> <span class="n">func</span><span class="p">,</span>
             <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
             <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">,</span>
             <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
-            <span class="s2">&quot;store_reconstruction_info&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_reconstruction_info</span><span class="p">(),</span>
+            <span class="s2">&quot;store_reconstruction_info&quot;</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">get_reconstruction_info</span><span class="p">(),</span>
             <span class="s2">&quot;middleware_configs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_middleware</span><span class="p">(),</span>
         <span class="p">}</span>
         <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">task_data</span><span class="p">)</span>
@@ -214,7 +229,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

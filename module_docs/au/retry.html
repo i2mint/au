@@ -1,0 +1,384 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.retry &mdash; au 0.0.16 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="au.testing" href="testing.html" />
+    <link rel="prev" title="au.http" href="http.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">au.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="http.html">au.http</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">au.retry</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.BackoffStrategy"><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.NonRetryableError"><code class="docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.RetryPolicy"><code class="docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.max_attempts"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.max_attempts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.backoff"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.backoff</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.initial_delay"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.initial_delay</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.max_delay"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.max_delay</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.retry_on"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.retry_on</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.dont_retry_on"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.dont_retry_on</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.on_retry"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.on_retry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.get_delay"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.get_delay()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryPolicy.should_retry"><code class="docutils literal notranslate"><span class="pre">RetryPolicy.should_retry()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.RetryState"><code class="docutils literal notranslate"><span class="pre">RetryState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.attempt_count"><code class="docutils literal notranslate"><span class="pre">RetryState.attempt_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.last_error"><code class="docutils literal notranslate"><span class="pre">RetryState.last_error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.will_retry"><code class="docutils literal notranslate"><span class="pre">RetryState.will_retry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.next_retry_at"><code class="docutils literal notranslate"><span class="pre">RetryState.next_retry_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.retry_history"><code class="docutils literal notranslate"><span class="pre">RetryState.retry_history</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#au.retry.RetryState.add_attempt"><code class="docutils literal notranslate"><span class="pre">RetryState.add_attempt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#au.retry.retry_with_policy"><code class="docutils literal notranslate"><span class="pre">retry_with_policy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">au.workflow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">au.retry</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/au/retry.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-au.retry">
+<span id="au-retry"></span><h1>au.retry<a class="headerlink" href="#module-au.retry" title="Link to this heading"></a></h1>
+<p>Retry policies and error handling for AU.</p>
+<p>Provides configurable retry strategies with backoff policies.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="au.retry.BackoffStrategy">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">BackoffStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/retry.html#BackoffStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.BackoffStrategy" title="Link to this definition"></a></dt>
+<dd><p>Backoff strategy for retries.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="au.retry.NonRetryableError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">NonRetryableError</span></span><a class="reference internal" href="../../_modules/au/retry.html#NonRetryableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.NonRetryableError" title="Link to this definition"></a></dt>
+<dd><p>Base class for errors that should not be retried.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">max_attempts:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">3,</span> <span class="pre">backoff:</span> <span class="pre">~au.retry.BackoffStrategy</span> <span class="pre">=</span> <span class="pre">BackoffStrategy.EXPONENTIAL,</span> <span class="pre">initial_delay:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">max_delay:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">60.0,</span> <span class="pre">retry_on:</span> <span class="pre">list[~typing.Type[Exception]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">dont_retry_on:</span> <span class="pre">list[~typing.Type[Exception]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">on_retry:</span> <span class="pre">~typing.Callable[[int,</span> <span class="pre">Exception],</span> <span class="pre">None]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/retry.html#RetryPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryPolicy" title="Link to this definition"></a></dt>
+<dd><p>Configuration for retry behavior.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.max_attempts">
+<span class="sig-name descname"><span class="pre">max_attempts</span></span><a class="headerlink" href="#au.retry.RetryPolicy.max_attempts" title="Link to this definition"></a></dt>
+<dd><p>Maximum number of retry attempts (including initial try)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.backoff">
+<span class="sig-name descname"><span class="pre">backoff</span></span><a class="headerlink" href="#au.retry.RetryPolicy.backoff" title="Link to this definition"></a></dt>
+<dd><p>Backoff strategy (exponential, linear, constant)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#au.retry.BackoffStrategy" title="au.retry.BackoffStrategy">au.retry.BackoffStrategy</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.initial_delay">
+<span class="sig-name descname"><span class="pre">initial_delay</span></span><a class="headerlink" href="#au.retry.RetryPolicy.initial_delay" title="Link to this definition"></a></dt>
+<dd><p>Initial delay in seconds before first retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.max_delay">
+<span class="sig-name descname"><span class="pre">max_delay</span></span><a class="headerlink" href="#au.retry.RetryPolicy.max_delay" title="Link to this definition"></a></dt>
+<dd><p>Maximum delay between retries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.retry_on">
+<span class="sig-name descname"><span class="pre">retry_on</span></span><a class="headerlink" href="#au.retry.RetryPolicy.retry_on" title="Link to this definition"></a></dt>
+<dd><p>List of exception types to retry on (empty means retry all)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Type[Exception]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.dont_retry_on">
+<span class="sig-name descname"><span class="pre">dont_retry_on</span></span><a class="headerlink" href="#au.retry.RetryPolicy.dont_retry_on" title="Link to this definition"></a></dt>
+<dd><p>List of exception types to never retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Type[Exception]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.on_retry">
+<span class="sig-name descname"><span class="pre">on_retry</span></span><a class="headerlink" href="#au.retry.RetryPolicy.on_retry" title="Link to this definition"></a></dt>
+<dd><p>Optional callback called before each retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[int, Exception], None] | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.get_delay">
+<span class="sig-name descname"><span class="pre">get_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../../_modules/au/retry.html#RetryPolicy.get_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryPolicy.get_delay" title="Link to this definition"></a></dt>
+<dd><p>Calculate delay before next retry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attempt</strong> – Current attempt number (1-indexed)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Delay in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.retry.RetryPolicy.should_retry">
+<span class="sig-name descname"><span class="pre">should_retry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/au/retry.html#RetryPolicy.should_retry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryPolicy.should_retry" title="Link to this definition"></a></dt>
+<dd><p>Determine if we should retry given an attempt number and error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attempt</strong> – Current attempt number (1-indexed)</p></li>
+<li><p><strong>error</strong> – Exception that occurred</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if should retry, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.retry.RetryState">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list[tuple[float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]]</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/retry.html#RetryState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryState" title="Link to this definition"></a></dt>
+<dd><p>State tracking for retries.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryState.attempt_count">
+<span class="sig-name descname"><span class="pre">attempt_count</span></span><a class="headerlink" href="#au.retry.RetryState.attempt_count" title="Link to this definition"></a></dt>
+<dd><p>Number of attempts made</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryState.last_error">
+<span class="sig-name descname"><span class="pre">last_error</span></span><a class="headerlink" href="#au.retry.RetryState.last_error" title="Link to this definition"></a></dt>
+<dd><p>Last exception encountered</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Exception | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryState.will_retry">
+<span class="sig-name descname"><span class="pre">will_retry</span></span><a class="headerlink" href="#au.retry.RetryState.will_retry" title="Link to this definition"></a></dt>
+<dd><p>Whether another retry will be attempted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryState.next_retry_at">
+<span class="sig-name descname"><span class="pre">next_retry_at</span></span><a class="headerlink" href="#au.retry.RetryState.next_retry_at" title="Link to this definition"></a></dt>
+<dd><p>Timestamp of next retry attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.retry.RetryState.retry_history">
+<span class="sig-name descname"><span class="pre">retry_history</span></span><a class="headerlink" href="#au.retry.RetryState.retry_history" title="Link to this definition"></a></dt>
+<dd><p>List of (timestamp, exception) tuples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[float, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.retry.RetryState.add_attempt">
+<span class="sig-name descname"><span class="pre">add_attempt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/au/retry.html#RetryState.add_attempt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryState.add_attempt" title="Link to this definition"></a></dt>
+<dd><p>Record a retry attempt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>error</strong> – Exception that occurred</p></li>
+<li><p><strong>will_retry</strong> – Whether another retry will happen</p></li>
+<li><p><strong>next_retry_at</strong> – Timestamp of next retry</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="au.retry.RetryableError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryableError</span></span><a class="reference internal" href="../../_modules/au/retry.html#RetryableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryableError" title="Link to this definition"></a></dt>
+<dd><p>Base class for errors that should be retried.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.retry.retry_with_policy">
+<span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">retry_with_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#au.retry.RetryPolicy" title="au.retry.RetryPolicy"><span class="pre">RetryPolicy</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../../_modules/au/retry.html#retry_with_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.retry_with_policy" title="Link to this definition"></a></dt>
+<dd><p>Execute a function with retry policy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> – Function to execute</p></li>
+<li><p><strong>args</strong> – Positional arguments for function</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments for function</p></li>
+<li><p><strong>policy</strong> – Retry policy (None means no retry)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Function return value</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Last exception if all retries exhausted</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="http.html" class="btn btn-neutral float-left" title="au.http" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="testing.html" class="btn btn-neutral float-right" title="au.testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

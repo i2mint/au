@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>au.retry &mdash; au 0.0.16 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            au
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au.html">au</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/api.html">au.api</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends.html">au.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/base.html">au.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/config.html">au.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/hooks.html">au.hooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/http.html">au.http</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/retry.html">au.retry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/testing.html">au.testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/workflow.html">au.workflow</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">au</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">au.retry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for au.retry</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Retry policies and error handling for AU.</span>
+
+<span class="sd">Provides configurable retry strategies with backoff policies.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+
+<div class="viewcode-block" id="BackoffStrategy">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.BackoffStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BackoffStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backoff strategy for retries.&quot;&quot;&quot;</span>
+
+    <span class="n">EXPONENTIAL</span> <span class="o">=</span> <span class="s2">&quot;exponential&quot;</span>
+    <span class="n">LINEAR</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
+    <span class="n">CONSTANT</span> <span class="o">=</span> <span class="s2">&quot;constant&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RetryPolicy">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryPolicy">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RetryPolicy</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for retry behavior.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        max_attempts: Maximum number of retry attempts (including initial try)</span>
+<span class="sd">        backoff: Backoff strategy (exponential, linear, constant)</span>
+<span class="sd">        initial_delay: Initial delay in seconds before first retry</span>
+<span class="sd">        max_delay: Maximum delay between retries</span>
+<span class="sd">        retry_on: List of exception types to retry on (empty means retry all)</span>
+<span class="sd">        dont_retry_on: List of exception types to never retry</span>
+<span class="sd">        on_retry: Optional callback called before each retry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">backoff</span><span class="p">:</span> <span class="n">BackoffStrategy</span> <span class="o">=</span> <span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">EXPONENTIAL</span>
+    <span class="n">initial_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">max_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
+    <span class="n">retry_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">dont_retry_on</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">on_retry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="RetryPolicy.should_retry">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryPolicy.should_retry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">should_retry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if we should retry given an attempt number and error.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attempt: Current attempt number (1-indexed)</span>
+<span class="sd">            error: Exception that occurred</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if should retry, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if we&#39;ve exceeded max attempts</span>
+        <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check if error is in dont_retry list</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_retry_on</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">exc_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_retry_on</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check if error is in retry list (if specified)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">exc_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_on</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="c1"># If retry_on is specified and error not in it, don&#39;t retry</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Default: retry all errors</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="RetryPolicy.get_delay">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryPolicy.get_delay">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate delay before next retry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attempt: Current attempt number (1-indexed)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Delay in seconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backoff</span> <span class="o">==</span> <span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">CONSTANT</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">backoff</span> <span class="o">==</span> <span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span> <span class="o">*</span> <span class="n">attempt</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># EXPONENTIAL</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Cap at max_delay</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_delay</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RetryState">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryState">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RetryState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;State tracking for retries.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        attempt_count: Number of attempts made</span>
+<span class="sd">        last_error: Last exception encountered</span>
+<span class="sd">        will_retry: Whether another retry will be attempted</span>
+<span class="sd">        next_retry_at: Timestamp of next retry attempt</span>
+<span class="sd">        retry_history: List of (timestamp, exception) tuples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">attempt_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">will_retry</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">next_retry_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">retry_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RetryState.add_attempt">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryState.add_attempt">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">will_retry</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">next_retry_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a retry attempt.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            error: Exception that occurred</span>
+<span class="sd">            will_retry: Whether another retry will happen</span>
+<span class="sd">            next_retry_at: Timestamp of next retry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attempt_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="n">error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">will_retry</span> <span class="o">=</span> <span class="n">will_retry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_retry_at</span> <span class="o">=</span> <span class="n">next_retry_at</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_history</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">)))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="retry_with_policy">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.retry_with_policy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">retry_with_policy</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RetryPolicy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a function with retry policy.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        func: Function to execute</span>
+<span class="sd">        args: Positional arguments for function</span>
+<span class="sd">        kwargs: Keyword arguments for function</span>
+<span class="sd">        policy: Retry policy (None means no retry)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Function return value</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Last exception if all retries exhausted</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="c1"># No retry policy means single attempt</span>
+    <span class="k">if</span> <span class="n">policy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_error</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">while</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">policy</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">:</span>
+        <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">last_error</span> <span class="o">=</span> <span class="n">e</span>
+
+            <span class="c1"># Check if we should retry</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">policy</span><span class="o">.</span><span class="n">should_retry</span><span class="p">(</span><span class="n">attempt</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+                <span class="k">raise</span>
+
+            <span class="c1"># If this was the last attempt, raise</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="n">policy</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+            <span class="c1"># Calculate delay</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">get_delay</span><span class="p">(</span><span class="n">attempt</span><span class="p">)</span>
+
+            <span class="c1"># Call retry callback if provided</span>
+            <span class="k">if</span> <span class="n">policy</span><span class="o">.</span><span class="n">on_retry</span><span class="p">:</span>
+                <span class="n">policy</span><span class="o">.</span><span class="n">on_retry</span><span class="p">(</span><span class="n">attempt</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+            <span class="c1"># Log retry</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Retry attempt </span><span class="si">{</span><span class="n">attempt</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">policy</span><span class="o">.</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;after </span><span class="si">{</span><span class="n">delay</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s delay. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Wait before retry</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+
+    <span class="c1"># Should not reach here, but just in case</span>
+    <span class="k">if</span> <span class="n">last_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">last_error</span></div>
+
+
+
+<div class="viewcode-block" id="RetryableError">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.RetryableError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RetryableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for errors that should be retried.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="NonRetryableError">
+<a class="viewcode-back" href="../../module_docs/au/retry.html#au.NonRetryableError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NonRetryableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for errors that should not be retried.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<span class="c1"># Common retry policies</span>
+
+<span class="n">DEFAULT_RETRY_POLICY</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="o">=</span><span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">EXPONENTIAL</span><span class="p">,</span>
+    <span class="n">initial_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">AGGRESSIVE_RETRY_POLICY</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_attempts</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="o">=</span><span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">EXPONENTIAL</span><span class="p">,</span>
+    <span class="n">initial_delay</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">max_delay</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">CONSERVATIVE_RETRY_POLICY</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_attempts</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="o">=</span><span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">CONSTANT</span><span class="p">,</span>
+    <span class="n">initial_delay</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">NETWORK_RETRY_POLICY</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+    <span class="n">max_attempts</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">backoff</span><span class="o">=</span><span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">EXPONENTIAL</span><span class="p">,</span>
+    <span class="n">initial_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">max_delay</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+    <span class="n">retry_on</span><span class="o">=</span><span class="p">[</span><span class="ne">ConnectionError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">,</span> <span class="n">RetryableError</span><span class="p">],</span>
+    <span class="n">dont_retry_on</span><span class="o">=</span><span class="p">[</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">NonRetryableError</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
