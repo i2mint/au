@@ -166,5 +166,5 @@ def test_failed_task():
     status = get_status(task_id)
     assert status == ComputationStatus.FAILED
 
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError):
         get_result(task_id)
