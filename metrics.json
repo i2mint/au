@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 6.547695636749268,
+  "collection_duration_seconds": 6.8891332149505615,
   "commit_message": "Stores: unique temp file per write, cleanup without nested auto-cleanup, RUNNING never overwrites a terminal state (#6)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
   "commit_sha": "f7883d158c603df58aa0924dc8861e77e200d30d",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35308,
-      "comment_lines_ratio": 0.06516050212046609,
-      "docs_lines": 42313,
-      "empty_lines": 71013,
-      "empty_lines_ratio": 0.1310536631097955,
-      "files_analyzed": 1342,
-      "function_lines": 324917,
-      "function_lines_ratio": 0.5996305332353994,
-      "mean_lines_per_function": 15.955460616774701,
-      "num_classes": 3035,
-      "num_functions": 20364,
+      "comment_lines": 35123,
+      "comment_lines_ratio": 0.06513233047012922,
+      "docs_lines": 42221,
+      "empty_lines": 70596,
+      "empty_lines_ratio": 0.13091370332458052,
+      "files_analyzed": 1327,
+      "function_lines": 323094,
+      "function_lines_ratio": 0.5991477146290445,
+      "mean_lines_per_function": 15.95368358680624,
+      "num_classes": 3021,
+      "num_functions": 20252,
       "pypi_version": "0.1.1",
-      "total_lines": 541862
+      "total_lines": 539256
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-13T14:19:17.202990Z",
+  "timestamp": "2026-10-13T14:19:20.101286Z",
   "workflow_status": {}
 }
