@@ -1,3 +1,4 @@
+import sys
 import time
 from datetime import timedelta
 import pytest
@@ -16,11 +17,38 @@ from au.base import (
     ComputationResult,
 )
 
+# Functions a worker process runs are defined at module level and wrapped inside
+# the tests: where processes are spawned (Windows, macOS) the function is pickled
+# by reference, which a local function or a name rebound by a decorator cannot be.
+
+
+def _double(x):
+    return x * 2
+
+
+def _inc(x):
+    return x + 1
+
+
+def _square(x):
+    return x * x
+
+
+def _slow(x):
+    time.sleep(10)
+    return x
+
+
+def _make_dict(x):
+    return {"val": x, "list": [x, x + 1]}
+
+
+def _identity(x):
+    return x
+
 
 def test_basic_async_compute(tmp_path):
-    @async_compute(base_path=tmp_path)
-    def double(x):
-        return x * 2
+    double = async_compute(base_path=tmp_path)(_double)
 
     handle = double(21)
     result = handle.get_result(timeout=5)
@@ -33,9 +61,7 @@ def test_custom_backend_and_store(tmp_path):
     store = FileSystemStore(tmp_path, ttl_seconds=60)
     backend = ProcessBackend(store)
 
-    @async_compute(backend=backend, store=store)
-    def inc(x):
-        return x + 1
+    inc = async_compute(backend=backend, store=store)(_inc)
 
     handle = inc(10)
     assert handle.get_status() in (ComputationStatus.PENDING, ComputationStatus.RUNNING)
@@ -59,9 +85,9 @@ def test_middleware_and_metrics(tmp_path):
     metrics = SharedMetricsMiddleware(**shared_state)
     logging_mw = LoggingMiddleware()
 
-    @async_compute(base_path=tmp_path, middleware=[metrics, logging_mw])
-    def square(x):
-        return x * x
+    square = async_compute(base_path=tmp_path, middleware=[metrics, logging_mw])(
+        _square
+    )
 
     handles = [square(i) for i in range(5)]
     # Wait for all handles to be ready, but don't hang forever
@@ -86,10 +112,7 @@ def test_cancellation_and_termination(tmp_path):
     store = FileSystemStore(tmp_path, ttl_seconds=60)
     backend = ProcessBackend(store)
 
-    @async_compute(backend=backend, store=store)
-    def slow(x):
-        time.sleep(10)
-        return x
+    slow = async_compute(backend=backend, store=store)(_slow)
 
     handle: ComputationHandle = slow(123)
     # Cancel and terminate the process
@@ -106,9 +129,9 @@ def test_cancellation_and_termination(tmp_path):
 
 
 def test_pickle_serialization(tmp_path):
-    @async_compute(base_path=tmp_path, serialization=SerializationFormat.PICKLE)
-    def make_dict(x):
-        return {"val": x, "list": [x, x + 1]}
+    make_dict = async_compute(
+        base_path=tmp_path, serialization=SerializationFormat.PICKLE
+    )(_make_dict)
 
     handle = make_dict(7)
     result = handle.get_result(timeout=5)
@@ -116,9 +139,7 @@ def test_pickle_serialization(tmp_path):
 
 
 def test_cleanup_expired(tmp_path):
-    @async_compute(base_path=tmp_path, ttl_seconds=1)
-    def foo(x):
-        return x
+    foo = async_compute(base_path=tmp_path, ttl_seconds=1)(_identity)
 
     handle = foo(1)
     handle.get_result(timeout=5)
@@ -210,6 +231,11 @@ if __name__ == "__main__":
 # --- races between writers and readers of one store (i2mint/au#6) -------------
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="Windows refuses to replace a file a reader has open (PermissionError); "
+    "see the issue on retrying the rename",
+)
 def test_concurrent_writers_of_one_key_never_leave_a_torn_file(tmp_path):
     """The worker's RUNNING and the caller's CANCELLED share a key; two writers
     must not interleave into one file (a reader saw ``Extra data``)."""
@@ -329,3 +355,33 @@ def test_temp_files_never_look_like_keys_whatever_the_suffix(tmp_path):
     store[key] = ComputationResult(1, ComputationStatus.COMPLETED)
     assert seen_mid_write == [[]]
     assert list(store) == [key] and len(store) == 1
+
+
+# --- platforms without fork (i2mint/au#7) --------------------------------------
+
+
+def test_process_backend_builds_where_fork_does_not_exist(monkeypatch):
+    """Windows: ``set_start_method('fork')`` raises ValueError, so it is not asked."""
+    import multiprocessing
+
+    def no_fork(method, force=False):
+        raise ValueError("cannot find context for 'fork'")
+
+    monkeypatch.setattr(multiprocessing, "get_all_start_methods", lambda: ["spawn"])
+    monkeypatch.setattr(multiprocessing, "set_start_method", no_fork)
+    monkeypatch.setattr(multiprocessing, "get_start_method", lambda *a, **k: "spawn")
+    backend = ProcessBackend()
+    assert backend.store is None
+
+
+def test_a_spawned_process_gets_a_clear_refusal_for_an_unpicklable_function(
+    tmp_path, monkeypatch
+):
+    import multiprocessing
+
+    monkeypatch.setattr(multiprocessing, "get_start_method", lambda *a, **k: "spawn")
+    store = FileSystemStore(tmp_path)
+    backend = ProcessBackend(store)
+    with pytest.raises(ValueError, match="module-level function"):
+        backend.launch(lambda x: x, (1,), {}, "k", store)
+    assert "k" not in backend._processes

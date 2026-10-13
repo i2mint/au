@@ -70,7 +70,6 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -746,6 +745,24 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
         store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
 
+def _require_picklable(func: Callable, args: tuple, kwargs: dict) -> None:
+    """Refuse, with the fix, work a spawned process cannot receive.
+
+    Where processes are spawned (Windows, and macOS by default) the function and
+    its arguments cross by pickle: a lambda, a local function, or a module-level
+    name rebound by a decorator fails there with an error that does not say so.
+    """
+    try:
+        pickle.dumps((func, args, kwargs))
+    except Exception as e:
+        raise ValueError(
+            f"{getattr(func, '__qualname__', func)!r} cannot be sent to a spawned "
+            f"process ({type(e).__name__}: {e}). On this platform the start method "
+            f"is {multiprocessing.get_start_method()!r}, which pickles the function: "
+            "use a module-level function, or ThreadBackend."
+        ) from e
+
+
 def _worker_function(
     func: Callable,
     args: tuple,
@@ -815,7 +832,14 @@ class ProcessBackend(ComputationBackend):
         self._processes = {}
 
     def _ensure_fork_method(self) -> None:
-        """Ensure we're using fork method for better pickling compatibility."""
+        """Prefer ``fork`` for better pickling compatibility, where it exists.
+
+        ``fork`` does not exist on Windows, where asking for it raises
+        ``ValueError`` (i2mint/au#7): there the platform default (``spawn``) is
+        kept, and ``launch`` checks that the function can be pickled.
+        """
+        if "fork" not in multiprocessing.get_all_start_methods():
+            return
         try:
             current_method = multiprocessing.get_start_method()
             if current_method != "fork":
@@ -867,6 +891,8 @@ class ProcessBackend(ComputationBackend):
                     )
 
         middleware_configs = self._serialize_middleware()
+        if multiprocessing.get_start_method() != "fork":
+            _require_picklable(func, args, kwargs)
         process = multiprocessing.Process(
             target=_worker_function,
             args=(func, args, kwargs, store, key, middleware_configs),
