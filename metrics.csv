@@ -1,26 +1,28 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-13T14:19:28.414264Z
-commit_sha,30d35dad37fcb9f6815470f7f024404a8a560258
-commit_message,Merge f7883d158c603df58aa0924dc8861e77e200d30d into 1811ff8b887ead0358f60755d4c1c9acbbe4c84d
+timestamp,2026-10-13T14:40:48.262003Z
+commit_sha,acfcd6fe921b57f13faba5b29f002298b84c2535
+commit_message,"Review of #6: store.get in _mark_running, cancel re-asserts after terminate, temp files in a subdirectory
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 python_version,3.10
 metrics.umpyre_stats.num_functions,20364
 metrics.umpyre_stats.num_classes,3035
-metrics.umpyre_stats.total_lines,541862
-metrics.umpyre_stats.empty_lines,71013
-metrics.umpyre_stats.comment_lines,35308
-metrics.umpyre_stats.docs_lines,42313
-metrics.umpyre_stats.function_lines,324917
-metrics.umpyre_stats.empty_lines_ratio,0.1310536631097955
-metrics.umpyre_stats.comment_lines_ratio,0.06516050212046609
-metrics.umpyre_stats.function_lines_ratio,0.5996305332353994
-metrics.umpyre_stats.mean_lines_per_function,15.955460616774701
+metrics.umpyre_stats.total_lines,541885
+metrics.umpyre_stats.empty_lines,71016
+metrics.umpyre_stats.comment_lines,35315
+metrics.umpyre_stats.docs_lines,42318
+metrics.umpyre_stats.function_lines,324936
+metrics.umpyre_stats.empty_lines_ratio,0.13105363684176533
+metrics.umpyre_stats.comment_lines_ratio,0.06517065429011691
+metrics.umpyre_stats.function_lines_ratio,0.5996401450492264
+metrics.umpyre_stats.mean_lines_per_function,15.956393635827931
 metrics.umpyre_stats.files_analyzed,1342
 metrics.umpyre_stats.pypi_version,0.1.1
 metrics.workflow_status.last_run_status,failure
-metrics.workflow_status.last_success_timestamp,2026-10-13T05:27:18Z
-metrics.workflow_status.recent_failure_count,3
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/38351499890
+metrics.workflow_status.last_success_timestamp,2026-10-13T14:19:26Z
+metrics.workflow_status.recent_failure_count,2
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/38412191594
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -36,4 +38,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.534811973571777
+collection_duration_seconds,7.284132719039917
