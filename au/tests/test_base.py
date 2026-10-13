@@ -234,7 +234,7 @@ if __name__ == "__main__":
 @pytest.mark.skipif(
     sys.platform == "win32",
     reason="Windows refuses to replace a file a reader has open (PermissionError); "
-    "see the issue on retrying the rename",
+    "see au#10 (retry the rename)",
 )
 def test_concurrent_writers_of_one_key_never_leave_a_torn_file(tmp_path):
     """The worker's RUNNING and the caller's CANCELLED share a key; two writers
@@ -374,14 +374,75 @@ def test_process_backend_builds_where_fork_does_not_exist(monkeypatch):
     assert backend.store is None
 
 
+def _put_double(queue, x):
+    queue.put(x * 2)
+
+
+@pytest.fixture
+def spawn_start_method():
+    """Run with the ``spawn`` start method (what Windows has), then put ``fork``
+    back for the rest of the session."""
+    import multiprocessing
+
+    previous = multiprocessing.get_start_method(allow_none=True)
+    multiprocessing.set_start_method("spawn", force=True)
+    try:
+        yield
+    finally:
+        multiprocessing.set_start_method(previous or "fork", force=True)
+
+
+def test_spawn_accepts_what_only_a_starting_process_can_receive(
+    tmp_path, spawn_start_method
+):
+    """A Queue pickles only while a process is being started, so pickling the
+    arguments up front (the first version of this change) refused it."""
+    import multiprocessing
+
+    store = FileSystemStore(tmp_path)
+    backend = ProcessBackend(store)
+    multiprocessing.set_start_method("spawn", force=True)  # the backend forces fork
+    queue = multiprocessing.Queue()
+    backend.launch(_put_double, (queue, 21), {}, "k", store)
+    assert queue.get(timeout=30) == 42
+    backend._processes["k"].join(10)
+
+
 def test_a_spawned_process_gets_a_clear_refusal_for_an_unpicklable_function(
-    tmp_path, monkeypatch
+    tmp_path, spawn_start_method
 ):
     import multiprocessing
 
-    monkeypatch.setattr(multiprocessing, "get_start_method", lambda *a, **k: "spawn")
     store = FileSystemStore(tmp_path)
     backend = ProcessBackend(store)
+    multiprocessing.set_start_method("spawn", force=True)
     with pytest.raises(ValueError, match="module-level function"):
         backend.launch(lambda x: x, (1,), {}, "k", store)
     assert "k" not in backend._processes
+
+
+def test_a_launch_that_raises_does_not_leave_the_key_running(tmp_path):
+    from au.api import submit_task
+    from au.base import ComputationBackend
+
+    class Refusing(ComputationBackend):
+        def launch(self, func, args, kwargs, key, store=None):
+            raise ValueError("cannot launch")
+
+    store = FileSystemStore(tmp_path)
+    with pytest.raises(ValueError, match="cannot launch"):
+        submit_task(_identity, 1, key="job", backend=Refusing(), store=store)
+    assert store["job"].status == ComputationStatus.FAILED
+    # ... so a resubmit under the same key is not taken for a live duplicate.
+    backend = ProcessBackend(store)
+    assert submit_task(_identity, 1, key="job", backend=backend, store=store) == "job"
+
+
+def test_a_retry_policy_wrapper_pickles_by_reference():
+    import pickle
+
+    from au.api import _WithRetryPolicy
+    from au.retry import RetryPolicy
+
+    wrapped = pickle.loads(pickle.dumps(_WithRetryPolicy(_identity, RetryPolicy())))
+    assert wrapped(5) == 5

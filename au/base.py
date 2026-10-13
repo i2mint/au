@@ -745,22 +745,26 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
         store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
 
-def _require_picklable(func: Callable, args: tuple, kwargs: dict) -> None:
-    """Refuse, with the fix, work a spawned process cannot receive.
+def _explained_start_failure(error: Exception) -> Exception:
+    """The error to raise when a process could not be started.
 
-    Where processes are spawned (Windows, and macOS by default) the function and
-    its arguments cross by pickle: a lambda, a local function, or a module-level
-    name rebound by a decorator fails there with an error that does not say so.
+    Where processes are spawned (Windows; macOS and Python 3.14 by default if
+    the start method is changed) the work crosses by pickle at ``start()``: a
+    lambda, a local function, or a name rebound by a decorator fails there with
+    an error that does not say so. Starting is the only honest test of what a
+    spawned process accepts (a ``multiprocessing.Queue`` pickles only then).
     """
-    try:
-        pickle.dumps((func, args, kwargs))
-    except Exception as e:
-        raise ValueError(
-            f"{getattr(func, '__qualname__', func)!r} cannot be sent to a spawned "
-            f"process ({type(e).__name__}: {e}). On this platform the start method "
-            f"is {multiprocessing.get_start_method()!r}, which pickles the function: "
-            "use a module-level function, or ThreadBackend."
-        ) from e
+    # Pickling failures surface as PicklingError, TypeError ("cannot pickle ...")
+    # or AttributeError ("Can't get local object ...").
+    pickling = isinstance(error, (pickle.PicklingError, TypeError, AttributeError))
+    if multiprocessing.get_start_method() == "fork" or not pickling:
+        return error
+    return ValueError(
+        f"The work cannot be sent to a spawned process ({type(error).__name__}: "
+        f"{error}). The start method is {multiprocessing.get_start_method()!r}, "
+        "which pickles the function and its arguments: use a module-level "
+        "function, or ThreadBackend."
+    )
 
 
 def _worker_function(
@@ -891,14 +895,16 @@ class ProcessBackend(ComputationBackend):
                     )
 
         middleware_configs = self._serialize_middleware()
-        if multiprocessing.get_start_method() != "fork":
-            _require_picklable(func, args, kwargs)
         process = multiprocessing.Process(
             target=_worker_function,
             args=(func, args, kwargs, store, key, middleware_configs),
         )
         self._processes[key] = process
-        process.start()
+        try:
+            process.start()
+        except Exception as e:
+            self._processes.pop(key, None)
+            raise _explained_start_failure(e) from e
 
     def terminate(self, key: str) -> None:
         proc = self._processes.get(key)

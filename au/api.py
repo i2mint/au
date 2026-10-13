@@ -152,6 +152,17 @@ def _inflight_record(store: ComputationStore, key: str) -> Optional[ComputationR
     return existing
 
 
+class _WithRetryPolicy:
+    """``func`` retried under ``policy``. A class rather than a local function so
+    it pickles by reference, which a spawned process needs (i2mint/au#7)."""
+
+    def __init__(self, func: Callable, policy: RetryPolicy):
+        self.func, self.policy = func, policy
+
+    def __call__(self, *args, **kwargs):
+        return retry_with_policy(self.func, args, kwargs, self.policy)
+
+
 def submit_task(
     func: Callable,
     *args,
@@ -204,15 +215,15 @@ def submit_task(
 
     # If retry policy provided, wrap function
     if retry_policy:
-        original_func = func
+        func = _WithRetryPolicy(func, retry_policy)
 
-        def wrapped_func(*args, **kwargs):
-            return retry_with_policy(original_func, args, kwargs, retry_policy)
-
-        func = wrapped_func
-
-    # Launch task
-    backend.launch(func, args, kwargs, key, store)
+    # Launch task. A launch that raises must not leave the key RUNNING for good
+    # (a resubmit with the same key would be taken for a live duplicate).
+    try:
+        backend.launch(func, args, kwargs, key, store)
+    except Exception as e:
+        store[key] = ComputationResult(None, ComputationStatus.FAILED, error=e)
+        raise
 
     return key
 
