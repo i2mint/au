@@ -301,6 +301,10 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         pass
 
 
+#: Where ``FileSystemStore`` writes a result before renaming it into place.
+_WRITING_DIR = ".writing"
+
+
 class FileSystemStore(ComputationStore):
     """
     Store computation results in the filesystem with automatic cleanup.
@@ -435,12 +439,16 @@ class FileSystemStore(ComputationStore):
         if result.is_ready and result.completed_at is None:
             result.completed_at = datetime.now()
 
-        # A temp file of its own per write, in the same directory so the rename
+        # A temp file of its own per write, on the same filesystem so the rename
         # is atomic. A shared ``<key>.json.tmp`` let two writers of one key (the
         # worker's RUNNING and the caller's CANCELLED) interleave bytes into one
-        # file, which a reader saw as ``Extra data`` (i2mint/au#6).
-        tmp_path = path.with_name(f"{path.name}.{uuid.uuid4().hex}.tmp")
+        # file, which a reader saw as ``Extra data`` (i2mint/au#6). It lives in a
+        # subdirectory so no suffix can make it look like a key to ``__iter__``,
+        # and its name does not grow the key's.
+        tmp_dir = self.base_path / _WRITING_DIR
+        tmp_path = tmp_dir / f"{uuid.uuid4().hex}.tmp"
         try:
+            tmp_dir.mkdir(exist_ok=True)
             with open(tmp_path, "wb") as f:
                 f.write(self._serialize(result))
             tmp_path.replace(path)
@@ -733,7 +741,8 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
     A worker starts after the caller may have cancelled it; writing RUNNING over
     that CANCELLED makes the cancellation disappear (i2mint/au#6).
     """
-    if not store[key].is_ready:
+    current = store.get(key)  # a store may raise KeyError for a key not yet written
+    if current is None or not current.is_ready:
         store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
 
@@ -1063,6 +1072,11 @@ class ComputationHandle(Generic[T]):
 
         Returns:
             True if cancelled, False if already in a terminal state.
+
+        Note:
+            Only a backend that can stop the work (``ProcessBackend``) makes
+            CANCELLED final. A thread, or a pool task that is already running,
+            cannot be stopped and may still write its own result afterwards.
         """
         result = self.store[self.key]
         if not result.is_ready:
@@ -1073,6 +1087,15 @@ class ComputationHandle(Generic[T]):
             )
             if self.backend:
                 self.backend.terminate(self.key)
+                # A worker that started between the first write and the
+                # terminate may have written RUNNING over it, and nothing writes
+                # after the terminate returns (ProcessBackend waits for the
+                # process to exit): say it again so CANCELLED is what is left.
+                self.store[self.key] = ComputationResult(
+                    None,
+                    ComputationStatus.CANCELLED,
+                    terminal_reason=reason,
+                )
             return True
         return False
 

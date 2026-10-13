@@ -272,3 +272,60 @@ def test_a_worker_starting_late_does_not_undo_a_cancellation(tmp_path):
     fresh = store.create_key()
     _mark_running(store, fresh)
     assert store[fresh].status == ComputationStatus.RUNNING
+
+
+# --- review of au#8 -----------------------------------------------------------
+
+
+def test_a_late_running_mark_works_on_a_store_that_raises_for_a_missing_key():
+    """``InMemoryStore`` raises KeyError for a key nobody wrote yet."""
+    from au.base import ThreadBackend, _mark_running
+    from au.testing import InMemoryStore
+
+    store = InMemoryStore()
+    _mark_running(store, "never-written")
+    assert store["never-written"].status == ComputationStatus.RUNNING
+
+    @async_compute(backend=ThreadBackend(store), store=store)
+    def double(x):
+        return x * 2
+
+    assert double(21).get_result(timeout=5) == 42
+
+
+def _quick(x):
+    time.sleep(0.2)
+    return x
+
+
+def test_a_cancel_just_after_launch_always_ends_cancelled(tmp_path):
+    """A worker starting between cancel's write and the terminate used to leave
+    RUNNING behind for good."""
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    backend = ProcessBackend(store)
+    wrapped = async_compute(backend=backend, store=store)(_quick)
+    stuck, cancelled = 0, 0
+    for i in range(80):
+        handle = wrapped(i)
+        time.sleep(0.001 * (1 + i % 2))
+        if handle.cancel():
+            cancelled += 1
+            if handle.get_status() != ComputationStatus.CANCELLED:
+                stuck += 1
+    assert cancelled >= 70 and stuck == 0
+
+
+def test_temp_files_never_look_like_keys_whatever_the_suffix(tmp_path):
+    store = FileSystemStore(tmp_path, suffix=".tmp", auto_cleanup=False)
+    key = store.create_key()
+    seen_mid_write = []
+    real = store._serialize
+
+    def serialize_and_look(result):
+        seen_mid_write.append(list(store))  # the temp file exists by now
+        return real(result)
+
+    store._serialize = serialize_and_look
+    store[key] = ComputationResult(1, ComputationStatus.COMPLETED)
+    assert seen_mid_write == [[]]
+    assert list(store) == [key] and len(store) == 1
