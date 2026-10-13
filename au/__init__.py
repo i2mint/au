@@ -90,21 +90,29 @@ from au.hooks import (
     create_observability_middleware,
 )
 
-# Optional HTTP interface (only if FastAPI is installed)
-try:
-    from au.http import (
-        mk_http_interface,
-        create_app_from_decorator,
-        mk_flask_interface,
-    )
+# Optional HTTP interface. Resolved lazily (PEP 562): importing ``au.http`` pulls in
+# fastapi and flask, which costs hundreds of milliseconds that a caller using only the
+# backends and stores should not pay. ``from au import mk_http_interface`` and ``au.http``
+# keep working; only the moment of import moves.
+__all_http__ = [
+    "mk_http_interface",
+    "create_app_from_decorator",
+    "mk_flask_interface",
+]
 
-    __all_http__ = [
-        "mk_http_interface",
-        "create_app_from_decorator",
-        "mk_flask_interface",
-    ]
-except ImportError:
-    __all_http__ = []
+
+def __getattr__(name):
+    if name == "http" or name in __all_http__:
+        import importlib
+
+        http = importlib.import_module("au.http")
+        return http if name == "http" else getattr(http, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+def __dir__():
+    return sorted(set(globals()) | set(__all_http__) | {"http"})
+
 
 # Version
 __version__ = "0.1.0"
