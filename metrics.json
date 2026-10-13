@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 7.920344829559326,
+  "collection_duration_seconds": 7.3506410121917725,
   "commit_message": "Fix the store races behind the flaky tests (#6) (#8)\n\n* Stores: unique temp file per write, cleanup without nested auto-cleanup, RUNNING never overwrites a terminal state (#6)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* Review of #6: store.get in _mark_running, cancel re-asserts after terminate, temp files in a subdirectory\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
   "commit_sha": "a141325341ac2674f96f6459cd65ebbc4c6af553",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35130,
-      "comment_lines_ratio": 0.06514253290040962,
-      "docs_lines": 42226,
-      "empty_lines": 70599,
-      "empty_lines_ratio": 0.13091368289883346,
-      "files_analyzed": 1327,
-      "function_lines": 323113,
-      "function_lines_ratio": 0.5991573934827797,
-      "mean_lines_per_function": 15.954621765751531,
-      "num_classes": 3021,
-      "num_functions": 20252,
+      "comment_lines": 35315,
+      "comment_lines_ratio": 0.06517065429011691,
+      "docs_lines": 42318,
+      "empty_lines": 71016,
+      "empty_lines_ratio": 0.13105363684176533,
+      "files_analyzed": 1342,
+      "function_lines": 324936,
+      "function_lines_ratio": 0.5996401450492264,
+      "mean_lines_per_function": 15.956393635827931,
+      "num_classes": 3035,
+      "num_functions": 20364,
       "pypi_version": "0.1.1",
-      "total_lines": 539279
+      "total_lines": 541885
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-13T14:43:10.999905Z",
+  "timestamp": "2026-10-13T14:43:16.554159Z",
   "workflow_status": {}
 }
