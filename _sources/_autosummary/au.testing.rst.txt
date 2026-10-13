@@ -1,0 +1,24 @@
+au.testing
+==========
+
+.. automodule:: au.testing
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_test_backend
+      create_test_store
+      mock_async
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      InMemoryStore
+      MockTaskTracker
+      SyncTestBackend
+      TaskCallRecord
+      TrackingTestBackend
+   

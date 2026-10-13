@@ -1,4 +1,0 @@
-au.workflow
-===========
-.. automodule:: au.workflow
-   :members:

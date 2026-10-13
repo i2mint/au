@@ -1,0 +1,12 @@
+au.backends.supabase\_backend
+=============================
+
+.. automodule:: au.backends.supabase_backend
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      SupabaseQueueBackend
+   

@@ -1,0 +1,39 @@
+au.base
+=======
+
+.. automodule:: au.base
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      async_compute
+      temporary_async_compute
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ComputationBackend
+      ComputationHandle
+      ComputationResult
+      ComputationStatus
+      ComputationStore
+      FileSystemStore
+      LoggingMiddleware
+      MetricsMiddleware
+      Middleware
+      ProcessBackend
+      RemoteAPIBackend
+      SerializationFormat
+      SharedMetricsMiddleware
+      StdLibQueueBackend
+      ThreadBackend
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ComputationCancelledError
+   

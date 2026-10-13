@@ -1,0 +1,23 @@
+au.hooks
+========
+
+.. automodule:: au.hooks
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_observability_middleware
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CompositeMiddleware
+      HooksMiddleware
+      MetricsCollectorMiddleware
+      TaskEvent
+      TaskEventHandler
+      TracingMiddleware
+   

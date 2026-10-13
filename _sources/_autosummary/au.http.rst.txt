@@ -1,0 +1,36 @@
+au.http
+=======
+
+.. automodule:: au.http
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      Body
+      Field
+      Query
+      create_app_from_decorator
+      mk_flask_interface
+      mk_http_interface
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BaseModel
+      FastAPI
+      TaskCancelResponse
+      TaskListResponse
+      TaskResultResponse
+      TaskStatusResponse
+      TaskSubmitRequest
+      TaskSubmitResponse
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      HTTPException
+   

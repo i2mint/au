@@ -1,4 +1,0 @@
-au.base
-=======
-.. automodule:: au.base
-   :members:

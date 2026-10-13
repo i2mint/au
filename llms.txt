@@ -1,0 +1,30 @@
+# au
+
+> Async Utils - A lightweight, convention-over-configuration async framework for Python
+
+
+## Pages
+
+- [AU - Async Utils](index.html.md): &#42;&#42;A lightweight, convention-over-configuration async framework for Python.&#42;&#42;
+- [API reference](api.html.md): | &#96;au&#96;   | AU - Asynchronous Utilities   |
+- [au](_autosummary/au.html.md): AU - Asynchronous Utilities
+- [au.api](_autosummary/au.api.html.md): Simplified API for AU - direct task submission without decorators.
+- [au.backends](_autosummary/au.backends.html.md): &#92;&#95;&#92;&#95;init&#95;&#92;&#95;.py for au.backends package
+- [au.backends.rq_backend](_autosummary/au.backends.rq_backend.html.md): RQ (Redis Queue) backend for au framework.
+- [au.backends.supabase_backend](_autosummary/au.backends.supabase_backend.html.md): Supabase PostgreSQL queue backend for au framework.
+- [au.base](_autosummary/au.base.html.md): Asynchronous computation framework with pluggable backends.
+- [au.config](_autosummary/au.config.html.md): Configuration management for AU with convention-over-configuration support.
+- [au.hooks](_autosummary/au.hooks.html.md): Enhanced hooks and observability for AU.
+- [au.http](_autosummary/au.http.html.md): HTTP interface for AU task management.
+- [au.retry](_autosummary/au.retry.html.md): Retry policies and error handling for AU.
+- [au.testing](_autosummary/au.testing.html.md): Testing utilities for AU.
+- [au.workflow](_autosummary/au.workflow.html.md): Workflow and task dependency management for AU.
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-13 14:44 UTC&#42;&#42; from commit &lt;a href="https://github.com/i2m...
+
+## Optional
+
+- [au.md](au.md): Complete documentation in a single file.
+
+## Build
+
+- [build_info.json](build_info.json): build provenance (commit, version, tool versions, whether the docs match the package)

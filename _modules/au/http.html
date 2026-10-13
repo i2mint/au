@@ -1,639 +1,1051 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
+<html lang="en" data-accent-color="red" data-content_root="../../">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>au.http &mdash; au 0.0.16 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
-
-  
-      <script src="../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c7cdf6fe"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
-      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
-</head>
-
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="../../index.html" class="icon icon-home">
-            au
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>au.http - au</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="au.http"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../index.html">
+      
+      
+      <strong>au</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au.html">au</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/api.html">au.api</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends.html">au.backends</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/base.html">au.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/config.html">au.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/hooks.html">au.hooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/http.html">au.http</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/retry.html">au.retry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/testing.html">au.testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../module_docs/au/workflow.html">au.workflow</a></li>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../_autosummary/au.html">au</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.api.html">au.api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.backends.html">au.backends</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/au.backends.rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/au.backends.supabase_backend.html">au.backends.supabase_backend</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.base.html">au.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.config.html">au.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.hooks.html">au.hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.http.html">au.http</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.retry.html">au.retry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.testing.html">au.testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/au.workflow.html">au.workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
       </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">au</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">au.http</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <h1>Source code for au.http</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">HTTP interface for AU task management.</span>
-
-<span class="sd">Provides REST API endpoints for async task management using FastAPI.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Query</span><span class="p">,</span> <span class="n">Body</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
-    <span class="n">HAS_FASTAPI</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">HAS_FASTAPI</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="c1"># Create dummy classes for type hints</span>
-    <span class="k">class</span><span class="w"> </span><span class="nc">FastAPI</span><span class="p">:</span> <span class="k">pass</span>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Module code</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">au.http</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <h1>Source code for au.http</h1><div class="highlight"><pre>
+<span></span><span data-line="1"><span class="sd">"""</span>
+</span><span data-line="2"><span class="sd">HTTP interface for AU task management.</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="sd">Provides REST API endpoints for async task management using FastAPI.</span>
+</span><span data-line="5"><span class="sd">"""</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+</span><span data-line="8"><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+</span><span data-line="9"><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="k">try</span><span class="p">:</span>
+</span><span data-line="12">    <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Query</span><span class="p">,</span> <span class="n">Body</span>
+</span><span data-line="13">    <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+</span><span data-line="14">    <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+</span><span data-line="15">
+</span><span data-line="16">    <span class="n">HAS_FASTAPI</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="17"><span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span data-line="18">    <span class="n">HAS_FASTAPI</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span data-line="19">
+</span><span data-line="20">    <span class="c1"># Create dummy classes for type hints</span>
+</span><span data-line="21">    <span class="k">class</span><span class="w"> </span><span class="nc">FastAPI</span><span class="p">:</span>
+</span><span data-line="22">        <span class="k">pass</span>
+</span><span data-line="23">
 <div class="viewcode-block" id="HTTPException">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.HTTPException">[docs]</a>
-    <span class="k">class</span><span class="w"> </span><span class="nc">HTTPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.HTTPException">[docs]</a>
+</span><span data-line="24">    <span class="k">class</span><span class="w"> </span><span class="nc">HTTPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span data-line="25">        <span class="k">pass</span></div>
 
-    <span class="k">class</span><span class="w"> </span><span class="nc">BaseModel</span><span class="p">:</span> <span class="k">pass</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="k">pass</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Query</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="k">pass</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">Body</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="k">pass</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComputationStatus</span><span class="p">,</span> <span class="n">ComputationHandle</span><span class="p">,</span> <span class="n">ComputationBackend</span><span class="p">,</span> <span class="n">ComputationStore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">au.api</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">submit_task</span><span class="p">,</span>
-    <span class="n">get_result</span><span class="p">,</span>
-    <span class="n">get_status</span><span class="p">,</span>
-    <span class="n">is_ready</span><span class="p">,</span>
-    <span class="n">cancel_task</span><span class="p">,</span>
-    <span class="n">_get_default_backend</span><span class="p">,</span>
-    <span class="n">_get_default_store</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="c1"># Pydantic models for API</span>
-
-
+</span><span data-line="26">
+</span><span data-line="27">    <span class="k">class</span><span class="w"> </span><span class="nc">BaseModel</span><span class="p">:</span>
+</span><span data-line="28">        <span class="k">pass</span>
+</span><span data-line="29">
+</span><span data-line="30">    <span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span data-line="31">        <span class="k">pass</span>
+</span><span data-line="32">
+</span><span data-line="33">    <span class="k">def</span><span class="w"> </span><span class="nf">Query</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span data-line="34">        <span class="k">pass</span>
+</span><span data-line="35">
+</span><span data-line="36">    <span class="k">def</span><span class="w"> </span><span class="nf">Body</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span data-line="37">        <span class="k">pass</span>
+</span><span data-line="38">
+</span><span data-line="39">
+</span><span data-line="40"><span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="41">    <span class="n">ComputationStatus</span><span class="p">,</span>
+</span><span data-line="42">    <span class="n">ComputationHandle</span><span class="p">,</span>
+</span><span data-line="43">    <span class="n">ComputationBackend</span><span class="p">,</span>
+</span><span data-line="44">    <span class="n">ComputationStore</span><span class="p">,</span>
+</span><span data-line="45"><span class="p">)</span>
+</span><span data-line="46"><span class="kn">from</span><span class="w"> </span><span class="nn">au.api</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="47">    <span class="n">submit_task</span><span class="p">,</span>
+</span><span data-line="48">    <span class="n">get_result</span><span class="p">,</span>
+</span><span data-line="49">    <span class="n">get_status</span><span class="p">,</span>
+</span><span data-line="50">    <span class="n">is_ready</span><span class="p">,</span>
+</span><span data-line="51">    <span class="n">cancel_task</span><span class="p">,</span>
+</span><span data-line="52">    <span class="n">_get_default_backend</span><span class="p">,</span>
+</span><span data-line="53">    <span class="n">_get_default_store</span><span class="p">,</span>
+</span><span data-line="54"><span class="p">)</span>
+</span><span data-line="55">
+</span><span data-line="56">
+</span><span data-line="57"><span class="c1"># Pydantic models for API</span>
+</span><span data-line="58">
+</span><span data-line="59">
 <div class="viewcode-block" id="TaskSubmitRequest">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskSubmitRequest">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskSubmitRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for task submission.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskSubmitRequest">[docs]</a>
+</span><span data-line="60"><span class="k">class</span><span class="w"> </span><span class="nc">TaskSubmitRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="61"><span class="w">    </span><span class="sd">"""Request model for task submission."""</span>
+</span><span data-line="62">
+</span><span data-line="63">    <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Name of the function to execute"</span><span class="p">)</span>
+</span><span data-line="64">    <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Positional arguments"</span><span class="p">)</span>
+</span><span data-line="65">    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span data-line="66">        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Keyword arguments"</span>
+</span><span data-line="67">    <span class="p">)</span></div>
 
-    <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the function to execute&quot;</span><span class="p">)</span>
-    <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Positional arguments&quot;</span><span class="p">)</span>
-    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Keyword arguments&quot;</span><span class="p">)</span></div>
-
-
-
+</span><span data-line="68">
+</span><span data-line="69">
 <div class="viewcode-block" id="TaskSubmitResponse">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskSubmitResponse">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskSubmitResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for task submission.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskSubmitResponse">[docs]</a>
+</span><span data-line="70"><span class="k">class</span><span class="w"> </span><span class="nc">TaskSubmitResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="71"><span class="w">    </span><span class="sd">"""Response model for task submission."""</span>
+</span><span data-line="72">
+</span><span data-line="73">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Unique task identifier"</span><span class="p">)</span>
+</span><span data-line="74">    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Initial task status"</span><span class="p">)</span>
+</span><span data-line="75">    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">"Task submitted successfully"</span><span class="p">)</span></div>
 
-    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique task identifier&quot;</span><span class="p">)</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Initial task status&quot;</span><span class="p">)</span>
-    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;Task submitted successfully&quot;</span><span class="p">)</span></div>
-
-
-
+</span><span data-line="76">
+</span><span data-line="77">
 <div class="viewcode-block" id="TaskStatusResponse">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskStatusResponse">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskStatusResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for task status.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskStatusResponse">[docs]</a>
+</span><span data-line="78"><span class="k">class</span><span class="w"> </span><span class="nc">TaskStatusResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="79"><span class="w">    </span><span class="sd">"""Response model for task status."""</span>
+</span><span data-line="80">
+</span><span data-line="81">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="82">    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="83">    <span class="n">created_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="84">    <span class="n">completed_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="85">    <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">created_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">completed_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-
-
+</span><span data-line="86">
+</span><span data-line="87">
 <div class="viewcode-block" id="TaskResultResponse">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskResultResponse">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskResultResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for task result.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskResultResponse">[docs]</a>
+</span><span data-line="88"><span class="k">class</span><span class="w"> </span><span class="nc">TaskResultResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="89"><span class="w">    </span><span class="sd">"""Response model for task result."""</span>
+</span><span data-line="90">
+</span><span data-line="91">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="92">    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="93">    <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="94">    <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="95">    <span class="n">created_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="96">    <span class="n">completed_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="97">    <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">created_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">completed_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-
-
+</span><span data-line="98">
+</span><span data-line="99">
 <div class="viewcode-block" id="TaskListResponse">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskListResponse">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskListResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for task list.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskListResponse">[docs]</a>
+</span><span data-line="100"><span class="k">class</span><span class="w"> </span><span class="nc">TaskListResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="101"><span class="w">    </span><span class="sd">"""Response model for task list."""</span>
+</span><span data-line="102">
+</span><span data-line="103">    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span data-line="104">    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span></div>
 
-    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span></div>
-
-
-
+</span><span data-line="105">
+</span><span data-line="106">
 <div class="viewcode-block" id="TaskCancelResponse">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.TaskCancelResponse">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskCancelResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for task cancellation.&quot;&quot;&quot;</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.TaskCancelResponse">[docs]</a>
+</span><span data-line="107"><span class="k">class</span><span class="w"> </span><span class="nc">TaskCancelResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="108"><span class="w">    </span><span class="sd">"""Response model for task cancellation."""</span>
+</span><span data-line="109">
+</span><span data-line="110">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="111">    <span class="n">cancelled</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span data-line="112">    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span></div>
 
-    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">cancelled</span><span class="p">:</span> <span class="nb">bool</span>
-    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span></div>
-
-
-
+</span><span data-line="113">
+</span><span data-line="114">
 <div class="viewcode-block" id="mk_http_interface">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.mk_http_interface">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">mk_http_interface</span><span class="p">(</span>
-    <span class="n">functions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AU Task API&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Async task management API&quot;</span><span class="p">,</span>
-    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a FastAPI application for task management.</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.mk_http_interface">[docs]</a>
+</span><span data-line="115"><span class="k">def</span><span class="w"> </span><span class="nf">mk_http_interface</span><span class="p">(</span>
+</span><span data-line="116">    <span class="n">functions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="117">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="118">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="119">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"AU Task API"</span><span class="p">,</span>
+</span><span data-line="120">    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Async task management API"</span><span class="p">,</span>
+</span><span data-line="121">    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"0.1.0"</span><span class="p">,</span>
+</span><span data-line="122"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
+</span><span data-line="123"><span class="w">    </span><span class="sd">"""Create a FastAPI application for task management.</span>
+</span><span data-line="124">
+</span><span data-line="125"><span class="sd">    Args:</span>
+</span><span data-line="126"><span class="sd">        functions: Optional list of functions to register</span>
+</span><span data-line="127"><span class="sd">        backend: Optional backend for task execution</span>
+</span><span data-line="128"><span class="sd">        store: Optional store for results</span>
+</span><span data-line="129"><span class="sd">        title: API title</span>
+</span><span data-line="130"><span class="sd">        description: API description</span>
+</span><span data-line="131"><span class="sd">        version: API version</span>
+</span><span data-line="132">
+</span><span data-line="133"><span class="sd">    Returns:</span>
+</span><span data-line="134"><span class="sd">        FastAPI application instance</span>
+</span><span data-line="135">
+</span><span data-line="136"><span class="sd">    Raises:</span>
+</span><span data-line="137"><span class="sd">        ImportError: If FastAPI is not installed</span>
+</span><span data-line="138">
+</span><span data-line="139"><span class="sd">    Example:</span>
+</span><span data-line="140"><span class="sd">        &gt;&gt;&gt; @async_compute</span>
+</span><span data-line="141"><span class="sd">        &gt;&gt;&gt; def my_func(n: int) -&gt; int:</span>
+</span><span data-line="142"><span class="sd">        &gt;&gt;&gt;     return n * 2</span>
+</span><span data-line="143"><span class="sd">        &gt;&gt;&gt;</span>
+</span><span data-line="144"><span class="sd">        &gt;&gt;&gt; app = mk_http_interface([my_func])</span>
+</span><span data-line="145"><span class="sd">        &gt;&gt;&gt; # Run with: uvicorn main:app --reload</span>
+</span><span data-line="146"><span class="sd">    """</span>
+</span><span data-line="147">    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FASTAPI</span><span class="p">:</span>
+</span><span data-line="148">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span data-line="149">            <span class="s2">"FastAPI is required for HTTP interface. Install with: pip install au[http]"</span>
+</span><span data-line="150">        <span class="p">)</span>
+</span><span data-line="151">
+</span><span data-line="152">    <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
+</span><span data-line="153">        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+</span><span data-line="154">        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+</span><span data-line="155">        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+</span><span data-line="156">    <span class="p">)</span>
+</span><span data-line="157">
+</span><span data-line="158">    <span class="c1"># Store registered functions</span>
+</span><span data-line="159">    <span class="n">registered_functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="160">    <span class="k">if</span> <span class="n">functions</span><span class="p">:</span>
+</span><span data-line="161">        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
+</span><span data-line="162">            <span class="n">registered_functions</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+</span><span data-line="163">
+</span><span data-line="164">    <span class="c1"># Get backend and store</span>
+</span><span data-line="165">    <span class="n">_backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="166">    <span class="n">_store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="167">
+</span><span data-line="168">    <span class="c1"># Root endpoint</span>
+</span><span data-line="169">    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+</span><span data-line="170">    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
+</span><span data-line="171"><span class="w">        </span><span class="sd">"""Get API information."""</span>
+</span><span data-line="172">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="173">            <span class="s2">"name"</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+</span><span data-line="174">            <span class="s2">"version"</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
+</span><span data-line="175">            <span class="s2">"endpoints"</span><span class="p">:</span> <span class="p">{</span>
+</span><span data-line="176">                <span class="s2">"submit"</span><span class="p">:</span> <span class="s2">"POST /tasks"</span><span class="p">,</span>
+</span><span data-line="177">                <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"GET /tasks/</span><span class="si">{task_id}</span><span class="s2">/status"</span><span class="p">,</span>
+</span><span data-line="178">                <span class="s2">"result"</span><span class="p">:</span> <span class="s2">"GET /tasks/</span><span class="si">{task_id}</span><span class="s2">/result"</span><span class="p">,</span>
+</span><span data-line="179">                <span class="s2">"list"</span><span class="p">:</span> <span class="s2">"GET /tasks"</span><span class="p">,</span>
+</span><span data-line="180">                <span class="s2">"cancel"</span><span class="p">:</span> <span class="s2">"DELETE /tasks/</span><span class="si">{task_id}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="181">            <span class="p">},</span>
+</span><span data-line="182">            <span class="s2">"registered_functions"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+</span><span data-line="183">        <span class="p">}</span>
+</span><span data-line="184">
+</span><span data-line="185">    <span class="c1"># Submit task endpoint</span>
+</span><span data-line="186">    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"/tasks"</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskSubmitResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">202</span><span class="p">)</span>
+</span><span data-line="187">    <span class="k">def</span><span class="w"> </span><span class="nf">submit_task_endpoint</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">TaskSubmitRequest</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="o">...</span><span class="p">)):</span>
+</span><span data-line="188"><span class="w">        </span><span class="sd">"""Submit a new task for execution.</span>
+</span><span data-line="189">
+</span><span data-line="190"><span class="sd">        Returns HTTP 202 Accepted with task ID.</span>
+</span><span data-line="191"><span class="sd">        """</span>
+</span><span data-line="192">        <span class="c1"># Check if function is registered</span>
+</span><span data-line="193">        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">function_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registered_functions</span><span class="p">:</span>
+</span><span data-line="194">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+</span><span data-line="195">                <span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
+</span><span data-line="196">                <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Function '</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">function_name</span><span class="si">}</span><span class="s2">' not registered. "</span>
+</span><span data-line="197">                <span class="sa">f</span><span class="s2">"Available functions: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="198">            <span class="p">)</span>
+</span><span data-line="199">
+</span><span data-line="200">        <span class="n">func</span> <span class="o">=</span> <span class="n">registered_functions</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">function_name</span><span class="p">]</span>
+</span><span data-line="201">
+</span><span data-line="202">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="203">            <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span>
+</span><span data-line="204">                <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">,</span> <span class="o">**</span><span class="n">request</span><span class="o">.</span><span class="n">kwargs</span>
+</span><span data-line="205">            <span class="p">)</span>
+</span><span data-line="206">
+</span><span data-line="207">            <span class="k">return</span> <span class="n">TaskSubmitResponse</span><span class="p">(</span>
+</span><span data-line="208">                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"pending"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">"Task submitted successfully"</span>
+</span><span data-line="209">            <span class="p">)</span>
+</span><span data-line="210">
+</span><span data-line="211">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="212">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span data-line="213">
+</span><span data-line="214">    <span class="c1"># Get task status endpoint</span>
+</span><span data-line="215">    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks/</span><span class="si">{task_id}</span><span class="s2">/status"</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskStatusResponse</span><span class="p">)</span>
+</span><span data-line="216">    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="217"><span class="w">        </span><span class="sd">"""Get the status of a task."""</span>
+</span><span data-line="218">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="219">            <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="220">
+</span><span data-line="221">            <span class="c1"># Get additional metadata if available</span>
+</span><span data-line="222">            <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">_store</span><span class="p">)</span>
+</span><span data-line="223">            <span class="n">metadata</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">metadata</span>
+</span><span data-line="224">
+</span><span data-line="225">            <span class="n">response</span> <span class="o">=</span> <span class="n">TaskStatusResponse</span><span class="p">(</span>
+</span><span data-line="226">                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+</span><span data-line="227">                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span data-line="228">            <span class="p">)</span>
+</span><span data-line="229">
+</span><span data-line="230">            <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+</span><span data-line="231">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="p">:</span>
+</span><span data-line="232">                    <span class="n">response</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+</span><span data-line="233">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="p">:</span>
+</span><span data-line="234">                    <span class="n">response</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+</span><span data-line="235">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="236">                    <span class="n">response</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span>
+</span><span data-line="237">
+</span><span data-line="238">            <span class="k">return</span> <span class="n">response</span>
+</span><span data-line="239">
+</span><span data-line="240">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span data-line="241">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+</span><span data-line="242">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="243">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span data-line="244">
+</span><span data-line="245">    <span class="c1"># Get task result endpoint</span>
+</span><span data-line="246">    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks/</span><span class="si">{task_id}</span><span class="s2">/result"</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskResultResponse</span><span class="p">)</span>
+</span><span data-line="247">    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_result</span><span class="p">(</span>
+</span><span data-line="248">        <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="249">        <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Wait for task to complete"</span><span class="p">),</span>
+</span><span data-line="250">        <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Timeout in seconds"</span><span class="p">),</span>
+</span><span data-line="251">    <span class="p">):</span>
+</span><span data-line="252"><span class="w">        </span><span class="sd">"""Get the result of a task.</span>
+</span><span data-line="253">
+</span><span data-line="254"><span class="sd">        If wait=true, blocks until task completes or timeout.</span>
+</span><span data-line="255"><span class="sd">        Otherwise, returns current status immediately.</span>
+</span><span data-line="256"><span class="sd">        """</span>
+</span><span data-line="257">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="258">            <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">_store</span><span class="p">)</span>
+</span><span data-line="259">
+</span><span data-line="260">            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+</span><span data-line="261">                <span class="c1"># Block until result is ready</span>
+</span><span data-line="262">                <span class="k">try</span><span class="p">:</span>
+</span><span data-line="263">                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span data-line="264">                    <span class="n">status</span> <span class="o">=</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+</span><span data-line="265">                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="266">                <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+</span><span data-line="267">                    <span class="c1"># Timeout while waiting</span>
+</span><span data-line="268">                    <span class="n">status</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+</span><span data-line="269">                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="270">                    <span class="n">error</span> <span class="o">=</span> <span class="s2">"Timeout while waiting for result"</span>
+</span><span data-line="271">                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="272">                    <span class="n">status</span> <span class="o">=</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span>
+</span><span data-line="273">                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="274">                    <span class="n">error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span data-line="275">            <span class="k">else</span><span class="p">:</span>
+</span><span data-line="276">                <span class="c1"># Get current status without waiting</span>
+</span><span data-line="277">                <span class="n">status</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+</span><span data-line="278">
+</span><span data-line="279">                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+</span><span data-line="280">                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span data-line="281">                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="282">                <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
+</span><span data-line="283">                    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="284">                        <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span data-line="285">                        <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="286">                        <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="287">                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="288">                        <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="289">                        <span class="n">error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span data-line="290">                <span class="k">else</span><span class="p">:</span>
+</span><span data-line="291">                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="292">                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="293">
+</span><span data-line="294">            <span class="c1"># Get metadata</span>
+</span><span data-line="295">            <span class="n">metadata</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">metadata</span>
+</span><span data-line="296">            <span class="n">response</span> <span class="o">=</span> <span class="n">TaskResultResponse</span><span class="p">(</span>
+</span><span data-line="297">                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+</span><span data-line="298">                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span data-line="299">                <span class="n">result</span><span class="o">=</span><span class="n">result_value</span><span class="p">,</span>
+</span><span data-line="300">                <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span>
+</span><span data-line="301">            <span class="p">)</span>
+</span><span data-line="302">
+</span><span data-line="303">            <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+</span><span data-line="304">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="p">:</span>
+</span><span data-line="305">                    <span class="n">response</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+</span><span data-line="306">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="p">:</span>
+</span><span data-line="307">                    <span class="n">response</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+</span><span data-line="308">                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="309">                    <span class="n">response</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span>
+</span><span data-line="310">
+</span><span data-line="311">            <span class="k">return</span> <span class="n">response</span>
+</span><span data-line="312">
+</span><span data-line="313">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span data-line="314">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+</span><span data-line="315">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="316">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span data-line="317">
+</span><span data-line="318">    <span class="c1"># List tasks endpoint</span>
+</span><span data-line="319">    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/tasks"</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskListResponse</span><span class="p">)</span>
+</span><span data-line="320">    <span class="k">def</span><span class="w"> </span><span class="nf">list_tasks</span><span class="p">():</span>
+</span><span data-line="321"><span class="w">        </span><span class="sd">"""List all task IDs in the store."""</span>
+</span><span data-line="322">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="323">            <span class="n">task_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="324">            <span class="k">return</span> <span class="n">TaskListResponse</span><span class="p">(</span><span class="n">tasks</span><span class="o">=</span><span class="n">task_ids</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">))</span>
+</span><span data-line="325">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="326">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span data-line="327">
+</span><span data-line="328">    <span class="c1"># Cancel task endpoint</span>
+</span><span data-line="329">    <span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">"/tasks/</span><span class="si">{task_id}</span><span class="s2">"</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskCancelResponse</span><span class="p">)</span>
+</span><span data-line="330">    <span class="k">def</span><span class="w"> </span><span class="nf">cancel_task_endpoint</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="331"><span class="w">        </span><span class="sd">"""Cancel a running task."""</span>
+</span><span data-line="332">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="333">            <span class="c1"># Check if task exists</span>
+</span><span data-line="334">            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_store</span><span class="p">:</span>
+</span><span data-line="335">                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found"</span><span class="p">)</span>
+</span><span data-line="336">
+</span><span data-line="337">            <span class="n">cancelled</span> <span class="o">=</span> <span class="n">cancel_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="338">
+</span><span data-line="339">            <span class="k">return</span> <span class="n">TaskCancelResponse</span><span class="p">(</span>
+</span><span data-line="340">                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
+</span><span data-line="341">                <span class="n">cancelled</span><span class="o">=</span><span class="n">cancelled</span><span class="p">,</span>
+</span><span data-line="342">                <span class="n">message</span><span class="o">=</span><span class="s2">"Cancellation attempted"</span>
+</span><span data-line="343">                <span class="k">if</span> <span class="n">cancelled</span>
+</span><span data-line="344">                <span class="k">else</span> <span class="s2">"Task not cancellable"</span><span class="p">,</span>
+</span><span data-line="345">            <span class="p">)</span>
+</span><span data-line="346">
+</span><span data-line="347">        <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
+</span><span data-line="348">            <span class="k">raise</span>
+</span><span data-line="349">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="350">            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span><span data-line="351">
+</span><span data-line="352">    <span class="c1"># Health check endpoint</span>
+</span><span data-line="353">    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"/health"</span><span class="p">)</span>
+</span><span data-line="354">    <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">():</span>
+</span><span data-line="355"><span class="w">        </span><span class="sd">"""Health check endpoint."""</span>
+</span><span data-line="356">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="357">            <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"healthy"</span><span class="p">,</span>
+</span><span data-line="358">            <span class="s2">"backend"</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">_backend</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+</span><span data-line="359">            <span class="s2">"store"</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">_store</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+</span><span data-line="360">        <span class="p">}</span>
+</span><span data-line="361">
+</span><span data-line="362">    <span class="k">return</span> <span class="n">app</span></div>
 
-<span class="sd">    Args:</span>
-<span class="sd">        functions: Optional list of functions to register</span>
-<span class="sd">        backend: Optional backend for task execution</span>
-<span class="sd">        store: Optional store for results</span>
-<span class="sd">        title: API title</span>
-<span class="sd">        description: API description</span>
-<span class="sd">        version: API version</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        FastAPI application instance</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ImportError: If FastAPI is not installed</span>
-
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; @async_compute</span>
-<span class="sd">        &gt;&gt;&gt; def my_func(n: int) -&gt; int:</span>
-<span class="sd">        &gt;&gt;&gt;     return n * 2</span>
-<span class="sd">        &gt;&gt;&gt;</span>
-<span class="sd">        &gt;&gt;&gt; app = mk_http_interface([my_func])</span>
-<span class="sd">        &gt;&gt;&gt; # Run with: uvicorn main:app --reload</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FASTAPI</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;FastAPI is required for HTTP interface. &quot;</span>
-            <span class="s2">&quot;Install with: pip install au[http]&quot;</span>
-        <span class="p">)</span>
-
-    <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-        <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="c1"># Store registered functions</span>
-    <span class="n">registered_functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="n">functions</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
-            <span class="n">registered_functions</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
-
-    <span class="c1"># Get backend and store</span>
-    <span class="n">_backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-    <span class="n">_store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-
-    <span class="c1"># Root endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get API information.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
-            <span class="s2">&quot;endpoints&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;submit&quot;</span><span class="p">:</span> <span class="s2">&quot;POST /tasks&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;GET /tasks/</span><span class="si">{task_id}</span><span class="s2">/status&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;GET /tasks/</span><span class="si">{task_id}</span><span class="s2">/result&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="s2">&quot;GET /tasks&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;cancel&quot;</span><span class="p">:</span> <span class="s2">&quot;DELETE /tasks/</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s2">&quot;registered_functions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-        <span class="p">}</span>
-
-    <span class="c1"># Submit task endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/tasks&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskSubmitResponse</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">202</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_task_endpoint</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">TaskSubmitRequest</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="o">...</span><span class="p">)):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a new task for execution.</span>
-
-<span class="sd">        Returns HTTP 202 Accepted with task ID.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check if function is registered</span>
-        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">function_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registered_functions</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
-                <span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
-                <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Function &#39;</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">function_name</span><span class="si">}</span><span class="s2">&#39; not registered. &quot;</span>
-                       <span class="sa">f</span><span class="s2">&quot;Available functions: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">func</span> <span class="o">=</span> <span class="n">registered_functions</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">function_name</span><span class="p">]</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span>
-                <span class="n">func</span><span class="p">,</span>
-                <span class="o">*</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
-                <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span>
-                <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">request</span><span class="o">.</span><span class="n">kwargs</span>
-            <span class="p">)</span>
-
-            <span class="k">return</span> <span class="n">TaskSubmitResponse</span><span class="p">(</span>
-                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;pending&quot;</span><span class="p">,</span>
-                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Task submitted successfully&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-
-    <span class="c1"># Get task status endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/</span><span class="si">{task_id}</span><span class="s2">/status&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskStatusResponse</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the status of a task.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-
-            <span class="c1"># Get additional metadata if available</span>
-            <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">_store</span><span class="p">)</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">metadata</span>
-
-            <span class="n">response</span> <span class="o">=</span> <span class="n">TaskStatusResponse</span><span class="p">(</span>
-                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span>
-
-            <span class="k">return</span> <span class="n">response</span>
-
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-
-    <span class="c1"># Get task result endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks/</span><span class="si">{task_id}</span><span class="s2">/result&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskResultResponse</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_task_result</span><span class="p">(</span>
-        <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Wait for task to complete&quot;</span><span class="p">),</span>
-        <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timeout in seconds&quot;</span><span class="p">),</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the result of a task.</span>
-
-<span class="sd">        If wait=true, blocks until task completes or timeout.</span>
-<span class="sd">        Otherwise, returns current status immediately.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">_store</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
-                <span class="c1"># Block until result is ready</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-                    <span class="n">status</span> <span class="o">=</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
-                    <span class="c1"># Timeout while waiting</span>
-                    <span class="n">status</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="s2">&quot;Timeout while waiting for result&quot;</span>
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="n">status</span> <span class="o">=</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Get current status without waiting</span>
-                <span class="n">status</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                        <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
-                        <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
-                        <span class="n">error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="c1"># Get metadata</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">metadata</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">TaskResultResponse</span><span class="p">(</span>
-                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">result</span><span class="o">=</span><span class="n">result_value</span><span class="p">,</span>
-                <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">completed_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">response</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">duration</span>
-
-            <span class="k">return</span> <span class="n">response</span>
-
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-
-    <span class="c1"># List tasks endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/tasks&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskListResponse</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">list_tasks</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;List all task IDs in the store.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">task_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_store</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">TaskListResponse</span><span class="p">(</span>
-                <span class="n">tasks</span><span class="o">=</span><span class="n">task_ids</span><span class="p">,</span>
-                <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">task_ids</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-
-    <span class="c1"># Cancel task endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/tasks/</span><span class="si">{task_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">TaskCancelResponse</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">cancel_task_endpoint</span><span class="p">(</span><span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancel a running task.&quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Check if task exists</span>
-            <span class="k">if</span> <span class="n">task_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_store</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
-
-            <span class="n">cancelled</span> <span class="o">=</span> <span class="n">cancel_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-
-            <span class="k">return</span> <span class="n">TaskCancelResponse</span><span class="p">(</span>
-                <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">,</span>
-                <span class="n">cancelled</span><span class="o">=</span><span class="n">cancelled</span><span class="p">,</span>
-                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Cancellation attempted&quot;</span> <span class="k">if</span> <span class="n">cancelled</span> <span class="k">else</span> <span class="s2">&quot;Task not cancellable&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
-            <span class="k">raise</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-
-    <span class="c1"># Health check endpoint</span>
-    <span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/health&quot;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">():</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Health check endpoint.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">_backend</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">_store</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-        <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">app</span></div>
-
-
-
+</span><span data-line="363">
+</span><span data-line="364">
 <div class="viewcode-block" id="create_app_from_decorator">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.create_app_from_decorator">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_app_from_decorator</span><span class="p">(</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;AU Task API&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Async task management API&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a FastAPI app that auto-discovers @async_compute decorated functions.</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.create_app_from_decorator">[docs]</a>
+</span><span data-line="365"><span class="k">def</span><span class="w"> </span><span class="nf">create_app_from_decorator</span><span class="p">(</span>
+</span><span data-line="366">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"AU Task API"</span><span class="p">,</span>
+</span><span data-line="367">    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Async task management API"</span><span class="p">,</span>
+</span><span data-line="368"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
+</span><span data-line="369"><span class="w">    </span><span class="sd">"""Create a FastAPI app that auto-discovers @async_compute decorated functions.</span>
+</span><span data-line="370">
+</span><span data-line="371"><span class="sd">    Note: This requires functions to be imported/registered before app creation.</span>
+</span><span data-line="372">
+</span><span data-line="373"><span class="sd">    Args:</span>
+</span><span data-line="374"><span class="sd">        title: API title</span>
+</span><span data-line="375"><span class="sd">        description: API description</span>
+</span><span data-line="376">
+</span><span data-line="377"><span class="sd">    Returns:</span>
+</span><span data-line="378"><span class="sd">        FastAPI application instance</span>
+</span><span data-line="379"><span class="sd">    """</span>
+</span><span data-line="380">    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FASTAPI</span><span class="p">:</span>
+</span><span data-line="381">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span data-line="382">            <span class="s2">"FastAPI is required for HTTP interface. Install with: pip install au[http]"</span>
+</span><span data-line="383">        <span class="p">)</span>
+</span><span data-line="384">
+</span><span data-line="385">    <span class="c1"># For now, create empty app</span>
+</span><span data-line="386">    <span class="c1"># In future, could use registry pattern to auto-discover decorated functions</span>
+</span><span data-line="387">    <span class="k">return</span> <span class="n">mk_http_interface</span><span class="p">(</span>
+</span><span data-line="388">        <span class="n">functions</span><span class="o">=</span><span class="p">[],</span>
+</span><span data-line="389">        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+</span><span data-line="390">        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+</span><span data-line="391">    <span class="p">)</span></div>
 
-<span class="sd">    Note: This requires functions to be imported/registered before app creation.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        title: API title</span>
-<span class="sd">        description: API description</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        FastAPI application instance</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FASTAPI</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;FastAPI is required for HTTP interface. &quot;</span>
-            <span class="s2">&quot;Install with: pip install au[http]&quot;</span>
-        <span class="p">)</span>
-
-    <span class="c1"># For now, create empty app</span>
-    <span class="c1"># In future, could use registry pattern to auto-discover decorated functions</span>
-    <span class="k">return</span> <span class="n">mk_http_interface</span><span class="p">(</span>
-        <span class="n">functions</span><span class="o">=</span><span class="p">[],</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-
-<span class="c1"># Flask support (if available)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
-    <span class="n">HAS_FLASK</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">HAS_FLASK</span> <span class="o">=</span> <span class="kc">False</span>
-
-
+</span><span data-line="392">
+</span><span data-line="393">
+</span><span data-line="394"><span class="c1"># Flask support (if available)</span>
+</span><span data-line="395"><span class="k">try</span><span class="p">:</span>
+</span><span data-line="396">    <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
+</span><span data-line="397">
+</span><span data-line="398">    <span class="n">HAS_FLASK</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="399"><span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span data-line="400">    <span class="n">HAS_FLASK</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span data-line="401">
+</span><span data-line="402">
 <div class="viewcode-block" id="mk_flask_interface">
-<a class="viewcode-back" href="../../module_docs/au/http.html#au.mk_flask_interface">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">mk_flask_interface</span><span class="p">(</span>
-    <span class="n">functions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Flask&#39;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a Flask application for task management.</span>
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.mk_flask_interface">[docs]</a>
+</span><span data-line="403"><span class="k">def</span><span class="w"> </span><span class="nf">mk_flask_interface</span><span class="p">(</span>
+</span><span data-line="404">    <span class="n">functions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="405">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="406">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="407"><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Flask"</span><span class="p">:</span>
+</span><span data-line="408"><span class="w">    </span><span class="sd">"""Create a Flask application for task management.</span>
+</span><span data-line="409">
+</span><span data-line="410"><span class="sd">    Args:</span>
+</span><span data-line="411"><span class="sd">        functions: Optional list of functions to register</span>
+</span><span data-line="412"><span class="sd">        backend: Optional backend</span>
+</span><span data-line="413"><span class="sd">        store: Optional store</span>
+</span><span data-line="414">
+</span><span data-line="415"><span class="sd">    Returns:</span>
+</span><span data-line="416"><span class="sd">        Flask application instance</span>
+</span><span data-line="417">
+</span><span data-line="418"><span class="sd">    Raises:</span>
+</span><span data-line="419"><span class="sd">        ImportError: If Flask is not installed</span>
+</span><span data-line="420"><span class="sd">    """</span>
+</span><span data-line="421">    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FLASK</span><span class="p">:</span>
+</span><span data-line="422">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span data-line="423">            <span class="s2">"Flask is required for Flask interface. Install with: pip install au[flask]"</span>
+</span><span data-line="424">        <span class="p">)</span>
+</span><span data-line="425">
+</span><span data-line="426">    <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
+</span><span data-line="427">
+</span><span data-line="428">    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span data-line="429">
+</span><span data-line="430">    <span class="c1"># Store registered functions</span>
+</span><span data-line="431">    <span class="n">registered_functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="432">    <span class="k">if</span> <span class="n">functions</span><span class="p">:</span>
+</span><span data-line="433">        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
+</span><span data-line="434">            <span class="n">registered_functions</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+</span><span data-line="435">
+</span><span data-line="436">    <span class="n">_backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="437">    <span class="n">_store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="438">
+</span><span data-line="439">    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+</span><span data-line="440">    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
+</span><span data-line="441">        <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span>
+</span><span data-line="442">            <span class="p">{</span>
+</span><span data-line="443">                <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"AU Task API (Flask)"</span><span class="p">,</span>
+</span><span data-line="444">                <span class="s2">"registered_functions"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+</span><span data-line="445">            <span class="p">}</span>
+</span><span data-line="446">        <span class="p">)</span>
+</span><span data-line="447">
+</span><span data-line="448">    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/tasks"</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"POST"</span><span class="p">])</span>
+</span><span data-line="449">    <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">():</span>
+</span><span data-line="450">        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+</span><span data-line="451">        <span class="n">func_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"function_name"</span><span class="p">)</span>
+</span><span data-line="452">
+</span><span data-line="453">        <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registered_functions</span><span class="p">:</span>
+</span><span data-line="454">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Function not registered"</span><span class="p">}),</span> <span class="mi">404</span>
+</span><span data-line="455">
+</span><span data-line="456">        <span class="n">func</span> <span class="o">=</span> <span class="n">registered_functions</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span>
+</span><span data-line="457">        <span class="n">args</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"args"</span><span class="p">,</span> <span class="p">[])</span>
+</span><span data-line="458">        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kwargs"</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="459">
+</span><span data-line="460">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="461">            <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="462">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"pending"</span><span class="p">}),</span> <span class="mi">202</span>
+</span><span data-line="463">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="464">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span>
+</span><span data-line="465">
+</span><span data-line="466">    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/tasks/&lt;task_id&gt;/status"</span><span class="p">)</span>
+</span><span data-line="467">    <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+</span><span data-line="468">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="469">            <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="470">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
+</span><span data-line="471">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span data-line="472">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Task not found"</span><span class="p">}),</span> <span class="mi">404</span>
+</span><span data-line="473">
+</span><span data-line="474">    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/tasks/&lt;task_id&gt;/result"</span><span class="p">)</span>
+</span><span data-line="475">    <span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+</span><span data-line="476">        <span class="n">wait</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wait"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"true"</span>
+</span><span data-line="477">        <span class="n">timeout</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"timeout"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+</span><span data-line="478">
+</span><span data-line="479">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="480">            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+</span><span data-line="481">                <span class="n">result_value</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="482">                <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span>
+</span><span data-line="483">                    <span class="p">{</span><span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="s2">"completed"</span><span class="p">,</span> <span class="s2">"result"</span><span class="p">:</span> <span class="n">result_value</span><span class="p">}</span>
+</span><span data-line="484">                <span class="p">)</span>
+</span><span data-line="485">            <span class="k">else</span><span class="p">:</span>
+</span><span data-line="486">                <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="487">                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+</span><span data-line="488">                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
+</span><span data-line="489">                    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span>
+</span><span data-line="490">                        <span class="p">{</span>
+</span><span data-line="491">                            <span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
+</span><span data-line="492">                            <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+</span><span data-line="493">                            <span class="s2">"result"</span><span class="p">:</span> <span class="n">result_value</span><span class="p">,</span>
+</span><span data-line="494">                        <span class="p">}</span>
+</span><span data-line="495">                    <span class="p">)</span>
+</span><span data-line="496">                <span class="k">else</span><span class="p">:</span>
+</span><span data-line="497">                    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"task_id"</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">"status"</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
+</span><span data-line="498">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span data-line="499">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Task not found"</span><span class="p">}),</span> <span class="mi">404</span>
+</span><span data-line="500">        <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+</span><span data-line="501">            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"error"</span><span class="p">:</span> <span class="s2">"Timeout"</span><span class="p">}),</span> <span class="mi">408</span>
+</span><span data-line="502">
+</span><span data-line="503">    <span class="k">return</span> <span class="n">app</span></div>
 
-<span class="sd">    Args:</span>
-<span class="sd">        functions: Optional list of functions to register</span>
-<span class="sd">        backend: Optional backend</span>
-<span class="sd">        store: Optional store</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Flask application instance</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ImportError: If Flask is not installed</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FLASK</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;Flask is required for Flask interface. &quot;</span>
-            <span class="s2">&quot;Install with: pip install au[flask]&quot;</span>
-        <span class="p">)</span>
-
-    <span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
-
-    <span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-    <span class="c1"># Store registered functions</span>
-    <span class="n">registered_functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="n">functions</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
-            <span class="n">registered_functions</span><span class="p">[</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
-
-    <span class="n">_backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-    <span class="n">_store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
-        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;AU Task API (Flask)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;registered_functions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">registered_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-        <span class="p">})</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tasks&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">():</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
-        <span class="n">func_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;function_name&#39;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registered_functions</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Function not registered&quot;</span><span class="p">}),</span> <span class="mi">404</span>
-
-        <span class="n">func</span> <span class="o">=</span> <span class="n">registered_functions</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">_backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;pending&quot;</span><span class="p">}),</span> <span class="mi">202</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}),</span> <span class="mi">500</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tasks/&lt;task_id&gt;/status&#39;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Task not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
-
-    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tasks/&lt;task_id&gt;/result&#39;</span><span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
-        <span class="n">wait</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wait&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
-        <span class="n">timeout</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
-                <span class="n">result_value</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
-                    <span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-                    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">result_value</span>
-                <span class="p">})</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
-                    <span class="n">result_value</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">_store</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
-                        <span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-                        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                        <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">result_value</span>
-                    <span class="p">})</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
-                        <span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">,</span>
-                        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="o">.</span><span class="n">value</span>
-                    <span class="p">})</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Task not found&quot;</span><span class="p">}),</span> <span class="mi">404</span>
-        <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Timeout&quot;</span><span class="p">}),</span> <span class="mi">408</span>
-
-    <span class="k">return</span> <span class="n">app</span></div>
-
-</pre></div>
-
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p></p>
+</span></pre></div>
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
   </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
 </footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      <script src="../../_static/documentation_options.js?v=92734c54"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../../_static/shibuya.js?v=50760d75"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
-</body>
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script></body>
 </html>

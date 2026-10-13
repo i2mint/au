@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="red" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>au.base - au</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="au.config" href="au.config.html" /><link rel="prev" title="au.backends.supabase_backend" href="au.backends.supabase_backend.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="au.base"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="au.base.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>au</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="au.html">au</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="au.api.html">au.api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.backends.html">au.backends</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="au.backends.rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="au.backends.supabase_backend.html">au.backends.supabase_backend</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">au.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.config.html">au.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.hooks.html">au.hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.http.html">au.http</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.retry.html">au.retry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.testing.html">au.testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.workflow.html">au.workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#architecture-overview">Architecture Overview:</a></li>
+<li><a class="reference internal" href="#usage-patterns">Usage Patterns:</a></li>
+<li><a class="reference internal" href="#au.base.ComputationBackend"><code class="docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ComputationBackend.launch"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.launch()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationBackend.terminate"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.terminate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.ComputationCancelledError"><code class="docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ComputationHandle.cancel"><code class="docutils literal notranslate"><span class="pre">ComputationHandle.cancel()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationHandle.get_result"><code class="docutils literal notranslate"><span class="pre">ComputationHandle.get_result()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationHandle.get_status"><code class="docutils literal notranslate"><span class="pre">ComputationHandle.get_status()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationHandle.is_ready"><code class="docutils literal notranslate"><span class="pre">ComputationHandle.is_ready()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationHandle.metadata"><code class="docutils literal notranslate"><span class="pre">ComputationHandle.metadata</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.ComputationResult"><code class="docutils literal notranslate"><span class="pre">ComputationResult</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ComputationResult.duration"><code class="docutils literal notranslate"><span class="pre">ComputationResult.duration</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationResult.is_ready"><code class="docutils literal notranslate"><span class="pre">ComputationResult.is_ready</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ComputationStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.cleanup_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore.create_key"><code class="docutils literal notranslate"><span class="pre">ComputationStore.create_key()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">ComputationStore.get_reconstruction_info()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore.is_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.is_expired()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.FileSystemStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.cleanup_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.FileSystemStore.create_key"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.create_key()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.FileSystemStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.get_reconstruction_info()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.LoggingMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware.after_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.LoggingMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.LoggingMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware.on_error()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.MetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.MetricsMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware.after_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.MetricsMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.MetricsMiddleware.get_stats"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware.get_stats()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.MetricsMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware.on_error()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.Middleware"><code class="docutils literal notranslate"><span class="pre">Middleware</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.Middleware.after_compute"><code class="docutils literal notranslate"><span class="pre">Middleware.after_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.Middleware.before_compute"><code class="docutils literal notranslate"><span class="pre">Middleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.Middleware.on_error"><code class="docutils literal notranslate"><span class="pre">Middleware.on_error()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.ProcessBackend"><code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ProcessBackend.launch"><code class="docutils literal notranslate"><span class="pre">ProcessBackend.launch()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ProcessBackend.terminate"><code class="docutils literal notranslate"><span class="pre">ProcessBackend.terminate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.RemoteAPIBackend"><code class="docutils literal notranslate"><span class="pre">RemoteAPIBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.RemoteAPIBackend.launch"><code class="docutils literal notranslate"><span class="pre">RemoteAPIBackend.launch()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.SerializationFormat"><code class="docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></li>
+<li><a class="reference internal" href="#au.base.SharedMetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.SharedMetricsMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.after_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.SharedMetricsMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.SharedMetricsMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.on_error()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.StdLibQueueBackend.launch"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.launch()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.StdLibQueueBackend.shutdown"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.shutdown()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.StdLibQueueBackend.terminate"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.terminate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.base.ThreadBackend.launch"><code class="docutils literal notranslate"><span class="pre">ThreadBackend.launch()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.base.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../api.html"><span itemprop="name">API reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="au.html"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="3" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">au.base</strong>
+        <meta itemprop="position" content="4" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <section id="module-au.base">
+<span id="au-base"></span><h1>au.base<a class="headerlink" href="#module-au.base" title="Link to this heading">#</a></h1>
+<p>Asynchronous computation framework with pluggable backends.</p>
+<p>This module provides a decorator-based approach to transform synchronous functions
+into asynchronous ones that return immediately with a handle to check status
+and retrieve results later.</p>
+<section id="architecture-overview">
+<h2>Architecture Overview:<a class="headerlink" href="#architecture-overview" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Storage abstraction (ComputationStore): Implements MutableMapping interface</p></li>
+<li><p>Execution abstraction (ComputationBackend): Handles computation launching</p></li>
+<li><p>Result handling (ComputationHandle): Clean API for status/result retrieval</p></li>
+<li><p>Middleware system: For cross-cutting concerns like logging and metrics</p></li>
+<li><p>Cleanup mechanisms: Automatic expiration of old results</p></li>
+</ol>
+</section>
+<section id="usage-patterns">
+<h2>Usage Patterns:<a class="headerlink" href="#usage-patterns" title="Link to this heading">#</a></h2>
+<p>Simple file-based async:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span><span class="p">()</span>
+</span><span data-line="2"><span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span></pre></div>
+</div>
+<p>Custom configuration (example setup):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</span><span data-line="4"><span class="gp">... </span>    <span class="n">backend</span> <span class="o">=</span> <span class="n">ProcessBackend</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">LoggingMiddleware</span><span class="p">(),</span> <span class="n">MetricsMiddleware</span><span class="p">()])</span>
+</span><span data-line="5"><span class="gp">... </span>    <span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="6"><span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">api_computation</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span data-line="7"><span class="gp">... </span>        <span class="k">return</span> <span class="n">data</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="8"><span class="gp">... </span>    <span class="c1"># Function is ready to use</span>
+</span><span data-line="9"><span class="gp">... </span>    <span class="kc">True</span>
+</span><span data-line="10"><span class="go">True</span>
+</span></pre></div>
+</div>
+<p>Shared infrastructure:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</span><span data-line="4"><span class="gp">... </span>    <span class="n">backend</span> <span class="o">=</span> <span class="n">ProcessBackend</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="5"><span class="gp">... </span>    <span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="6"><span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">step1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="7"><span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span data-line="8"><span class="gp">... </span>    <span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="9"><span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">step2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="10"><span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="11"><span class="gp">... </span>    <span class="c1"># Functions are ready to use</span>
+</span><span data-line="12"><span class="gp">... </span>    <span class="kc">True</span>
+</span><span data-line="13"><span class="go">True</span>
+</span></pre></div>
+</div>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.async_compute" title="au.base.async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">async_compute</span></code></a>([backend, store, base_path, ...])</p></td>
+<td><p>Decorator to make functions asynchronous with status tracking.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.temporary_async_compute" title="au.base.temporary_async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">temporary_async_compute</span></code></a>(**kwargs)</p></td>
+<td><p>Context manager for temporary async computations with automatic cleanup.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a>([middleware])</p></td>
+<td><p>Abstract base for computation execution backends.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.ComputationHandle" title="au.base.ComputationHandle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a>(key, store[, backend])</p></td>
+<td><p>Handle to check status and retrieve results of async computation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ComputationResult" title="au.base.ComputationResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationResult</span></code></a>(value, status[, error, ...])</p></td>
+<td><p>Result of a computation with metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.ComputationStatus" title="au.base.ComputationStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a>(*values)</p></td>
+<td><p>Status of a computation task.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationStore</span></code></a>(*[, ttl_seconds])</p></td>
+<td><p>Abstract base for storing computation results with TTL support.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.FileSystemStore" title="au.base.FileSystemStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a>(base_path, *[, suffix, ...])</p></td>
+<td><p>Store computation results in the filesystem with automatic cleanup.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.LoggingMiddleware" title="au.base.LoggingMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a>(*[, level, logger_name])</p></td>
+<td><p>Middleware for logging computation lifecycle.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.MetricsMiddleware" title="au.base.MetricsMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a>()</p></td>
+<td><p>Middleware for collecting computation metrics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Middleware</span></code></a>()</p></td>
+<td><p>Base class for middleware components.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.ProcessBackend" title="au.base.ProcessBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a>([store, middleware])</p></td>
+<td><p>Execute computations in separate processes with middleware support.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.RemoteAPIBackend" title="au.base.RemoteAPIBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteAPIBackend</span></code></a>(store, *, api_url[, ...])</p></td>
+<td><p>Example backend for remote computation services.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.SerializationFormat" title="au.base.SerializationFormat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a>(*values)</p></td>
+<td><p>Supported serialization formats.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.SharedMetricsMiddleware" title="au.base.SharedMetricsMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a>([...])</p></td>
+<td><p>Metrics middleware using shared memory for multiprocessing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.StdLibQueueBackend" title="au.base.StdLibQueueBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a>([store, max_workers, ...])</p></td>
+<td><p>Execute computations using Python's standard library concurrent.futures.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ThreadBackend" title="au.base.ThreadBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a>([store, middleware])</p></td>
+<td><p>Execute computations in separate threads (good for I/O-bound tasks).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Exceptions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ComputationCancelledError" title="au.base.ComputationCancelledError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></p></td>
+<td><p>Raised by <a class="reference internal" href="#au.base.ComputationHandle.get_result" title="au.base.ComputationHandle.get_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationHandle.get_result()</span></code></a> when a computation was cancelled.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ComputationBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base for computation execution backends.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationBackend.launch">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Launch the computation asynchronously.</p>
+<p>The backend should execute <code class="docutils literal notranslate"><span class="pre">func(*args,</span> <span class="pre">**kwargs)</span></code> and store the result
+under <code class="docutils literal notranslate"><span class="pre">key</span></code>. The result store is resolved by <code class="xref py py-meth docutils literal notranslate"><span class="pre">_resolve_store()</span></code>:
+<code class="docutils literal notranslate"><span class="pre">store</span></code> (passed per-launch by the simple <code class="docutils literal notranslate"><span class="pre">au.api</span></code> surface) takes
+precedence, falling back to the backend’s own <code class="docutils literal notranslate"><span class="pre">self.store</span></code> (set at
+construction by the <code class="docutils literal notranslate"><span class="pre">async_compute</span></code> decorator path).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationBackend.terminate" title="Link to this definition">#</a></dt>
+<dd><p>Attempt to terminate the computation. Default: do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="au.base.ComputationCancelledError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationCancelledError</span></span><a class="reference internal" href="../_modules/au/base.html#ComputationCancelledError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationCancelledError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised by <a class="reference internal" href="#au.base.ComputationHandle.get_result" title="au.base.ComputationHandle.get_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationHandle.get_result()</span></code></a> when a computation was cancelled.</p>
+<p>This lets callers distinguish a deliberate user cancellation (a first-class
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">ComputationStatus.CANCELLED</span></code>) from a genuine computation failure
+(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ComputationStatus.FAILED</span></code>) without string-sniffing the error message.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ComputationHandle">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<p>Handle to check status and retrieve results of async computation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="s2">"test-key"</span><span class="p">,</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="s2">"/tmp"</span><span class="p">))</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span>
+</span><span data-line="3"><span class="go">False</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationHandle.cancel">
+<span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Computation</span> <span class="pre">cancelled'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle.cancel" title="Link to this definition">#</a></dt>
+<dd><p>Attempt to cancel the computation.</p>
+<p>Writes a first-class <code class="xref py py-attr docutils literal notranslate"><span class="pre">ComputationStatus.CANCELLED</span></code> result (not a
+<code class="docutils literal notranslate"><span class="pre">FAILED</span></code> one), so callers can tell a deliberate cancellation apart from
+a genuine failure via <a class="reference internal" href="#au.base.ComputationHandle.get_status" title="au.base.ComputationHandle.get_status"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_status()</span></code></a> without inspecting error text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Human-readable reason stored on the result’s
+<code class="docutils literal notranslate"><span class="pre">terminal_reason</span></code> (surfaced by
+<a class="reference internal" href="#au.base.ComputationCancelledError" title="au.base.ComputationCancelledError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a> from <a class="reference internal" href="#au.base.ComputationHandle.get_result" title="au.base.ComputationHandle.get_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_result()</span></code></a>).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if cancelled, False if already in a terminal state.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only a backend that can stop the work (<code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code>) makes
+CANCELLED final. A thread, or a pool task that is already running,
+cannot be stopped and may still write its own result afterwards.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationHandle.get_result">
+<span class="sig-name descname"><span class="pre">get_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle.get_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle.get_result" title="Link to this definition">#</a></dt>
+<dd><p>Get the computation result, optionally waiting for completion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Maximum seconds to wait. None means no waiting.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#TimeoutError" title="(in Python v3.15)"><strong>TimeoutError</strong></a> – If timeout expires before completion.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><strong>Exception</strong></a> – If the computation failed.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">T</span></code>)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationHandle.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle.get_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle.get_status" title="Link to this definition">#</a></dt>
+<dd><p>Get the current status of the computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationStatus" title="au.base.ComputationStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationHandle.is_ready">
+<span class="sig-name descname"><span class="pre">is_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle.is_ready"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle.is_ready" title="Link to this definition">#</a></dt>
+<dd><p>Check if the computation is complete.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="au.base.ComputationHandle.metadata">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#au.base.ComputationHandle.metadata" title="Link to this definition">#</a></dt>
+<dd><p>Get computation metadata.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ComputationResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal_reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Result of a computation with metadata.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="s2">"done"</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">is_ready</span>
+</span><span data-line="3"><span class="go">True</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="au.base.ComputationResult.duration">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">duration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.15)"><span class="pre">timedelta</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><span class="pre">None</span></a></span><a class="headerlink" href="#au.base.ComputationResult.duration" title="Link to this definition">#</a></dt>
+<dd><p>Get computation duration if completed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="au.base.ComputationResult.is_ready">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_ready</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#au.base.ComputationResult.is_ready" title="Link to this definition">#</a></dt>
+<dd><p>Check if computation reached a terminal state (success, failure, or cancellation).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ComputationStatus">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStatus" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Status of a computation task.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ComputationStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MutableMapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="#au.base.ComputationResult" title="au.base.ComputationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationResult</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base for storing computation results with TTL support.</p>
+<p>Stores should implement cleanup of expired results.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.cleanup_expired">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cleanup_expired</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.cleanup_expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.cleanup_expired" title="Link to this definition">#</a></dt>
+<dd><p>Remove expired results. Returns count of removed items.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.create_key">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.create_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.create_key" title="Link to this definition">#</a></dt>
+<dd><p>Generate a unique key for a new computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.get_reconstruction_info">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.get_reconstruction_info" title="Link to this definition">#</a></dt>
+<dd><p>Get information needed to reconstruct this store in a worker process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.is_expired">
+<span class="sig-name descname"><span class="pre">is_expired</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.is_expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.is_expired" title="Link to this definition">#</a></dt>
+<dd><p>Check if a result has expired based on TTL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.FileSystemStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">FileSystemStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SerializationFormat.JSON</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_cleanup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanup_probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#FileSystemStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></p>
+<p>Store computation results in the filesystem with automatic cleanup.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</span><span data-line="4"><span class="gp">... </span>    <span class="n">key</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">create_key</span><span class="p">()</span>
+</span><span data-line="5"><span class="gp">... </span>    <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
+</span><span data-line="6"><span class="gp">... </span>    <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+</span><span data-line="7"><span class="go">42</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.FileSystemStore.cleanup_expired">
+<span class="sig-name descname"><span class="pre">cleanup_expired</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#FileSystemStore.cleanup_expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.cleanup_expired" title="Link to this definition">#</a></dt>
+<dd><p>Remove expired results from filesystem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.FileSystemStore.create_key">
+<span class="sig-name descname"><span class="pre">create_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#FileSystemStore.create_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.create_key" title="Link to this definition">#</a></dt>
+<dd><p>Generate a unique filename.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.FileSystemStore.get_reconstruction_info">
+<span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#FileSystemStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.get_reconstruction_info" title="Link to this definition">#</a></dt>
+<dd><p>Get information needed to reconstruct this FileSystemStore in a worker process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.LoggingMiddleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">LoggingMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#LoggingMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.LoggingMiddleware" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
+<p>Middleware for logging computation lifecycle.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">middleware</span> <span class="o">=</span> <span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.LoggingMiddleware.after_compute">
+<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#LoggingMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.LoggingMiddleware.after_compute" title="Link to this definition">#</a></dt>
+<dd><p>Log computation completion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.LoggingMiddleware.before_compute">
+<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#LoggingMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.LoggingMiddleware.before_compute" title="Link to this definition">#</a></dt>
+<dd><p>Log computation start.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.LoggingMiddleware.on_error">
+<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#LoggingMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.LoggingMiddleware.on_error" title="Link to this definition">#</a></dt>
+<dd><p>Log computation error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.MetricsMiddleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">MetricsMiddleware</span></span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
+<p>Middleware for collecting computation metrics.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsMiddleware</span><span class="p">()</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
+</span><span data-line="3"><span class="go">{'total': 0, 'completed': 0, 'failed': 0, 'avg_duration': 0.0}</span>
+</span></pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.MetricsMiddleware.after_compute">
+<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
+<dd><p>Update completion metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.MetricsMiddleware.before_compute">
+<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware.before_compute" title="Link to this definition">#</a></dt>
+<dd><p>Increment total computations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.MetricsMiddleware.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware.get_stats" title="Link to this definition">#</a></dt>
+<dd><p>Get current metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.MetricsMiddleware.on_error">
+<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
+<dd><p>Update failure metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.Middleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">Middleware</span></span><a class="reference internal" href="../_modules/au/base.html#Middleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.Middleware" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Base class for middleware components.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.Middleware.after_compute">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#Middleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.Middleware.after_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called after computation completes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.Middleware.before_compute">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#Middleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.Middleware.before_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called before computation starts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.Middleware.on_error">
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#Middleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.Middleware.on_error" title="Link to this definition">#</a></dt>
+<dd><p>Called when computation fails.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ProcessBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ProcessBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ProcessBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ProcessBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></p>
+<p>Execute computations in separate processes with middleware support.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ProcessBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ProcessBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ProcessBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Launch computation in a new process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ProcessBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ProcessBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ProcessBackend.terminate" title="Link to this definition">#</a></dt>
+<dd><p>Attempt to terminate the computation. Default: do nothing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.RemoteAPIBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">RemoteAPIBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#RemoteAPIBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.RemoteAPIBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></p>
+<p>Example backend for remote computation services.</p>
+<p>This integrates with external APIs that have their own
+job tracking mechanisms.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.RemoteAPIBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#RemoteAPIBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.RemoteAPIBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Launch computation via remote API.</p>
+<p>In a real implementation, this would:</p>
+<ol class="arabic simple">
+<li><p>Serialize the function and arguments</p></li>
+<li><p>Submit to the remote API</p></li>
+<li><p>Poll for status updates</p></li>
+<li><p>Store results when complete</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.SerializationFormat">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">SerializationFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SerializationFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SerializationFormat" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Supported serialization formats.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">SharedMetricsMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
+<p>Metrics middleware using shared memory for multiprocessing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.after_compute">
+<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called after computation completes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.before_compute">
+<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.before_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called before computation starts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.on_error">
+<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
+<dd><p>Called when computation fails.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">StdLibQueueBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#StdLibQueueBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></p>
+<p>Execute computations using Python’s standard library concurrent.futures.</p>
+<p>This backend uses ThreadPoolExecutor or ProcessPoolExecutor for in-memory
+task queuing. Not persistent across application restarts.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#StdLibQueueBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Launch computation using executor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#StdLibQueueBackend.shutdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.shutdown" title="Link to this definition">#</a></dt>
+<dd><p>Shutdown the executor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.StdLibQueueBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#StdLibQueueBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StdLibQueueBackend.terminate" title="Link to this definition">#</a></dt>
+<dd><p>Attempt to cancel a running task.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.base.ThreadBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ThreadBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ThreadBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ThreadBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></p>
+<p>Execute computations in separate threads (good for I/O-bound tasks).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="s2">"/tmp/thread_computations"</span><span class="p">)</span>
+</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">backend</span> <span class="o">=</span> <span class="n">ThreadBackend</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ThreadBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ThreadBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ThreadBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Launch computation in a new thread.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.base.async_compute">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">async_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/tmp/computations'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SerializationFormat.JSON</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#async_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.async_compute" title="Link to this definition">#</a></dt>
+<dd><p>Decorator to make functions asynchronous with status tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Backend to execute computations (default: ProcessBackend)</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (default: FileSystemStore)</p></li>
+<li><p><strong>base_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path for FileSystemStore if no store provided</p></li>
+<li><p><strong>ttl_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Time-to-live for results (default: 1 hour)</p></li>
+<li><p><strong>serialization</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.SerializationFormat" title="au.base.SerializationFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></span>) – Format for storing results</p></li>
+<li><p><strong>middleware</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – List of middleware components</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span><span class="p">(</span>
+</span><span data-line="2"><span class="gp">... </span>    <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">LoggingMiddleware</span><span class="p">(),</span> <span class="n">MetricsMiddleware</span><span class="p">()]</span>
+</span><span data-line="4"><span class="gp">... </span><span class="p">)</span>
+</span><span data-line="5"><span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">slow_computation</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="6"><span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+</span><span data-line="7"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">slow_computation</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Returns immediately</span>
+</span><span data-line="8"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.base.temporary_async_compute">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">temporary_async_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#temporary_async_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.temporary_async_compute" title="Link to this definition">#</a></dt>
+<dd><p>Context manager for temporary async computations with automatic cleanup.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">temporary_async_compute</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span> <span class="k">as</span> <span class="n">async_func</span><span class="p">:</span>
+</span><span data-line="2"><span class="gp">... </span>    <span class="nd">@async_func</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="4"><span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="5"><span class="gp">... </span>    <span class="n">handle</span> <span class="o">=</span> <span class="n">compute</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="6"><span class="gp">... </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="au.backends.supabase_backend.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">au.backends.supabase_backend</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="au.config.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">au.config</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=92734c54"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

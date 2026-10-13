@@ -1,0 +1,94 @@
+﻿au
+==
+
+.. automodule:: au
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      async_compute
+      temporary_async_compute
+      submit_task
+      get_result
+      get_status
+      is_ready
+      cancel_task
+      async_task
+      get_handle
+      submit_many
+      get_many
+      set_default_backend
+      set_default_store
+      get_config
+      get_global_config
+      set_global_config
+      reset_global_config
+      retry_with_policy
+      mock_async
+      create_test_backend
+      create_test_store
+      depends_on
+      create_observability_middleware
+      mk_http_interface
+      create_app_from_decorator
+      mk_flask_interface
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      ComputationHandle
+      ComputationStore
+      ComputationResult
+      ComputationStatus
+      SerializationFormat
+      FileSystemStore
+      ProcessBackend
+      ThreadBackend
+      StdLibQueueBackend
+      Middleware
+      LoggingMiddleware
+      MetricsMiddleware
+      AUConfig
+      RetryPolicy
+      BackoffStrategy
+      RetryState
+      InMemoryStore
+      SyncTestBackend
+      TrackingTestBackend
+      MockTaskTracker
+      TaskGraph
+      WorkflowTask
+      WorkflowBuilder
+      TaskState
+      HooksMiddleware
+      TracingMiddleware
+      MetricsCollectorMiddleware
+      CompositeMiddleware
+      TaskEvent
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ComputationCancelledError
+      RetryableError
+      NonRetryableError
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   api
+   backends
+   base
+   config
+   hooks
+   http
+   retry
+   testing
+   workflow

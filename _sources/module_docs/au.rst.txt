@@ -1,4 +1,0 @@
-au
-==
-.. automodule:: au
-   :members:

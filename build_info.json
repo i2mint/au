@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "built_at": "2026-10-13T14:44:06Z",
+  "package": {
+    "name": "au",
+    "version": "0.1.2",
+    "display_name": "au",
+    "source": "pyproject.toml"
+  },
+  "git": {
+    "available": true,
+    "commit": "daaf0c26ff570013812dfed0dd2ccdcec9543e72",
+    "short_commit": "daaf0c2",
+    "branch": "master",
+    "tags": [
+      "0.1.2"
+    ],
+    "dirty": false,
+    "remote_url": "https://github.com/i2mint/au",
+    "commit_url": "https://github.com/i2mint/au/commit/daaf0c26ff570013812dfed0dd2ccdcec9543e72",
+    "error": null
+  },
+  "ci": {
+    "provider": "github",
+    "repository": "i2mint/au",
+    "sha": "a141325341ac2674f96f6459cd65ebbc4c6af553",
+    "sha_in_history": true,
+    "ref": "refs/heads/master",
+    "ref_name": "master",
+    "run_id": "38415608892",
+    "run_url": "https://github.com/i2mint/au/actions/runs/38415608892",
+    "server_url": "https://github.com"
+  },
+  "tools": {
+    "epythet": "0.2.16",
+    "sphinx": "9.1.0",
+    "docutils": "0.22.4",
+    "python": "3.12.15"
+  },
+  "config": {
+    "theme": "auto",
+    "html_theme": "shibuya",
+    "accent": "#92323d",
+    "mode": "auto",
+    "api_generator": "autosummary",
+    "ignore": [
+      "tests/",
+      "scrap/",
+      "examples/"
+    ],
+    "agent_outputs": true,
+    "aggregates": [
+      "md"
+    ],
+    "ai_artifacts": true,
+    "provenance": true,
+    "docs_dir": "docsrc"
+  },
+  "site": {
+    "modules_documented": 12,
+    "objects_documented": 329
+  },
+  "pypi": {
+    "checked": true,
+    "latest": "0.1.2",
+    "relation": "same",
+    "error": null
+  },
+  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout daaf0c26ff570013812dfed0dd2ccdcec9543e72\npip install \"epythet==0.2.16\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "warnings": [],
+  "alignment": {
+    "aligned": true,
+    "notes": []
+  }
+}

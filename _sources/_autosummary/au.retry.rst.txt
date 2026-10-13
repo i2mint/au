@@ -1,0 +1,27 @@
+au.retry
+========
+
+.. automodule:: au.retry
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      retry_with_policy
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      BackoffStrategy
+      RetryPolicy
+      RetryState
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NonRetryableError
+      RetryableError
+   

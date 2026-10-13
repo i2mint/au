@@ -1,4 +1,0 @@
-au.hooks
-========
-.. automodule:: au.hooks
-   :members:

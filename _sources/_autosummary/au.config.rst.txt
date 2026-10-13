@@ -1,0 +1,23 @@
+au.config
+=========
+
+.. automodule:: au.config
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_config
+      get_global_config
+      load_config_from_env
+      load_config_from_file
+      reset_global_config
+      set_global_config
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AUConfig
+   

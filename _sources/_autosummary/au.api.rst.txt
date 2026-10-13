@@ -1,0 +1,22 @@
+au.api
+======
+
+.. automodule:: au.api
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      async_task
+      cancel_task
+      get_handle
+      get_many
+      get_result
+      get_status
+      is_ready
+      set_default_backend
+      set_default_store
+      submit_many
+      submit_task
+   

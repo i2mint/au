@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="red" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>au.testing - au</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="au.workflow" href="au.workflow.html" /><link rel="prev" title="au.retry" href="au.retry.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="au.testing"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="au.testing.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>au</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="au.html">au</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="au.api.html">au.api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.backends.html">au.backends</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="au.backends.rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="au.backends.supabase_backend.html">au.backends.supabase_backend</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="au.base.html">au.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.config.html">au.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.hooks.html">au.hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.http.html">au.http</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.retry.html">au.retry</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">au.testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="au.workflow.html">au.workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#au.testing.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a><ul>
+<li><a class="reference internal" href="#au.testing.InMemoryStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.cleanup_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.InMemoryStore.clear"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.clear()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.InMemoryStore.create_key"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.create_key()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.InMemoryStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.get_reconstruction_info()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a><ul>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.task_count"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.task_count</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.tasks_by_name"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.tasks_by_name</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.all_tasks"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.all_tasks</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.call_count"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.call_count()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.get_calls"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.get_calls()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.last_call"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.last_call()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.MockTaskTracker.record_call"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker.record_call()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.testing.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.testing.SyncTestBackend.get_execution"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend.get_execution()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.SyncTestBackend.launch"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend.launch()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.SyncTestBackend.terminate"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend.terminate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.testing.TaskCallRecord"><code class="docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.TrackingTestBackend"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a><ul>
+<li><a class="reference internal" href="#au.testing.TrackingTestBackend.launch"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend.launch()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#au.testing.create_test_backend"><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.create_test_store"><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.mock_async"><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code></a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../api.html"><span itemprop="name">API reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="au.html"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="3" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">au.testing</strong>
+        <meta itemprop="position" content="4" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <section id="module-au.testing">
+<span id="au-testing"></span><h1>au.testing<a class="headerlink" href="#module-au.testing" title="Link to this heading">#</a></h1>
+<p>Testing utilities for AU.</p>
+<p>Provides test backends, mocking utilities, and helpers for testing async code.</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.create_test_backend" title="au.testing.create_test_backend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_test_backend</span></code></a>(**kwargs)</p></td>
+<td><p>Create a test backend with optional configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.testing.create_test_store" title="au.testing.create_test_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_test_store</span></code></a>(**kwargs)</p></td>
+<td><p>Create a test store with optional configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.mock_async" title="au.testing.mock_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mock_async</span></code></a>([backend])</p></td>
+<td><p>Context manager for mocking async execution.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.InMemoryStore" title="au.testing.InMemoryStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a>([ttl_seconds])</p></td>
+<td><p>In-memory store for testing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.testing.MockTaskTracker" title="au.testing.MockTaskTracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a>([task_count, tasks_by_name, ...])</p></td>
+<td><p>Tracks task executions for testing.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.SyncTestBackend" title="au.testing.SyncTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a>([middleware])</p></td>
+<td><p>Synchronous test backend that executes immediately.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>(func_name, args, kwargs[, ...])</p></td>
+<td><p>Record of a task call for testing/mocking.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.TrackingTestBackend" title="au.testing.TrackingTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a>([middleware])</p></td>
+<td><p>Test backend that tracks all executions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">InMemoryStore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#InMemoryStore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.InMemoryStore" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></p>
+<p>In-memory store for testing.</p>
+<p>Stores results in a dictionary without any persistence.
+Useful for testing without filesystem dependencies.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore.cleanup_expired">
+<span class="sig-name descname"><span class="pre">cleanup_expired</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#InMemoryStore.cleanup_expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.InMemoryStore.cleanup_expired" title="Link to this definition">#</a></dt>
+<dd><p>No-op for in-memory store (no automatic expiration).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 (nothing cleaned up)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#InMemoryStore.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.InMemoryStore.clear" title="Link to this definition">#</a></dt>
+<dd><p>Clear all stored results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore.create_key">
+<span class="sig-name descname"><span class="pre">create_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#InMemoryStore.create_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.InMemoryStore.create_key" title="Link to this definition">#</a></dt>
+<dd><p>Create a unique key for a computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore.get_reconstruction_info">
+<span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#InMemoryStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.InMemoryStore.get_reconstruction_info" title="Link to this definition">#</a></dt>
+<dd><p>Get info needed to reconstruct this store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with store type and parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">MockTaskTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks_by_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_tasks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.MockTaskTracker" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Tracks task executions for testing.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.task_count">
+<span class="sig-name descname"><span class="pre">task_count</span></span><a class="headerlink" href="#au.testing.MockTaskTracker.task_count" title="Link to this definition">#</a></dt>
+<dd><p>Total number of tasks executed</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.tasks_by_name">
+<span class="sig-name descname"><span class="pre">tasks_by_name</span></span><a class="headerlink" href="#au.testing.MockTaskTracker.tasks_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Dictionary mapping function names to call records</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.all_tasks">
+<span class="sig-name descname"><span class="pre">all_tasks</span></span><a class="headerlink" href="#au.testing.MockTaskTracker.all_tasks" title="Link to this definition">#</a></dt>
+<dd><p>List of all task call records</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.call_count">
+<span class="sig-name descname"><span class="pre">call_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker.call_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.MockTaskTracker.call_count" title="Link to this definition">#</a></dt>
+<dd><p>Get call count for a specific function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the function</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of calls</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.get_calls">
+<span class="sig-name descname"><span class="pre">get_calls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker.get_calls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.MockTaskTracker.get_calls" title="Link to this definition">#</a></dt>
+<dd><p>Get all calls for a specific function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the function</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of call records</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.last_call">
+<span class="sig-name descname"><span class="pre">last_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker.last_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.MockTaskTracker.last_call" title="Link to this definition">#</a></dt>
+<dd><p>Get last call for a specific function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the function</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Last call record or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.MockTaskTracker.record_call">
+<span class="sig-name descname"><span class="pre">record_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker.record_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.MockTaskTracker.record_call" title="Link to this definition">#</a></dt>
+<dd><p>Record a task call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the function</p></li>
+<li><p><strong>args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span>) – Positional arguments</p></li>
+<li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Keyword arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.testing.SyncTestBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">SyncTestBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#SyncTestBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.SyncTestBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></p>
+<p>Synchronous test backend that executes immediately.</p>
+<p>This backend runs computations synchronously in the current process/thread,
+making it ideal for testing without the complexity of actual async execution.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.SyncTestBackend.get_execution">
+<span class="sig-name descname"><span class="pre">get_execution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#SyncTestBackend.get_execution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.SyncTestBackend.get_execution" title="Link to this definition">#</a></dt>
+<dd><p>Get recorded execution for a key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Computation key</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple of (function, args, kwargs) or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.SyncTestBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#SyncTestBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.SyncTestBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Execute function synchronously and store result immediately.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span>) – Function to execute</p></li>
+<li><p><strong>args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span>) – Positional arguments</p></li>
+<li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Keyword arguments</p></li>
+<li><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Result key</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (falls back to the backend’s own store)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.SyncTestBackend.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#SyncTestBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.SyncTestBackend.terminate" title="Link to this definition">#</a></dt>
+<dd><p>No-op for synchronous backend (already completed).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Computation key</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.testing.TaskCallRecord">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">TaskCallRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#TaskCallRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.TaskCallRecord" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Record of a task call for testing/mocking.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.testing.TrackingTestBackend">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">TrackingTestBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#TrackingTestBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.TrackingTestBackend" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#au.testing.SyncTestBackend" title="au.testing.SyncTestBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></p>
+<p>Test backend that tracks all executions.</p>
+<p>Extends SyncTestBackend with detailed tracking for testing/debugging.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.testing.TrackingTestBackend.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#TrackingTestBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.TrackingTestBackend.launch" title="Link to this definition">#</a></dt>
+<dd><p>Execute and track function call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span>) – Function to execute</p></li>
+<li><p><strong>args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span>) – Positional arguments</p></li>
+<li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Keyword arguments</p></li>
+<li><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Result key</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (falls back to the backend’s own store)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.testing.create_test_backend">
+<span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">create_test_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#create_test_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.create_test_backend" title="Link to this definition">#</a></dt>
+<dd><p>Create a test backend with optional configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Configuration options (currently accepts ‘middleware’)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.testing.SyncTestBackend" title="au.testing.SyncTestBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SyncTestBackend instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.testing.create_test_store">
+<span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">create_test_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#create_test_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.create_test_store" title="Link to this definition">#</a></dt>
+<dd><p>Create a test store with optional configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – Configuration options (accepts ‘ttl_seconds’)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.testing.InMemoryStore" title="au.testing.InMemoryStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>InMemoryStore instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.testing.mock_async">
+<span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">mock_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#mock_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.mock_async" title="Link to this definition">#</a></dt>
+<dd><p>Context manager for mocking async execution.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">with</span> <span class="n">mock_async</span><span class="p">()</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
+</span><span data-line="2">    <span class="nd">@async_compute</span>
+</span><span data-line="3">    <span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="4">        <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="5">
+</span><span data-line="6">    <span class="n">handle</span> <span class="o">=</span> <span class="n">my_func</span><span class="o">.</span><span class="n">async_run</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="7">    <span class="k">assert</span> <span class="n">mock</span><span class="o">.</span><span class="n">task_count</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span data-line="8">    <span class="k">assert</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a>]</span>) – Optional custom backend (defaults to TrackingTestBackend)</p>
+</dd>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dd class="field-even"><p>MockTaskTracker instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="au.retry.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">au.retry</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="au.workflow.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">au.workflow</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=92734c54"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

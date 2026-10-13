@@ -1,0 +1,21 @@
+au.workflow
+===========
+
+.. automodule:: au.workflow
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      depends_on
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      TaskGraph
+      TaskState
+      WorkflowBuilder
+      WorkflowTask
+   

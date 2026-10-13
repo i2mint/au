@@ -1,306 +1,806 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
+<html lang="en" data-accent-color="red" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to au’s documentation! &mdash; au 0.0.16 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>au</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API reference" href="api.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="AU - Async Utils"/>
+    <meta name="twitter:card" content="summary"/>
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c7cdf6fe"></script>
+<link rel="alternate" type="text/markdown" href="index.html.md">
+<link rel="describedby" href="llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="#">
+      
+      
+      <strong>au</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/au.html">au</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.api.html">au.api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.backends.html">au.backends</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/au.backends.rq_backend.html">au.backends.rq_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/au.backends.supabase_backend.html">au.backends.supabase_backend</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.base.html">au.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.config.html">au.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.hooks.html">au.hooks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.http.html">au.http</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.retry.html">au.retry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.testing.html">au.testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/au.workflow.html">au.workflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#features">&#10024; Features</a></li>
+<li><a class="reference internal" href="#installation">&#128230; Installation</a></li>
+<li><a class="reference internal" href="#quick-start">&#128640; Quick Start</a><ul>
+<li><a class="reference internal" href="#simple-decorator-pattern">Simple Decorator Pattern</a></li>
+<li><a class="reference internal" href="#simplified-api-no-decorator-required">Simplified API (No Decorator Required)</a></li>
+<li><a class="reference internal" href="#context-manager-pattern">Context Manager Pattern</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">&#127899;&#65039; Configuration</a><ul>
+<li><a class="reference internal" href="#environment-variables">1. Environment Variables</a></li>
+<li><a class="reference internal" href="#config-file-au-toml">2. Config File (au.toml)</a></li>
+<li><a class="reference internal" href="#explicit-configuration">3. Explicit Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#backends">&#128260; Backends</a><ul>
+<li><a class="reference internal" href="#thread-backend-default">Thread Backend (Default)</a></li>
+<li><a class="reference internal" href="#process-backend">Process Backend</a></li>
+<li><a class="reference internal" href="#redis-queue-backend">Redis Queue Backend</a></li>
+<li><a class="reference internal" href="#standard-library-queue-backend">Standard Library Queue Backend</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#http-interface">&#127760; HTTP Interface</a><ul>
+<li><a class="reference internal" href="#api-endpoints">API Endpoints</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retry-logic">&#128257; Retry Logic</a><ul>
+<li><a class="reference internal" href="#predefined-policies">Predefined Policies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#task-dependencies-workflows">&#128279; Task Dependencies &amp; Workflows</a><ul>
+<li><a class="reference internal" href="#fluent-builder-api">Fluent Builder API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#observability">&#128202; Observability</a><ul>
+<li><a class="reference internal" href="#logging-metrics">Logging &amp; Metrics</a></li>
+<li><a class="reference internal" href="#custom-hooks">Custom Hooks</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing">&#129514; Testing</a><ul>
+<li><a class="reference internal" href="#mocking-context-manager">Mocking Context Manager</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-reference">&#128218; API Reference</a><ul>
+<li><a class="reference internal" href="#core-functions">Core Functions</a></li>
+<li><a class="reference internal" href="#id1">Configuration</a></li>
+<li><a class="reference internal" href="#retry">Retry</a></li>
+<li><a class="reference internal" href="#workflow">Workflow</a></li>
+<li><a class="reference internal" href="#id2">Testing</a></li>
+<li><a class="reference internal" href="#http">HTTP</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-cases">&#127919; Use Cases</a><ul>
+<li><a class="reference internal" href="#web-application-background-tasks">Web Application Background Tasks</a></li>
+<li><a class="reference internal" href="#distributed-data-processing">Distributed Data Processing</a></li>
+<li><a class="reference internal" href="#ml-model-training-pipeline">ML Model Training Pipeline</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#architecture">&#127959;&#65039; Architecture</a></li>
+<li><a class="reference internal" href="#contributing">&#129309; Contributing</a></li>
+<li><a class="reference internal" href="#license">&#128196; License</a></li>
+<li><a class="reference internal" href="#related-projects">&#128279; Related Projects</a></li>
+<li><a class="reference internal" href="#documentation">&#128214; Documentation</a></li>
+<li><a class="reference internal" href="#examples">&#127891; Examples</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="#"><span itemprop="name">au</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">AU - Async Utils</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <!-- generated by epythet -->
+<section id="au-async-utils">
+<h1>AU - Async Utils<a class="headerlink" href="#au-async-utils" title="Link to this heading">#</a></h1>
+<p><strong>A lightweight, convention-over-configuration async framework for Python.</strong></p>
+<p>AU makes async task execution simple and powerful. Transform any Python function into an async task with a single decorator, or use the simple API for even more flexibility.</p>
+<section id="features">
+<h2>✨ Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>🎯 <strong>Convention Over Configuration</strong> - Works out of the box with smart defaults</p></li>
+<li><p>🚀 <strong>Simple APIs</strong> - Decorator pattern or direct function calls</p></li>
+<li><p>💾 <strong>Pluggable Storage</strong> - Filesystem, in-memory, Redis, databases</p></li>
+<li><p>🔄 <strong>Multiple Backends</strong> - Threads, processes, Redis Queue, Supabase</p></li>
+<li><p>🌐 <strong>HTTP Interface</strong> - Built-in REST API with FastAPI or Flask</p></li>
+<li><p>🔁 <strong>Retry Logic</strong> - Configurable retry policies with backoff</p></li>
+<li><p>🔗 <strong>Task Dependencies</strong> - DAG-based workflow orchestration</p></li>
+<li><p>🧪 <strong>Testing Utilities</strong> - Synchronous test backends and mocks</p></li>
+<li><p>📊 <strong>Observability</strong> - Logging, metrics, tracing, and hooks</p></li>
+<li><p>🛡️ <strong>Zero Dependencies</strong> - Core uses only Python stdlib</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>📦 Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core (no dependencies)</span>
+</span><span data-line="2">pip<span class="w"> </span>install<span class="w"> </span>au
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># With HTTP support (FastAPI)</span>
+</span><span data-line="5">pip<span class="w"> </span>install<span class="w"> </span>au<span class="o">[</span>http<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># With Redis backend</span>
+</span><span data-line="8">pip<span class="w"> </span>install<span class="w"> </span>au<span class="o">[</span>redis<span class="o">]</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># All features</span>
+</span><span data-line="11">pip<span class="w"> </span>install<span class="w"> </span>au<span class="o">[</span>all<span class="o">]</span>
+</span></pre></div>
+</div>
+</section>
+<section id="quick-start">
+<h2>🚀 Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<section id="simple-decorator-pattern">
+<h3>Simple Decorator Pattern<a class="headerlink" href="#simple-decorator-pattern" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@async_compute</span>
+</span><span data-line="5"><span class="k">def</span><span class="w"> </span><span class="nf">expensive_task</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="6"><span class="w">    </span><span class="sd">"""This runs asynchronously!"""</span>
+</span><span data-line="7">    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+</span><span data-line="8">
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># Launch task (returns immediately)</span>
+</span><span data-line="11"><span class="n">handle</span> <span class="o">=</span> <span class="n">expensive_task</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)</span>
+</span><span data-line="12">
+</span><span data-line="13"><span class="c1"># Get result (blocks until complete)</span>
+</span><span data-line="14"><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</span><span data-line="15"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="simplified-api-no-decorator-required">
+<h3>Simplified API (No Decorator Required)<a class="headerlink" href="#simplified-api-no-decorator-required" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_task</span><span class="p">,</span> <span class="n">get_result</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span data-line="5">    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+</span><span data-line="6">
+</span><span data-line="7">
+</span><span data-line="8"><span class="c1"># Submit task</span>
+</span><span data-line="9"><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_function</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="c1"># Get result</span>
+</span><span data-line="12"><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span><span data-line="13"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># 30</span>
+</span></pre></div>
+</div>
+</section>
+<section id="context-manager-pattern">
+<h3>Context Manager Pattern<a class="headerlink" href="#context-manager-pattern" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_task</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="k">with</span> <span class="n">async_task</span><span class="p">(</span><span class="n">expensive_task</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+</span><span data-line="4">    <span class="c1"># Do other work while task runs</span>
+</span><span data-line="5">    <span class="nb">print</span><span class="p">(</span><span class="s2">"Working..."</span><span class="p">)</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Result ready here</span>
+</span><span data-line="8"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="configuration">
+<h2>🎛️ Configuration<a class="headerlink" href="#configuration" title="Link to this heading">#</a></h2>
+<p>AU supports multiple configuration layers:</p>
+<section id="environment-variables">
+<h3>1. Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_BACKEND</span><span class="o">=</span>redis
+</span><span data-line="2"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_REDIS_URL</span><span class="o">=</span>redis://localhost:6379
+</span><span data-line="3"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_STORAGE_PATH</span><span class="o">=</span>/var/au/tasks
+</span><span data-line="4"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_TTL_SECONDS</span><span class="o">=</span><span class="m">7200</span>
+</span><span data-line="5"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_MAX_WORKERS</span><span class="o">=</span><span class="m">8</span>
+</span></pre></div>
+</div>
+</section>
+<section id="config-file-au-toml">
+<h3>2. Config File (au.toml)<a class="headerlink" href="#config-file-au-toml" title="Link to this heading">#</a></h3>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[au]</span>
+</span><span data-line="2"><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"redis"</span>
+</span><span data-line="3"><span class="n">redis_url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"redis://localhost:6379"</span>
+</span><span data-line="4"><span class="n">storage_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"/var/au/tasks"</span>
+</span><span data-line="5"><span class="n">ttl_seconds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7200</span>
+</span><span data-line="6"><span class="n">max_workers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
+</span></pre></div>
+</div>
+</section>
+<section id="explicit-configuration">
+<h3>3. Explicit Configuration<a class="headerlink" href="#explicit-configuration" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">set_global_config</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">config</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"redis"</span><span class="p">,</span> <span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://localhost:6379"</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">set_global_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="backends">
+<h2>🔄 Backends<a class="headerlink" href="#backends" title="Link to this heading">#</a></h2>
+<section id="thread-backend-default">
+<h3>Thread Backend (Default)<a class="headerlink" href="#thread-backend-default" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@async_compute</span>  <span class="c1"># Uses ThreadBackend by default</span>
+</span><span data-line="5"><span class="k">def</span><span class="w"> </span><span class="nf">io_bound_task</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+</span><span data-line="6">    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span></pre></div>
+</div>
+</section>
+<section id="process-backend">
+<h3>Process Backend<a class="headerlink" href="#process-backend" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span><span class="p">,</span> <span class="n">ProcessBackend</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">ProcessBackend</span><span class="p">())</span>
+</span><span data-line="5"><span class="k">def</span><span class="w"> </span><span class="nf">cpu_bound_task</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span><span data-line="6">    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+</span></pre></div>
+</div>
+</section>
+<section id="redis-queue-backend">
+<h3>Redis Queue Backend<a class="headerlink" href="#redis-queue-backend" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">au.backends.rq_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">RQBackend</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">backend</span> <span class="o">=</span> <span class="n">RQBackend</span><span class="p">(</span><span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://localhost:6379"</span><span class="p">)</span>
+</span><span data-line="5">
+</span><span data-line="6">
+</span><span data-line="7"><span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+</span><span data-line="8"><span class="k">def</span><span class="w"> </span><span class="nf">distributed_task</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span data-line="9">    <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="standard-library-queue-backend">
+<h3>Standard Library Queue Backend<a class="headerlink" href="#standard-library-queue-backend" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">StdLibQueueBackend</span><span class="p">,</span> <span class="n">async_compute</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">backend</span> <span class="o">=</span> <span class="n">StdLibQueueBackend</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">executor_type</span><span class="o">=</span><span class="s2">"thread"</span><span class="p">)</span>
+</span><span data-line="4">
+</span><span data-line="5">
+</span><span data-line="6"><span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+</span><span data-line="7"><span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="8">    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="http-interface">
+<h2>🌐 HTTP Interface<a class="headerlink" href="#http-interface" title="Link to this heading">#</a></h2>
+<p>Create a REST API for your tasks with one line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">au.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">mk_http_interface</span>
+</span><span data-line="3">
+</span><span data-line="4">
+</span><span data-line="5"><span class="nd">@async_compute</span>
+</span><span data-line="6"><span class="k">def</span><span class="w"> </span><span class="nf">process_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span data-line="7">    <span class="c1"># Process data</span>
+</span><span data-line="8">    <span class="k">return</span> <span class="p">{</span><span class="s2">"result"</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">}</span>
+</span><span data-line="9">
+</span><span data-line="10">
+</span><span data-line="11"><span class="c1"># Create FastAPI app</span>
+</span><span data-line="12"><span class="n">app</span> <span class="o">=</span> <span class="n">mk_http_interface</span><span class="p">([</span><span class="n">process_data</span><span class="p">])</span>
+</span><span data-line="13">
+</span><span data-line="14"><span class="c1"># Run with: uvicorn main:app</span>
+</span></pre></div>
+</div>
+<section id="api-endpoints">
+<h3>API Endpoints<a class="headerlink" href="#api-endpoints" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Submit task</span>
+</span><span data-line="2">curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:8000/tasks<span class="w"> </span><span class="se">\</span>
+</span><span data-line="3"><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+</span><span data-line="4"><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"function_name": "process_data", "args": [], "kwargs": {"data": {"value": 5}}}'</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="c1"># Get status</span>
+</span><span data-line="7">curl<span class="w"> </span>http://localhost:8000/tasks/<span class="o">{</span>task_id<span class="o">}</span>/status
+</span><span data-line="8">
+</span><span data-line="9"><span class="c1"># Get result (wait for completion)</span>
+</span><span data-line="10">curl<span class="w"> </span>http://localhost:8000/tasks/<span class="o">{</span>task_id<span class="o">}</span>/result?wait<span class="o">=</span>true<span class="p">&amp;</span><span class="nv">timeout</span><span class="o">=</span><span class="m">30</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="c1"># List all tasks</span>
+</span><span data-line="13">curl<span class="w"> </span>http://localhost:8000/tasks
+</span><span data-line="14">
+</span><span data-line="15"><span class="c1"># Cancel task</span>
+</span><span data-line="16">curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>http://localhost:8000/tasks/<span class="o">{</span>task_id<span class="o">}</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="retry-logic">
+<h2>🔁 Retry Logic<a class="headerlink" href="#retry-logic" title="Link to this heading">#</a></h2>
+<p>Add automatic retry with backoff:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span><span class="p">,</span> <span class="n">RetryPolicy</span><span class="p">,</span> <span class="n">BackoffStrategy</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">retry_policy</span> <span class="o">=</span> <span class="n">RetryPolicy</span><span class="p">(</span>
+</span><span data-line="4">    <span class="n">max_attempts</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+</span><span data-line="5">    <span class="n">backoff</span><span class="o">=</span><span class="n">BackoffStrategy</span><span class="o">.</span><span class="n">EXPONENTIAL</span><span class="p">,</span>
+</span><span data-line="6">    <span class="n">initial_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span data-line="7">    <span class="n">retry_on</span><span class="o">=</span><span class="p">[</span><span class="ne">ConnectionError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">],</span>
+</span><span data-line="8"><span class="p">)</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="kn">from</span><span class="w"> </span><span class="nn">au.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">submit_task</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">flaky_function</span><span class="p">,</span> <span class="n">retry_policy</span><span class="o">=</span><span class="n">retry_policy</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<section id="predefined-policies">
+<h3>Predefined Policies<a class="headerlink" href="#predefined-policies" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au.retry</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="2">    <span class="n">DEFAULT_RETRY_POLICY</span><span class="p">,</span>  <span class="c1"># 3 attempts, exponential</span>
+</span><span data-line="3">    <span class="n">AGGRESSIVE_RETRY_POLICY</span><span class="p">,</span>  <span class="c1"># 5 attempts, fast</span>
+</span><span data-line="4">    <span class="n">CONSERVATIVE_RETRY_POLICY</span><span class="p">,</span>  <span class="c1"># 2 attempts, slow</span>
+</span><span data-line="5">    <span class="n">NETWORK_RETRY_POLICY</span><span class="p">,</span>  <span class="c1"># Retries network errors only</span>
+</span><span data-line="6"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="task-dependencies-workflows">
+<h2>🔗 Task Dependencies &amp; Workflows<a class="headerlink" href="#task-dependencies-workflows" title="Link to this heading">#</a></h2>
+<p>Build complex workflows with dependencies:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskGraph</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="c1"># Define tasks</span>
+</span><span data-line="6"><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">fetch_data</span><span class="p">,</span> <span class="s2">"source1"</span><span class="p">)</span>
+</span><span data-line="7"><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">fetch_data</span><span class="p">,</span> <span class="s2">"source2"</span><span class="p">)</span>
+</span><span data-line="8"><span class="n">t3</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">merge_data</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">])</span>
+</span><span data-line="9"><span class="n">t4</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">analyze</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t3</span><span class="p">])</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="c1"># Execute workflow</span>
+</span><span data-line="12"><span class="n">results</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</span><span data-line="13"><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">t4</span><span class="p">])</span>
+</span></pre></div>
+</div>
+<section id="fluent-builder-api">
+<h3>Fluent Builder API<a class="headerlink" href="#fluent-builder-api" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkflowBuilder</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">workflow</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="4">    <span class="n">WorkflowBuilder</span><span class="p">()</span>
+</span><span data-line="5">    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s2">"fetch1"</span><span class="p">,</span> <span class="n">fetch_data</span><span class="p">,</span> <span class="s2">"source1"</span><span class="p">)</span>
+</span><span data-line="6">    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s2">"fetch2"</span><span class="p">,</span> <span class="n">fetch_data</span><span class="p">,</span> <span class="s2">"source2"</span><span class="p">)</span>
+</span><span data-line="7">    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s2">"merge"</span><span class="p">,</span> <span class="n">merge_data</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s2">"fetch1"</span><span class="p">,</span> <span class="s2">"fetch2"</span><span class="p">])</span>
+</span><span data-line="8">    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s2">"analyze"</span><span class="p">,</span> <span class="n">analyze</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s2">"merge"</span><span class="p">])</span>
+</span><span data-line="9">    <span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</span><span data-line="10"><span class="p">)</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="n">results</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="observability">
+<h2>📊 Observability<a class="headerlink" href="#observability" title="Link to this heading">#</a></h2>
+<section id="logging-metrics">
+<h3>Logging &amp; Metrics<a class="headerlink" href="#logging-metrics" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span><span class="p">,</span> <span class="n">LoggingMiddleware</span><span class="p">,</span> <span class="n">MetricsMiddleware</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@async_compute</span><span class="p">(</span>
+</span><span data-line="5">    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="6">        <span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">"INFO"</span><span class="p">),</span>
+</span><span data-line="7">        <span class="n">MetricsMiddleware</span><span class="p">(),</span>
+</span><span data-line="8">    <span class="p">]</span>
+</span><span data-line="9"><span class="p">)</span>
+</span><span data-line="10"><span class="k">def</span><span class="w"> </span><span class="nf">monitored_task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="11">    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span></pre></div>
+</div>
+</section>
+<section id="custom-hooks">
+<h3>Custom Hooks<a class="headerlink" href="#custom-hooks" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_observability_middleware</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">middleware</span> <span class="o">=</span> <span class="n">create_observability_middleware</span><span class="p">(</span>
+</span><span data-line="4">    <span class="n">logging_level</span><span class="o">=</span><span class="s2">"INFO"</span><span class="p">,</span>
+</span><span data-line="5">    <span class="n">enable_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="6">    <span class="n">enable_tracing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="7">    <span class="n">on_start</span><span class="o">=</span><span class="k">lambda</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> started"</span><span class="p">),</span>
+</span><span data-line="8">    <span class="n">on_complete</span><span class="o">=</span><span class="k">lambda</span> <span class="n">task_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> completed"</span><span class="p">),</span>
+</span><span data-line="9">    <span class="n">on_error</span><span class="o">=</span><span class="k">lambda</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Task </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">"</span><span class="p">),</span>
+</span><span data-line="10"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="testing">
+<h2>🧪 Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<p>AU provides synchronous test backends for easy testing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">SyncTestBackend</span><span class="p">,</span> <span class="n">InMemoryStore</span><span class="p">,</span> <span class="n">mock_async</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">test_my_task</span><span class="p">():</span>
+</span><span data-line="5">    <span class="n">backend</span> <span class="o">=</span> <span class="n">SyncTestBackend</span><span class="p">()</span>
+</span><span data-line="6">    <span class="n">store</span> <span class="o">=</span> <span class="n">InMemoryStore</span><span class="p">()</span>
+</span><span data-line="7">
+</span><span data-line="8">    <span class="c1"># Tasks execute synchronously for testing</span>
+</span><span data-line="9">    <span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="10">
+</span><span data-line="11">    <span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="12">    <span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="13">        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="14">
+</span><span data-line="15">    <span class="n">handle</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="16">    <span class="k">assert</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
+</span></pre></div>
+</div>
+<section id="mocking-context-manager">
+<h3>Mocking Context Manager<a class="headerlink" href="#mocking-context-manager" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">mock_async</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">test_with_mock</span><span class="p">():</span>
+</span><span data-line="5">    <span class="k">with</span> <span class="n">mock_async</span><span class="p">()</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
+</span><span data-line="6">
+</span><span data-line="7">        <span class="nd">@async_compute</span>
+</span><span data-line="8">        <span class="k">def</span><span class="w"> </span><span class="nf">task</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span data-line="9">            <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+</span><span data-line="10">
+</span><span data-line="11">        <span class="n">handle</span> <span class="o">=</span> <span class="n">task</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="12">
+</span><span data-line="13">        <span class="k">assert</span> <span class="n">mock</span><span class="o">.</span><span class="n">task_count</span> <span class="o">==</span> <span class="mi">1</span>
+</span><span data-line="14">        <span class="k">assert</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="api-reference">
+<h2>📚 API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h2>
+<section id="core-functions">
+<h3>Core Functions<a class="headerlink" href="#core-functions" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">async_compute(backend=None,</span> <span class="pre">store=None,</span> <span class="pre">...)</span></code> - Decorator for async tasks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">submit_task(func,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code> - Submit task without decorator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_result(task_id,</span> <span class="pre">timeout=None)</span></code> - Get task result</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_status(task_id)</span></code> - Get task status</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_ready(task_id)</span></code> - Check if task is complete</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cancel_task(task_id)</span></code> - Cancel running task</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">async_task(func,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code> - Context manager for tasks</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Configuration<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_config(**overrides)</span></code> - Get configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_global_config()</span></code> - Get global configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">set_global_config(config)</span></code> - Set global configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AUConfig</span></code> - Configuration dataclass</p></li>
+</ul>
+</section>
+<section id="retry">
+<h3>Retry<a class="headerlink" href="#retry" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RetryPolicy(max_attempts,</span> <span class="pre">backoff,</span> <span class="pre">...)</span></code> - Retry configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">retry_with_policy(func,</span> <span class="pre">args,</span> <span class="pre">kwargs,</span> <span class="pre">policy)</span></code> - Execute with retry</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code> - EXPONENTIAL, LINEAR, CONSTANT</p></li>
+</ul>
+</section>
+<section id="workflow">
+<h3>Workflow<a class="headerlink" href="#workflow" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TaskGraph()</span></code> - Create task graph</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder()</span></code> - Fluent workflow builder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depends_on(*funcs)</span></code> - Decorator for dependencies</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Testing<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SyncTestBackend()</span></code> - Synchronous test backend</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InMemoryStore()</span></code> - In-memory result store</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code> - Context manager for testing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code> - Create test backend</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code> - Create test store</p></li>
+</ul>
+</section>
+<section id="http">
+<h3>HTTP<a class="headerlink" href="#http" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mk_http_interface(functions,</span> <span class="pre">...)</span></code> - Create FastAPI app</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mk_flask_interface(functions,</span> <span class="pre">...)</span></code> - Create Flask app</p></li>
+</ul>
+</section>
+</section>
+<section id="use-cases">
+<h2>🎯 Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">#</a></h2>
+<section id="web-application-background-tasks">
+<h3>Web Application Background Tasks<a class="headerlink" href="#web-application-background-tasks" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span><span class="p">,</span> <span class="n">submit_task</span><span class="p">,</span> <span class="n">get_status</span><span class="p">,</span> <span class="n">get_result</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span data-line="5">
+</span><span data-line="6">
+</span><span data-line="7"><span class="nd">@async_compute</span>
+</span><span data-line="8"><span class="k">def</span><span class="w"> </span><span class="nf">process_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+</span><span data-line="9">    <span class="c1"># Heavy processing</span>
+</span><span data-line="10">    <span class="k">return</span> <span class="n">analyze_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</span><span data-line="11">
+</span><span data-line="12">
+</span><span data-line="13"><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/upload"</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"POST"</span><span class="p">])</span>
+</span><span data-line="14"><span class="k">def</span><span class="w"> </span><span class="nf">upload</span><span class="p">():</span>
+</span><span data-line="15">    <span class="n">file_path</span> <span class="o">=</span> <span class="n">save_uploaded_file</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s2">"file"</span><span class="p">])</span>
+</span><span data-line="16">    <span class="n">handle</span> <span class="o">=</span> <span class="n">process_upload</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+</span><span data-line="17">    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"task_id"</span><span class="p">:</span> <span class="n">handle</span><span class="o">.</span><span class="n">key</span><span class="p">})</span>
+</span><span data-line="18">
+</span><span data-line="19">
+</span><span data-line="20"><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/status/&lt;task_id&gt;"</span><span class="p">)</span>
+</span><span data-line="21"><span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+</span><span data-line="22">    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"status"</span><span class="p">:</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
+</span><span data-line="23">
+</span><span data-line="24">
+</span><span data-line="25"><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/result/&lt;task_id&gt;"</span><span class="p">)</span>
+</span><span data-line="26"><span class="k">def</span><span class="w"> </span><span class="nf">result</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
+</span><span data-line="27">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="28">        <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</span><span data-line="29">        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"result"</span><span class="p">:</span> <span class="n">result</span><span class="p">})</span>
+</span><span data-line="30">    <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+</span><span data-line="31">        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">"status"</span><span class="p">:</span> <span class="s2">"pending"</span><span class="p">}),</span> <span class="mi">202</span>
+</span></pre></div>
+</div>
+</section>
+<section id="distributed-data-processing">
+<h3>Distributed Data Processing<a class="headerlink" href="#distributed-data-processing" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">au.backends.rq_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">RQBackend</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">backend</span> <span class="o">=</span> <span class="n">RQBackend</span><span class="p">(</span><span class="n">redis_url</span><span class="o">=</span><span class="s2">"redis://queue:6379"</span><span class="p">)</span>
+</span><span data-line="5">
+</span><span data-line="6">
+</span><span data-line="7"><span class="nd">@async_compute</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+</span><span data-line="8"><span class="k">def</span><span class="w"> </span><span class="nf">process_chunk</span><span class="p">(</span><span class="n">data_chunk</span><span class="p">):</span>
+</span><span data-line="9">    <span class="k">return</span> <span class="p">[</span><span class="n">transform</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data_chunk</span><span class="p">]</span>
+</span><span data-line="10">
+</span><span data-line="11">
+</span><span data-line="12"><span class="c1"># Submit many tasks</span>
+</span><span data-line="13"><span class="n">chunks</span> <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">large_dataset</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span><span data-line="14"><span class="n">handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">process_chunk</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span>
+</span><span data-line="15">
+</span><span data-line="16"><span class="c1"># Collect results</span>
+</span><span data-line="17"><span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">handles</span><span class="p">]</span>
+</span><span data-line="18"><span class="n">final_result</span> <span class="o">=</span> <span class="n">merge_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="ml-model-training-pipeline">
+<h3>ML Model Training Pipeline<a class="headerlink" href="#ml-model-training-pipeline" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskGraph</span>
+</span><span data-line="2">
+</span><span data-line="3">
+</span><span data-line="4"><span class="k">def</span><span class="w"> </span><span class="nf">load_data</span><span class="p">():</span>
+</span><span data-line="5">    <span class="k">return</span> <span class="n">load_dataset</span><span class="p">()</span>
+</span><span data-line="6">
+</span><span data-line="7">
+</span><span data-line="8"><span class="k">def</span><span class="w"> </span><span class="nf">preprocess</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span data-line="9">    <span class="k">return</span> <span class="n">clean_and_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span data-line="10">
+</span><span data-line="11">
+</span><span data-line="12"><span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+</span><span data-line="13">    <span class="k">return</span> <span class="n">fit_model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span data-line="14">
+</span><span data-line="15">
+</span><span data-line="16"><span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+</span><span data-line="17">    <span class="k">return</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</span><span data-line="18">
+</span><span data-line="19">
+</span><span data-line="20"><span class="c1"># Build pipeline</span>
+</span><span data-line="21"><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
+</span><span data-line="22"><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">load_data</span><span class="p">)</span>
+</span><span data-line="23"><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">preprocess</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">])</span>
+</span><span data-line="24"><span class="n">t3</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">train_model</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t2</span><span class="p">])</span>
+</span><span data-line="25"><span class="n">t4</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">evaluate</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t3</span><span class="p">])</span>
+</span><span data-line="26">
+</span><span data-line="27"><span class="n">results</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+</span><span data-line="28"><span class="n">metrics</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">t4</span><span class="p">]</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="architecture">
+<h2>🏗️ Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
+<p>AU follows a clean, modular architecture:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">┌─────────────────────────────────────────┐
+</span><span data-line="2">│          User Application               │
+</span><span data-line="3">└─────────────────┬───────────────────────┘
+</span><span data-line="4">                  │
+</span><span data-line="5">      ┌───────────┴──────────┐
+</span><span data-line="6">      │   Decorator/API       │
+</span><span data-line="7">      │   (async_compute)     │
+</span><span data-line="8">      └───────────┬───────────┘
+</span><span data-line="9">                  │
+</span><span data-line="10">      ┌───────────┴──────────┐
+</span><span data-line="11">      │   ComputationHandle   │
+</span><span data-line="12">      │   (Result tracking)   │
+</span><span data-line="13">      └───────────┬───────────┘
+</span><span data-line="14">                  │
+</span><span data-line="15">      ┌───────────┴──────────┐
+</span><span data-line="16">      │   Backend Layer       │
+</span><span data-line="17">      │   (Execution)         │
+</span><span data-line="18">      └───────────┬───────────┘
+</span><span data-line="19">                  │
+</span><span data-line="20">      ┌───────────┴──────────┐
+</span><span data-line="21">      │   Storage Layer       │
+</span><span data-line="22">      │   (Persistence)       │
+</span><span data-line="23">      └───────────────────────┘
+</span></pre></div>
+</div>
+</section>
+<section id="contributing">
+<h2>🤝 Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
+<p>Contributions are welcome! Please check out the <a class="reference external" href="https://github.com/i2mint/au">GitHub repository</a>.</p>
+</section>
+<section id="license">
+<h2>📄 License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>MIT License - see LICENSE file for details.</p>
+</section>
+<section id="related-projects">
+<h2>🔗 Related Projects<a class="headerlink" href="#related-projects" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong><a class="reference external" href="https://github.com/i2mint/qh">qh</a></strong> - HTTP services built on AU</p></li>
+<li><p><strong><a class="reference external" href="https://github.com/i2mint">i2mint</a></strong> - Ecosystem of Python tools</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>📖 Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>For more detailed documentation, see the <a class="reference internal" href="#./docs"><span class="xref myst">docs folder</span></a> or visit our <a class="reference external" href="https://github.com/i2mint/au">documentation site</a>.</p>
+</section>
+<section id="examples">
+<h2>🎓 Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<p>Check out the <a class="reference internal" href="#./examples"><span class="xref myst">examples folder</span></a> for more use cases:</p>
+<ul class="simple">
+<li><p>Simple tasks</p></li>
+<li><p>Web API integration</p></li>
+<li><p>Distributed processing</p></li>
+<li><p>Workflow orchestration</p></li>
+<li><p>Testing strategies</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>Made with ❤️ by the i2mint team</strong></p>
+<p class="epythet-aggregates">This documentation as a single file: <a href="au.md">au.md</a> (Markdown, for agents).</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-13 14:44 UTC from <a href="https://github.com/i2mint/au/commit/daaf0c26ff570013812dfed0dd2ccdcec9543e72">daaf0c2</a> (master) · au 0.1.2 · <a href="about-this-build.html">about this build</a></p>
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-next">
+    <a href="api.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">API reference</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/i2mint/au" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=92734c54"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-      <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="au" href="module_docs/au.html" /> 
-</head>
-
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="#" class="icon icon-home">
-            au
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/api.html">au.api</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/base.html">au.base</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/config.html">au.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/hooks.html">au.hooks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/http.html">au.http</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/retry.html">au.retry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/testing.html">au.testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/workflow.html">au.workflow</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">au</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to au’s documentation!</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="welcome-to-au-s-documentation">
-<h1>Welcome to au’s documentation!<a class="headerlink" href="#welcome-to-au-s-documentation" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au.html">au</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.AUConfig"><code class="docutils literal notranslate"><span class="pre">AUConfig</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.BackoffStrategy"><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.CompositeMiddleware"><code class="docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationCancelledError"><code class="docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationResult"><code class="docutils literal notranslate"><span class="pre">ComputationResult</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.HooksMiddleware"><code class="docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MetricsCollectorMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.Middleware"><code class="docutils literal notranslate"><span class="pre">Middleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.MockTaskTracker"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.NonRetryableError"><code class="docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ProcessBackend"><code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryPolicy"><code class="docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryState"><code class="docutils literal notranslate"><span class="pre">RetryState</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.SerializationFormat"><code class="docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskEvent"><code class="docutils literal notranslate"><span class="pre">TaskEvent</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TaskState"><code class="docutils literal notranslate"><span class="pre">TaskState</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TracingMiddleware"><code class="docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.TrackingTestBackend"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.WorkflowBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.WorkflowTask"><code class="docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.async_task"><code class="docutils literal notranslate"><span class="pre">async_task()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.cancel_task"><code class="docutils literal notranslate"><span class="pre">cancel_task()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_app_from_decorator"><code class="docutils literal notranslate"><span class="pre">create_app_from_decorator()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_observability_middleware"><code class="docutils literal notranslate"><span class="pre">create_observability_middleware()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_test_backend"><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.create_test_store"><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.depends_on"><code class="docutils literal notranslate"><span class="pre">depends_on()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_global_config"><code class="docutils literal notranslate"><span class="pre">get_global_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_handle"><code class="docutils literal notranslate"><span class="pre">get_handle()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_many"><code class="docutils literal notranslate"><span class="pre">get_many()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_result"><code class="docutils literal notranslate"><span class="pre">get_result()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.get_status"><code class="docutils literal notranslate"><span class="pre">get_status()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.is_ready"><code class="docutils literal notranslate"><span class="pre">is_ready()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mk_flask_interface"><code class="docutils literal notranslate"><span class="pre">mk_flask_interface()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mk_http_interface"><code class="docutils literal notranslate"><span class="pre">mk_http_interface()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.mock_async"><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.reset_global_config"><code class="docutils literal notranslate"><span class="pre">reset_global_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.retry_with_policy"><code class="docutils literal notranslate"><span class="pre">retry_with_policy()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_default_backend"><code class="docutils literal notranslate"><span class="pre">set_default_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_default_store"><code class="docutils literal notranslate"><span class="pre">set_default_store()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.set_global_config"><code class="docutils literal notranslate"><span class="pre">set_global_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.submit_many"><code class="docutils literal notranslate"><span class="pre">submit_many()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.submit_task"><code class="docutils literal notranslate"><span class="pre">submit_task()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au.html#au.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/api.html">au.api</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.async_task"><code class="docutils literal notranslate"><span class="pre">async_task()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.cancel_task"><code class="docutils literal notranslate"><span class="pre">cancel_task()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_handle"><code class="docutils literal notranslate"><span class="pre">get_handle()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_many"><code class="docutils literal notranslate"><span class="pre">get_many()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_result"><code class="docutils literal notranslate"><span class="pre">get_result()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.get_status"><code class="docutils literal notranslate"><span class="pre">get_status()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.is_ready"><code class="docutils literal notranslate"><span class="pre">is_ready()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.set_default_backend"><code class="docutils literal notranslate"><span class="pre">set_default_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.set_default_store"><code class="docutils literal notranslate"><span class="pre">set_default_store()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.submit_many"><code class="docutils literal notranslate"><span class="pre">submit_many()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/api.html#au.api.submit_task"><code class="docutils literal notranslate"><span class="pre">submit_task()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends.html">au.backends</a></li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/rq_backend.html">au.backends.rq_backend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/backends/rq_backend.html#au.backends.rq_backend.RQBackend"><code class="docutils literal notranslate"><span class="pre">RQBackend</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html">au.backends.supabase_backend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/backends/supabase_backend.html#au.backends.supabase_backend.SupabaseQueueBackend"><code class="docutils literal notranslate"><span class="pre">SupabaseQueueBackend</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/base.html">au.base</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#architecture-overview">Architecture Overview:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#usage-patterns">Usage Patterns:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationBackend"><code class="docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationCancelledError"><code class="docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationHandle"><code class="docutils literal notranslate"><span class="pre">ComputationHandle</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationResult"><code class="docutils literal notranslate"><span class="pre">ComputationResult</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.LoggingMiddleware"><code class="docutils literal notranslate"><span class="pre">LoggingMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.MetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.Middleware"><code class="docutils literal notranslate"><span class="pre">Middleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ProcessBackend"><code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.RemoteAPIBackend"><code class="docutils literal notranslate"><span class="pre">RemoteAPIBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.SerializationFormat"><code class="docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.SharedMetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/base.html#au.base.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/config.html">au.config</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.AUConfig"><code class="docutils literal notranslate"><span class="pre">AUConfig</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.get_global_config"><code class="docutils literal notranslate"><span class="pre">get_global_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.load_config_from_env"><code class="docutils literal notranslate"><span class="pre">load_config_from_env()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.load_config_from_file"><code class="docutils literal notranslate"><span class="pre">load_config_from_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.reset_global_config"><code class="docutils literal notranslate"><span class="pre">reset_global_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/config.html#au.config.set_global_config"><code class="docutils literal notranslate"><span class="pre">set_global_config()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/hooks.html">au.hooks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.CompositeMiddleware"><code class="docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.HooksMiddleware"><code class="docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.MetricsCollectorMiddleware"><code class="docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TaskEvent"><code class="docutils literal notranslate"><span class="pre">TaskEvent</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TaskEventHandler"><code class="docutils literal notranslate"><span class="pre">TaskEventHandler</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.TracingMiddleware"><code class="docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/hooks.html#au.hooks.create_observability_middleware"><code class="docutils literal notranslate"><span class="pre">create_observability_middleware()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/http.html">au.http</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.HTTPException"><code class="docutils literal notranslate"><span class="pre">HTTPException</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskCancelResponse"><code class="docutils literal notranslate"><span class="pre">TaskCancelResponse</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskListResponse"><code class="docutils literal notranslate"><span class="pre">TaskListResponse</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskResultResponse"><code class="docutils literal notranslate"><span class="pre">TaskResultResponse</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskStatusResponse"><code class="docutils literal notranslate"><span class="pre">TaskStatusResponse</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskSubmitRequest"><code class="docutils literal notranslate"><span class="pre">TaskSubmitRequest</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.TaskSubmitResponse"><code class="docutils literal notranslate"><span class="pre">TaskSubmitResponse</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.create_app_from_decorator"><code class="docutils literal notranslate"><span class="pre">create_app_from_decorator()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.mk_flask_interface"><code class="docutils literal notranslate"><span class="pre">mk_flask_interface()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/http.html#au.http.mk_http_interface"><code class="docutils literal notranslate"><span class="pre">mk_http_interface()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/retry.html">au.retry</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.BackoffStrategy"><code class="docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.NonRetryableError"><code class="docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryPolicy"><code class="docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryState"><code class="docutils literal notranslate"><span class="pre">RetryState</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/retry.html#au.retry.retry_with_policy"><code class="docutils literal notranslate"><span class="pre">retry_with_policy()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/testing.html">au.testing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.MockTaskTracker"><code class="docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.TaskCallRecord"><code class="docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.TrackingTestBackend"><code class="docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.create_test_backend"><code class="docutils literal notranslate"><span class="pre">create_test_backend()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.create_test_store"><code class="docutils literal notranslate"><span class="pre">create_test_store()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/testing.html#au.testing.mock_async"><code class="docutils literal notranslate"><span class="pre">mock_async()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="module_docs/au/workflow.html">au.workflow</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.TaskGraph"><code class="docutils literal notranslate"><span class="pre">TaskGraph</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.TaskState"><code class="docutils literal notranslate"><span class="pre">TaskState</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.WorkflowBuilder"><code class="docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.WorkflowTask"><code class="docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="module_docs/au/workflow.html#au.workflow.depends_on"><code class="docutils literal notranslate"><span class="pre">depends_on()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-<p>Release: 0.0.16</p>
-<p>Last change: Jul 26, 2026</p>
-</section>
-
-
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="module_docs/au.html" class="btn btn-neutral float-right" title="au" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p></p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/shibuya.js?v=50760d75"></script></body>
 </html>
