@@ -1,5 +1,5 @@
-import sys
 import time
+from pathlib import Path
 from datetime import timedelta
 import pytest
 from au.base import (
@@ -231,11 +231,6 @@ if __name__ == "__main__":
 # --- races between writers and readers of one store (i2mint/au#6) -------------
 
 
-@pytest.mark.skipif(
-    sys.platform == "win32",
-    reason="Windows refuses to replace a file a reader has open (PermissionError); "
-    "see au#10 (retry the rename)",
-)
 def test_concurrent_writers_of_one_key_never_leave_a_torn_file(tmp_path):
     """The worker's RUNNING and the caller's CANCELLED share a key; two writers
     must not interleave into one file (a reader saw ``Extra data``)."""
@@ -446,3 +441,32 @@ def test_a_retry_policy_wrapper_pickles_by_reference():
 
     wrapped = pickle.loads(pickle.dumps(_WithRetryPolicy(_identity, RetryPolicy())))
     assert wrapped(5) == 5
+
+
+def test_a_busy_file_is_retried_on_windows_and_not_elsewhere(tmp_path, monkeypatch):
+    import au.base as base
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    key = store.create_key()
+    real_replace = Path.replace
+    refusals = []
+
+    def busy_twice(self, target):
+        if len(refusals) < 2:
+            refusals.append(1)
+            raise PermissionError(13, "Access is denied")
+        return real_replace(self, target)
+
+    monkeypatch.setattr(Path, "replace", busy_twice)
+    monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", True)
+    monkeypatch.setattr(base, "_PERMISSION_RETRY_SECONDS", 0.0)
+    store[key] = ComputationResult(1, ComputationStatus.COMPLETED)
+    assert len(refusals) == 2 and store[key].value == 1
+
+    # Off Windows a PermissionError is a real one: no retries, the write is lost
+    # (and logged), exactly as before.
+    refusals.clear()
+    other = store.create_key()
+    monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", False)
+    store[other] = ComputationResult(2, ComputationStatus.COMPLETED)
+    assert len(refusals) == 1 and store[other].status == ComputationStatus.PENDING

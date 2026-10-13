@@ -67,6 +67,7 @@ import concurrent.futures
 import threading
 import random
 import shutil
+import sys
 import tempfile
 from contextlib import contextmanager
 
@@ -300,6 +301,25 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         pass
 
 
+#: On Windows a file another handle has open cannot be replaced (``os.replace``)
+#: or opened while it is being replaced: both raise ``PermissionError`` for the
+#: few milliseconds a reader or writer holds it. Elsewhere that error is real.
+_RETRY_PERMISSION_ERRORS = sys.platform == "win32"
+_PERMISSION_RETRIES = 50
+_PERMISSION_RETRY_SECONDS = 0.01
+
+
+def _retrying_on_windows(operation: Callable[[], Any]) -> Any:
+    """``operation()``, retried briefly while Windows holds the file (au#10)."""
+    for attempt in range(_PERMISSION_RETRIES):
+        try:
+            return operation()
+        except PermissionError:
+            if not _RETRY_PERMISSION_ERRORS or attempt == _PERMISSION_RETRIES - 1:
+                raise
+            time.sleep(_PERMISSION_RETRY_SECONDS)
+
+
 #: Where ``FileSystemStore`` writes a result before renaming it into place.
 _WRITING_DIR = ".writing"
 
@@ -415,7 +435,7 @@ class FileSystemStore(ComputationStore):
             return ComputationResult(None, ComputationStatus.PENDING)
 
         try:
-            with open(path, "rb") as f:
+            with _retrying_on_windows(lambda: open(path, "rb")) as f:
                 data = f.read()
                 if not data:
                     # Empty file: treat as failed
@@ -450,7 +470,7 @@ class FileSystemStore(ComputationStore):
             tmp_dir.mkdir(exist_ok=True)
             with open(tmp_path, "wb") as f:
                 f.write(self._serialize(result))
-            tmp_path.replace(path)
+            _retrying_on_windows(lambda: tmp_path.replace(path))
         except Exception as e:
             logger.error(f"Failed to write result for key {key}: {e}")
             tmp_path.unlink(missing_ok=True)
