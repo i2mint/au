@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 from datetime import timedelta
 import pytest
 from au.base import (
@@ -16,11 +17,38 @@ from au.base import (
     ComputationResult,
 )
 
+# Functions a worker process runs are defined at module level and wrapped inside
+# the tests: where processes are spawned (Windows, macOS) the function is pickled
+# by reference, which a local function or a name rebound by a decorator cannot be.
+
+
+def _double(x):
+    return x * 2
+
+
+def _inc(x):
+    return x + 1
+
+
+def _square(x):
+    return x * x
+
+
+def _slow(x):
+    time.sleep(10)
+    return x
+
+
+def _make_dict(x):
+    return {"val": x, "list": [x, x + 1]}
+
+
+def _identity(x):
+    return x
+
 
 def test_basic_async_compute(tmp_path):
-    @async_compute(base_path=tmp_path)
-    def double(x):
-        return x * 2
+    double = async_compute(base_path=tmp_path)(_double)
 
     handle = double(21)
     result = handle.get_result(timeout=5)
@@ -33,9 +61,7 @@ def test_custom_backend_and_store(tmp_path):
     store = FileSystemStore(tmp_path, ttl_seconds=60)
     backend = ProcessBackend(store)
 
-    @async_compute(backend=backend, store=store)
-    def inc(x):
-        return x + 1
+    inc = async_compute(backend=backend, store=store)(_inc)
 
     handle = inc(10)
     assert handle.get_status() in (ComputationStatus.PENDING, ComputationStatus.RUNNING)
@@ -59,9 +85,9 @@ def test_middleware_and_metrics(tmp_path):
     metrics = SharedMetricsMiddleware(**shared_state)
     logging_mw = LoggingMiddleware()
 
-    @async_compute(base_path=tmp_path, middleware=[metrics, logging_mw])
-    def square(x):
-        return x * x
+    square = async_compute(base_path=tmp_path, middleware=[metrics, logging_mw])(
+        _square
+    )
 
     handles = [square(i) for i in range(5)]
     # Wait for all handles to be ready, but don't hang forever
@@ -86,10 +112,7 @@ def test_cancellation_and_termination(tmp_path):
     store = FileSystemStore(tmp_path, ttl_seconds=60)
     backend = ProcessBackend(store)
 
-    @async_compute(backend=backend, store=store)
-    def slow(x):
-        time.sleep(10)
-        return x
+    slow = async_compute(backend=backend, store=store)(_slow)
 
     handle: ComputationHandle = slow(123)
     # Cancel and terminate the process
@@ -106,9 +129,9 @@ def test_cancellation_and_termination(tmp_path):
 
 
 def test_pickle_serialization(tmp_path):
-    @async_compute(base_path=tmp_path, serialization=SerializationFormat.PICKLE)
-    def make_dict(x):
-        return {"val": x, "list": [x, x + 1]}
+    make_dict = async_compute(
+        base_path=tmp_path, serialization=SerializationFormat.PICKLE
+    )(_make_dict)
 
     handle = make_dict(7)
     result = handle.get_result(timeout=5)
@@ -116,9 +139,7 @@ def test_pickle_serialization(tmp_path):
 
 
 def test_cleanup_expired(tmp_path):
-    @async_compute(base_path=tmp_path, ttl_seconds=1)
-    def foo(x):
-        return x
+    foo = async_compute(base_path=tmp_path, ttl_seconds=1)(_identity)
 
     handle = foo(1)
     handle.get_result(timeout=5)
@@ -329,3 +350,123 @@ def test_temp_files_never_look_like_keys_whatever_the_suffix(tmp_path):
     store[key] = ComputationResult(1, ComputationStatus.COMPLETED)
     assert seen_mid_write == [[]]
     assert list(store) == [key] and len(store) == 1
+
+
+# --- platforms without fork (i2mint/au#7) --------------------------------------
+
+
+def test_process_backend_builds_where_fork_does_not_exist(monkeypatch):
+    """Windows: ``set_start_method('fork')`` raises ValueError, so it is not asked."""
+    import multiprocessing
+
+    def no_fork(method, force=False):
+        raise ValueError("cannot find context for 'fork'")
+
+    monkeypatch.setattr(multiprocessing, "get_all_start_methods", lambda: ["spawn"])
+    monkeypatch.setattr(multiprocessing, "set_start_method", no_fork)
+    monkeypatch.setattr(multiprocessing, "get_start_method", lambda *a, **k: "spawn")
+    backend = ProcessBackend()
+    assert backend.store is None
+
+
+def _put_double(queue, x):
+    queue.put(x * 2)
+
+
+@pytest.fixture
+def spawn_start_method():
+    """Run with the ``spawn`` start method (what Windows has), then put ``fork``
+    back for the rest of the session."""
+    import multiprocessing
+
+    previous = multiprocessing.get_start_method(allow_none=True)
+    multiprocessing.set_start_method("spawn", force=True)
+    try:
+        yield
+    finally:
+        multiprocessing.set_start_method(previous or "fork", force=True)
+
+
+def test_spawn_accepts_what_only_a_starting_process_can_receive(
+    tmp_path, spawn_start_method
+):
+    """A Queue pickles only while a process is being started, so pickling the
+    arguments up front (the first version of this change) refused it."""
+    import multiprocessing
+
+    store = FileSystemStore(tmp_path)
+    backend = ProcessBackend(store)
+    multiprocessing.set_start_method("spawn", force=True)  # the backend forces fork
+    queue = multiprocessing.Queue()
+    backend.launch(_put_double, (queue, 21), {}, "k", store)
+    assert queue.get(timeout=30) == 42
+    backend._processes["k"].join(10)
+
+
+def test_a_spawned_process_gets_a_clear_refusal_for_an_unpicklable_function(
+    tmp_path, spawn_start_method
+):
+    import multiprocessing
+
+    store = FileSystemStore(tmp_path)
+    backend = ProcessBackend(store)
+    multiprocessing.set_start_method("spawn", force=True)
+    with pytest.raises(ValueError, match="module-level function"):
+        backend.launch(lambda x: x, (1,), {}, "k", store)
+    assert "k" not in backend._processes
+
+
+def test_a_launch_that_raises_does_not_leave_the_key_running(tmp_path):
+    from au.api import submit_task
+    from au.base import ComputationBackend
+
+    class Refusing(ComputationBackend):
+        def launch(self, func, args, kwargs, key, store=None):
+            raise ValueError("cannot launch")
+
+    store = FileSystemStore(tmp_path)
+    with pytest.raises(ValueError, match="cannot launch"):
+        submit_task(_identity, 1, key="job", backend=Refusing(), store=store)
+    assert store["job"].status == ComputationStatus.FAILED
+    # ... so a resubmit under the same key is not taken for a live duplicate.
+    backend = ProcessBackend(store)
+    assert submit_task(_identity, 1, key="job", backend=backend, store=store) == "job"
+
+
+def test_a_retry_policy_wrapper_pickles_by_reference():
+    import pickle
+
+    from au.api import _WithRetryPolicy
+    from au.retry import RetryPolicy
+
+    wrapped = pickle.loads(pickle.dumps(_WithRetryPolicy(_identity, RetryPolicy())))
+    assert wrapped(5) == 5
+
+
+def test_a_busy_file_is_retried_on_windows_and_not_elsewhere(tmp_path, monkeypatch):
+    import au.base as base
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    key = store.create_key()
+    real_replace = Path.replace
+    refusals = []
+
+    def busy_twice(self, target):
+        if len(refusals) < 2:
+            refusals.append(1)
+            raise PermissionError(13, "Access is denied")
+        return real_replace(self, target)
+
+    monkeypatch.setattr(Path, "replace", busy_twice)
+    monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", True)
+    monkeypatch.setattr(base, "_PERMISSION_RETRY_SECONDS", 0.0)
+    store[key] = ComputationResult(1, ComputationStatus.COMPLETED)
+    assert len(refusals) == 2 and store[key].value == 1
+
+    # Off Windows a PermissionError is a real one: no retries, the write is lost
+    # (and logged), exactly as before.
+    refusals.clear()
+    other = store.create_key()
+    monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", False)
+    store[other] = ComputationResult(2, ComputationStatus.COMPLETED)
+    assert len(refusals) == 1 and store[other].status == ComputationStatus.PENDING

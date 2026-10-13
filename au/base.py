@@ -67,9 +67,9 @@ import concurrent.futures
 import threading
 import random
 import shutil
+import sys
 import tempfile
 from contextlib import contextmanager
-
 
 logger = logging.getLogger(__name__)
 
@@ -301,6 +301,25 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         pass
 
 
+#: On Windows a file another handle has open cannot be replaced (``os.replace``)
+#: or opened while it is being replaced: both raise ``PermissionError`` for the
+#: few milliseconds a reader or writer holds it. Elsewhere that error is real.
+_RETRY_PERMISSION_ERRORS = sys.platform == "win32"
+_PERMISSION_RETRIES = 50
+_PERMISSION_RETRY_SECONDS = 0.01
+
+
+def _retrying_on_windows(operation: Callable[[], Any]) -> Any:
+    """``operation()``, retried briefly while Windows holds the file (au#10)."""
+    for attempt in range(_PERMISSION_RETRIES):
+        try:
+            return operation()
+        except PermissionError:
+            if not _RETRY_PERMISSION_ERRORS or attempt == _PERMISSION_RETRIES - 1:
+                raise
+            time.sleep(_PERMISSION_RETRY_SECONDS)
+
+
 #: Where ``FileSystemStore`` writes a result before renaming it into place.
 _WRITING_DIR = ".writing"
 
@@ -416,7 +435,7 @@ class FileSystemStore(ComputationStore):
             return ComputationResult(None, ComputationStatus.PENDING)
 
         try:
-            with open(path, "rb") as f:
+            with _retrying_on_windows(lambda: open(path, "rb")) as f:
                 data = f.read()
                 if not data:
                     # Empty file: treat as failed
@@ -451,7 +470,7 @@ class FileSystemStore(ComputationStore):
             tmp_dir.mkdir(exist_ok=True)
             with open(tmp_path, "wb") as f:
                 f.write(self._serialize(result))
-            tmp_path.replace(path)
+            _retrying_on_windows(lambda: tmp_path.replace(path))
         except Exception as e:
             logger.error(f"Failed to write result for key {key}: {e}")
             tmp_path.unlink(missing_ok=True)
@@ -746,6 +765,28 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
         store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
 
+def _explained_start_failure(error: Exception) -> Exception:
+    """The error to raise when a process could not be started.
+
+    Where processes are spawned (Windows; macOS and Python 3.14 by default if
+    the start method is changed) the work crosses by pickle at ``start()``: a
+    lambda, a local function, or a name rebound by a decorator fails there with
+    an error that does not say so. Starting is the only honest test of what a
+    spawned process accepts (a ``multiprocessing.Queue`` pickles only then).
+    """
+    # Pickling failures surface as PicklingError, TypeError ("cannot pickle ...")
+    # or AttributeError ("Can't get local object ...").
+    pickling = isinstance(error, (pickle.PicklingError, TypeError, AttributeError))
+    if multiprocessing.get_start_method() == "fork" or not pickling:
+        return error
+    return ValueError(
+        f"The work cannot be sent to a spawned process ({type(error).__name__}: "
+        f"{error}). The start method is {multiprocessing.get_start_method()!r}, "
+        "which pickles the function and its arguments: use a module-level "
+        "function, or ThreadBackend."
+    )
+
+
 def _worker_function(
     func: Callable,
     args: tuple,
@@ -815,7 +856,14 @@ class ProcessBackend(ComputationBackend):
         self._processes = {}
 
     def _ensure_fork_method(self) -> None:
-        """Ensure we're using fork method for better pickling compatibility."""
+        """Prefer ``fork`` for better pickling compatibility, where it exists.
+
+        ``fork`` does not exist on Windows, where asking for it raises
+        ``ValueError`` (i2mint/au#7): there the platform default (``spawn``) is
+        kept, and ``launch`` checks that the function can be pickled.
+        """
+        if "fork" not in multiprocessing.get_all_start_methods():
+            return
         try:
             current_method = multiprocessing.get_start_method()
             if current_method != "fork":
@@ -872,7 +920,11 @@ class ProcessBackend(ComputationBackend):
             args=(func, args, kwargs, store, key, middleware_configs),
         )
         self._processes[key] = process
-        process.start()
+        try:
+            process.start()
+        except Exception as e:
+            self._processes.pop(key, None)
+            raise _explained_start_failure(e) from e
 
     def terminate(self, key: str) -> None:
         proc = self._processes.get(key)
