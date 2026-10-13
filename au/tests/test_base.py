@@ -1,4 +1,5 @@
 import time
+from datetime import timedelta
 import pytest
 from au.base import (
     async_compute,
@@ -12,6 +13,7 @@ from au.base import (
     ComputationHandle,
     ComputationStatus,
     ComputationCancelledError,
+    ComputationResult,
 )
 
 
@@ -203,3 +205,70 @@ def _test_slow_function(seconds):
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+# --- races between writers and readers of one store (i2mint/au#6) -------------
+
+
+def test_concurrent_writers_of_one_key_never_leave_a_torn_file(tmp_path):
+    """The worker's RUNNING and the caller's CANCELLED share a key; two writers
+    must not interleave into one file (a reader saw ``Extra data``)."""
+    import threading
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    key = store.create_key()
+    big = ComputationResult("x" * 200_000, ComputationStatus.COMPLETED)
+    small = ComputationResult(None, ComputationStatus.RUNNING)
+    stop = threading.Event()
+    torn = []
+
+    def write(result):
+        while not stop.is_set():
+            store[key] = result
+
+    def read(_=None):
+        while not stop.is_set():
+            got = store[key]
+            if got.status == ComputationStatus.FAILED:
+                torn.append(got.error)
+
+    threads = [
+        threading.Thread(target=f, args=(a,))
+        for f, a in [(write, big), (write, small), (read, None)]
+    ]
+    for t in threads:
+        t.start()
+    time.sleep(1.0)
+    stop.set()
+    for t in threads:
+        t.join()
+    assert not torn, torn[:3]
+    assert not list(tmp_path.glob("*.tmp"))  # every temp file was renamed or removed
+
+
+def test_cleanup_expired_counts_what_it_removed_even_with_automatic_cleanup(tmp_path):
+    store = FileSystemStore(tmp_path, ttl_seconds=1, cleanup_probability=1.0)
+    key = store.create_key()
+    done = ComputationResult(1, ComputationStatus.COMPLETED)
+    done.created_at = done.created_at - timedelta(seconds=10)
+    store[key] = done
+    # The nested read inside cleanup used to start its own cleanup, which removed
+    # the item first and left this call counting zero.
+    for _ in range(20):
+        store[key] = done
+        assert store.cleanup_expired() == 1
+
+
+def test_a_worker_starting_late_does_not_undo_a_cancellation(tmp_path):
+    from au.base import _mark_running
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    key = store.create_key()
+    store[key] = ComputationResult(
+        None, ComputationStatus.CANCELLED, terminal_reason="stop"
+    )
+    _mark_running(store, key)
+    assert store[key].status == ComputationStatus.CANCELLED
+    fresh = store.create_key()
+    _mark_running(store, fresh)
+    assert store[fresh].status == ComputationStatus.RUNNING

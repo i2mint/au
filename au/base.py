@@ -108,7 +108,7 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
                 )
 
         # Set status to running
-        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+        _mark_running(store, key)
 
         # Execute the function
         try:
@@ -402,6 +402,10 @@ class FileSystemStore(ComputationStore):
 
     def __getitem__(self, key: str) -> ComputationResult:
         self._maybe_cleanup()
+        return self._read(key)
+
+    def _read(self, key: str) -> ComputationResult:
+        """Read ``key`` without the chance of an automatic cleanup."""
         path = self._get_path(key)
 
         if not path.exists():
@@ -431,13 +435,18 @@ class FileSystemStore(ComputationStore):
         if result.is_ready and result.completed_at is None:
             result.completed_at = datetime.now()
 
+        # A temp file of its own per write, in the same directory so the rename
+        # is atomic. A shared ``<key>.json.tmp`` let two writers of one key (the
+        # worker's RUNNING and the caller's CANCELLED) interleave bytes into one
+        # file, which a reader saw as ``Extra data`` (i2mint/au#6).
+        tmp_path = path.with_name(f"{path.name}.{uuid.uuid4().hex}.tmp")
         try:
-            tmp_path = path.with_suffix(path.suffix + ".tmp")
             with open(tmp_path, "wb") as f:
                 f.write(self._serialize(result))
             tmp_path.replace(path)
         except Exception as e:
             logger.error(f"Failed to write result for key {key}: {e}")
+            tmp_path.unlink(missing_ok=True)
 
     def __delitem__(self, key: str) -> None:
         self._get_path(key).unlink(missing_ok=True)
@@ -465,7 +474,10 @@ class FileSystemStore(ComputationStore):
         removed = 0
         for key in list(self):  # Create list to avoid modification during iteration
             try:
-                result = self[key]
+                # Not `self[key]`: that may start an automatic cleanup of its
+                # own, which removes the very items this call is counting
+                # (a 10% flake in `test_cleanup_expired`, i2mint/au#6).
+                result = self._read(key)
                 if self.is_expired(result):
                     del self[key]
                     removed += 1
@@ -715,6 +727,16 @@ class ComputationBackend(ABC):
                 logger.error(f"Middleware {mw.__class__.__name__} on_error failed: {e}")
 
 
+def _mark_running(store: "ComputationStore", key: str) -> None:
+    """Record RUNNING, unless the computation was already cancelled or finished.
+
+    A worker starts after the caller may have cancelled it; writing RUNNING over
+    that CANCELLED makes the cancellation disappear (i2mint/au#6).
+    """
+    if not store[key].is_ready:
+        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+
+
 def _worker_function(
     func: Callable,
     args: tuple,
@@ -740,7 +762,7 @@ def _worker_function(
                 f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
             )
 
-    store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+    _mark_running(store, key)
 
     try:
         result_value = func(*args, **kwargs)  # FIX: do not pass mw_kwargs here
@@ -1150,7 +1172,7 @@ class ThreadBackend(ComputationBackend):
 
         def _worker():
             self._run_middleware_before(func, args, kwargs, key)
-            store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+            _mark_running(store, key)
 
             try:
                 result = func(*args, **kwargs)
