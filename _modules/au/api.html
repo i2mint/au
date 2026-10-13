@@ -284,334 +284,345 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="152">    <span class="k">return</span> <span class="n">existing</span>
 </span><span data-line="153">
 </span><span data-line="154">
+</span><span data-line="155"><span class="k">class</span><span class="w"> </span><span class="nc">_WithRetryPolicy</span><span class="p">:</span>
+</span><span data-line="156"><span class="w">    </span><span class="sd">"""``func`` retried under ``policy``. A class rather than a local function so</span>
+</span><span data-line="157"><span class="sd">    it pickles by reference, which a spawned process needs (i2mint/au#7)."""</span>
+</span><span data-line="158">
+</span><span data-line="159">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">RetryPolicy</span><span class="p">):</span>
+</span><span data-line="160">        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">func</span><span class="p">,</span> <span class="n">policy</span>
+</span><span data-line="161">
+</span><span data-line="162">    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span data-line="163">        <span class="k">return</span> <span class="n">retry_with_policy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span><span class="p">)</span>
+</span><span data-line="164">
+</span><span data-line="165">
 <div class="viewcode-block" id="submit_task">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.submit_task">[docs]</a>
-</span><span data-line="155"><span class="k">def</span><span class="w"> </span><span class="nf">submit_task</span><span class="p">(</span>
-</span><span data-line="156">    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="157">    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-</span><span data-line="158">    <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="159">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="160">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="161">    <span class="n">retry_policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RetryPolicy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="162">    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-</span><span data-line="163"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="164"><span class="w">    </span><span class="sd">"""Submit a task for async execution without decorator.</span>
-</span><span data-line="165">
-</span><span data-line="166"><span class="sd">    Args:</span>
-</span><span data-line="167"><span class="sd">        func: Function to execute</span>
-</span><span data-line="168"><span class="sd">        *args: Positional arguments for function</span>
-</span><span data-line="169"><span class="sd">        key: Optional caller-supplied idempotency key. When omitted, a fresh key</span>
-</span><span data-line="170"><span class="sd">            is minted per call. When supplied and a live (in-flight) computation</span>
-</span><span data-line="171"><span class="sd">            already exists for that key, the existing task is returned instead of</span>
-</span><span data-line="172"><span class="sd">            launching a duplicate — so a resubmit runs the work at most once while</span>
-</span><span data-line="173"><span class="sd">            it is in flight. A terminal (completed/failed/cancelled) or expired</span>
-</span><span data-line="174"><span class="sd">            key re-runs.</span>
-</span><span data-line="175"><span class="sd">        backend: Optional backend (uses default if not provided)</span>
-</span><span data-line="176"><span class="sd">        store: Optional store (uses default if not provided)</span>
-</span><span data-line="177"><span class="sd">        retry_policy: Optional retry policy</span>
-</span><span data-line="178"><span class="sd">        **kwargs: Keyword arguments for function</span>
-</span><span data-line="179">
-</span><span data-line="180"><span class="sd">    Returns:</span>
-</span><span data-line="181"><span class="sd">        Task ID (key) for retrieving results</span>
-</span><span data-line="182">
-</span><span data-line="183"><span class="sd">    Example:</span>
-</span><span data-line="184"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, multiplier=2)</span>
-</span><span data-line="185"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
-</span><span data-line="186">
-</span><span data-line="187"><span class="sd">        &gt;&gt;&gt; # Idempotent submission: resubmitting the same key while in flight</span>
-</span><span data-line="188"><span class="sd">        &gt;&gt;&gt; # returns the running task rather than launching a duplicate.</span>
-</span><span data-line="189"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
-</span><span data-line="190"><span class="sd">        &gt;&gt;&gt; same_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
-</span><span data-line="191"><span class="sd">    """</span>
-</span><span data-line="192">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-</span><span data-line="193">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="194">
-</span><span data-line="195">    <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="196">        <span class="c1"># No idempotency requested: mint a fresh key per call.</span>
-</span><span data-line="197">        <span class="n">key</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">create_key</span><span class="p">()</span>
-</span><span data-line="198">    <span class="k">else</span><span class="p">:</span>
-</span><span data-line="199">        <span class="c1"># Idempotency: dedup against a live in-flight computation, otherwise</span>
-</span><span data-line="200">        <span class="c1"># reserve the key so a concurrent/sequential resubmit dedups too.</span>
-</span><span data-line="201">        <span class="k">if</span> <span class="n">_inflight_record</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="202">            <span class="k">return</span> <span class="n">key</span>
-</span><span data-line="203">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
-</span><span data-line="204">
-</span><span data-line="205">    <span class="c1"># If retry policy provided, wrap function</span>
-</span><span data-line="206">    <span class="k">if</span> <span class="n">retry_policy</span><span class="p">:</span>
-</span><span data-line="207">        <span class="n">original_func</span> <span class="o">=</span> <span class="n">func</span>
-</span><span data-line="208">
-</span><span data-line="209">        <span class="k">def</span><span class="w"> </span><span class="nf">wrapped_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span data-line="210">            <span class="k">return</span> <span class="n">retry_with_policy</span><span class="p">(</span><span class="n">original_func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">retry_policy</span><span class="p">)</span>
-</span><span data-line="211">
-</span><span data-line="212">        <span class="n">func</span> <span class="o">=</span> <span class="n">wrapped_func</span>
-</span><span data-line="213">
-</span><span data-line="214">    <span class="c1"># Launch task</span>
-</span><span data-line="215">    <span class="n">backend</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
-</span><span data-line="216">
-</span><span data-line="217">    <span class="k">return</span> <span class="n">key</span></div>
-
-</span><span data-line="218">
+</span><span data-line="166"><span class="k">def</span><span class="w"> </span><span class="nf">submit_task</span><span class="p">(</span>
+</span><span data-line="167">    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="168">    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+</span><span data-line="169">    <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="170">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="171">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="172">    <span class="n">retry_policy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RetryPolicy</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="173">    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+</span><span data-line="174"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="175"><span class="w">    </span><span class="sd">"""Submit a task for async execution without decorator.</span>
+</span><span data-line="176">
+</span><span data-line="177"><span class="sd">    Args:</span>
+</span><span data-line="178"><span class="sd">        func: Function to execute</span>
+</span><span data-line="179"><span class="sd">        *args: Positional arguments for function</span>
+</span><span data-line="180"><span class="sd">        key: Optional caller-supplied idempotency key. When omitted, a fresh key</span>
+</span><span data-line="181"><span class="sd">            is minted per call. When supplied and a live (in-flight) computation</span>
+</span><span data-line="182"><span class="sd">            already exists for that key, the existing task is returned instead of</span>
+</span><span data-line="183"><span class="sd">            launching a duplicate — so a resubmit runs the work at most once while</span>
+</span><span data-line="184"><span class="sd">            it is in flight. A terminal (completed/failed/cancelled) or expired</span>
+</span><span data-line="185"><span class="sd">            key re-runs.</span>
+</span><span data-line="186"><span class="sd">        backend: Optional backend (uses default if not provided)</span>
+</span><span data-line="187"><span class="sd">        store: Optional store (uses default if not provided)</span>
+</span><span data-line="188"><span class="sd">        retry_policy: Optional retry policy</span>
+</span><span data-line="189"><span class="sd">        **kwargs: Keyword arguments for function</span>
+</span><span data-line="190">
+</span><span data-line="191"><span class="sd">    Returns:</span>
+</span><span data-line="192"><span class="sd">        Task ID (key) for retrieving results</span>
+</span><span data-line="193">
+</span><span data-line="194"><span class="sd">    Example:</span>
+</span><span data-line="195"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, multiplier=2)</span>
+</span><span data-line="196"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
+</span><span data-line="197">
+</span><span data-line="198"><span class="sd">        &gt;&gt;&gt; # Idempotent submission: resubmitting the same key while in flight</span>
+</span><span data-line="199"><span class="sd">        &gt;&gt;&gt; # returns the running task rather than launching a duplicate.</span>
+</span><span data-line="200"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
+</span><span data-line="201"><span class="sd">        &gt;&gt;&gt; same_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
+</span><span data-line="202"><span class="sd">    """</span>
+</span><span data-line="203">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="204">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="205">
+</span><span data-line="206">    <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="207">        <span class="c1"># No idempotency requested: mint a fresh key per call.</span>
+</span><span data-line="208">        <span class="n">key</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">create_key</span><span class="p">()</span>
+</span><span data-line="209">    <span class="k">else</span><span class="p">:</span>
+</span><span data-line="210">        <span class="c1"># Idempotency: dedup against a live in-flight computation, otherwise</span>
+</span><span data-line="211">        <span class="c1"># reserve the key so a concurrent/sequential resubmit dedups too.</span>
+</span><span data-line="212">        <span class="k">if</span> <span class="n">_inflight_record</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="213">            <span class="k">return</span> <span class="n">key</span>
+</span><span data-line="214">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
+</span><span data-line="215">
+</span><span data-line="216">    <span class="c1"># If retry policy provided, wrap function</span>
+</span><span data-line="217">    <span class="k">if</span> <span class="n">retry_policy</span><span class="p">:</span>
+</span><span data-line="218">        <span class="n">func</span> <span class="o">=</span> <span class="n">_WithRetryPolicy</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">retry_policy</span><span class="p">)</span>
 </span><span data-line="219">
+</span><span data-line="220">    <span class="c1"># Launch task. A launch that raises must not leave the key RUNNING for good</span>
+</span><span data-line="221">    <span class="c1"># (a resubmit with the same key would be taken for a live duplicate).</span>
+</span><span data-line="222">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="223">        <span class="n">backend</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+</span><span data-line="224">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="225">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+</span><span data-line="226">        <span class="k">raise</span>
+</span><span data-line="227">
+</span><span data-line="228">    <span class="k">return</span> <span class="n">key</span></div>
+
+</span><span data-line="229">
+</span><span data-line="230">
 <div class="viewcode-block" id="get_result">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.get_result">[docs]</a>
-</span><span data-line="220"><span class="k">def</span><span class="w"> </span><span class="nf">get_result</span><span class="p">(</span>
-</span><span data-line="221">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="222">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="223">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="224"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-</span><span data-line="225"><span class="w">    </span><span class="sd">"""Get result for a task ID.</span>
-</span><span data-line="226">
-</span><span data-line="227"><span class="sd">    Args:</span>
-</span><span data-line="228"><span class="sd">        task_id: Task ID returned from submit_task</span>
-</span><span data-line="229"><span class="sd">        timeout: Optional timeout in seconds</span>
-</span><span data-line="230"><span class="sd">        store: Optional store (uses default if not provided)</span>
-</span><span data-line="231">
-</span><span data-line="232"><span class="sd">    Returns:</span>
-</span><span data-line="233"><span class="sd">        Task result</span>
-</span><span data-line="234">
-</span><span data-line="235"><span class="sd">    Raises:</span>
-</span><span data-line="236"><span class="sd">        TimeoutError: If timeout exceeded</span>
-</span><span data-line="237"><span class="sd">        Exception: If task failed</span>
-</span><span data-line="238">
-</span><span data-line="239"><span class="sd">    Example:</span>
-</span><span data-line="240"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="241"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
-</span><span data-line="242"><span class="sd">    """</span>
-</span><span data-line="243">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="244">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
-</span><span data-line="245">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
+</span><span data-line="231"><span class="k">def</span><span class="w"> </span><span class="nf">get_result</span><span class="p">(</span>
+</span><span data-line="232">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="233">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="234">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="235"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span data-line="236"><span class="w">    </span><span class="sd">"""Get result for a task ID.</span>
+</span><span data-line="237">
+</span><span data-line="238"><span class="sd">    Args:</span>
+</span><span data-line="239"><span class="sd">        task_id: Task ID returned from submit_task</span>
+</span><span data-line="240"><span class="sd">        timeout: Optional timeout in seconds</span>
+</span><span data-line="241"><span class="sd">        store: Optional store (uses default if not provided)</span>
+</span><span data-line="242">
+</span><span data-line="243"><span class="sd">    Returns:</span>
+</span><span data-line="244"><span class="sd">        Task result</span>
+</span><span data-line="245">
+</span><span data-line="246"><span class="sd">    Raises:</span>
+</span><span data-line="247"><span class="sd">        TimeoutError: If timeout exceeded</span>
+</span><span data-line="248"><span class="sd">        Exception: If task failed</span>
+</span><span data-line="249">
+</span><span data-line="250"><span class="sd">    Example:</span>
+</span><span data-line="251"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
+</span><span data-line="252"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
+</span><span data-line="253"><span class="sd">    """</span>
+</span><span data-line="254">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="255">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+</span><span data-line="256">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
 
-</span><span data-line="246">
-</span><span data-line="247">
+</span><span data-line="257">
+</span><span data-line="258">
 <div class="viewcode-block" id="get_status">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.get_status">[docs]</a>
-</span><span data-line="248"><span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span>
-</span><span data-line="249">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="250">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="251"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationStatus</span><span class="p">:</span>
-</span><span data-line="252"><span class="w">    </span><span class="sd">"""Get status for a task ID.</span>
-</span><span data-line="253">
-</span><span data-line="254"><span class="sd">    Args:</span>
-</span><span data-line="255"><span class="sd">        task_id: Task ID returned from submit_task</span>
-</span><span data-line="256"><span class="sd">        store: Optional store (uses default if not provided)</span>
-</span><span data-line="257">
-</span><span data-line="258"><span class="sd">    Returns:</span>
-</span><span data-line="259"><span class="sd">        Task status (PENDING, RUNNING, COMPLETED, FAILED)</span>
-</span><span data-line="260">
-</span><span data-line="261"><span class="sd">    Example:</span>
-</span><span data-line="262"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="263"><span class="sd">        &gt;&gt;&gt; status = get_status(task_id)</span>
-</span><span data-line="264"><span class="sd">        &gt;&gt;&gt; if status == ComputationStatus.COMPLETED:</span>
-</span><span data-line="265"><span class="sd">        &gt;&gt;&gt;     result = get_result(task_id)</span>
-</span><span data-line="266"><span class="sd">    """</span>
-</span><span data-line="267">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="268">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
-</span><span data-line="269">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span></div>
-
-</span><span data-line="270">
+</span><span data-line="259"><span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span>
+</span><span data-line="260">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="261">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="262"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationStatus</span><span class="p">:</span>
+</span><span data-line="263"><span class="w">    </span><span class="sd">"""Get status for a task ID.</span>
+</span><span data-line="264">
+</span><span data-line="265"><span class="sd">    Args:</span>
+</span><span data-line="266"><span class="sd">        task_id: Task ID returned from submit_task</span>
+</span><span data-line="267"><span class="sd">        store: Optional store (uses default if not provided)</span>
+</span><span data-line="268">
+</span><span data-line="269"><span class="sd">    Returns:</span>
+</span><span data-line="270"><span class="sd">        Task status (PENDING, RUNNING, COMPLETED, FAILED)</span>
 </span><span data-line="271">
+</span><span data-line="272"><span class="sd">    Example:</span>
+</span><span data-line="273"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
+</span><span data-line="274"><span class="sd">        &gt;&gt;&gt; status = get_status(task_id)</span>
+</span><span data-line="275"><span class="sd">        &gt;&gt;&gt; if status == ComputationStatus.COMPLETED:</span>
+</span><span data-line="276"><span class="sd">        &gt;&gt;&gt;     result = get_result(task_id)</span>
+</span><span data-line="277"><span class="sd">    """</span>
+</span><span data-line="278">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="279">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+</span><span data-line="280">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span></div>
+
+</span><span data-line="281">
+</span><span data-line="282">
 <div class="viewcode-block" id="is_ready">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.is_ready">[docs]</a>
-</span><span data-line="272"><span class="k">def</span><span class="w"> </span><span class="nf">is_ready</span><span class="p">(</span>
-</span><span data-line="273">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="274">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="275"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="276"><span class="w">    </span><span class="sd">"""Check if task is ready (completed or failed).</span>
-</span><span data-line="277">
-</span><span data-line="278"><span class="sd">    Args:</span>
-</span><span data-line="279"><span class="sd">        task_id: Task ID returned from submit_task</span>
-</span><span data-line="280"><span class="sd">        store: Optional store (uses default if not provided)</span>
-</span><span data-line="281">
-</span><span data-line="282"><span class="sd">    Returns:</span>
-</span><span data-line="283"><span class="sd">        True if task is complete, False otherwise</span>
-</span><span data-line="284">
-</span><span data-line="285"><span class="sd">    Example:</span>
-</span><span data-line="286"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="287"><span class="sd">        &gt;&gt;&gt; while not is_ready(task_id):</span>
-</span><span data-line="288"><span class="sd">        &gt;&gt;&gt;     time.sleep(0.1)</span>
-</span><span data-line="289"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id)</span>
-</span><span data-line="290"><span class="sd">    """</span>
-</span><span data-line="291">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="292">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
-</span><span data-line="293">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span></div>
-
-</span><span data-line="294">
+</span><span data-line="283"><span class="k">def</span><span class="w"> </span><span class="nf">is_ready</span><span class="p">(</span>
+</span><span data-line="284">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="285">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="286"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="287"><span class="w">    </span><span class="sd">"""Check if task is ready (completed or failed).</span>
+</span><span data-line="288">
+</span><span data-line="289"><span class="sd">    Args:</span>
+</span><span data-line="290"><span class="sd">        task_id: Task ID returned from submit_task</span>
+</span><span data-line="291"><span class="sd">        store: Optional store (uses default if not provided)</span>
+</span><span data-line="292">
+</span><span data-line="293"><span class="sd">    Returns:</span>
+</span><span data-line="294"><span class="sd">        True if task is complete, False otherwise</span>
 </span><span data-line="295">
+</span><span data-line="296"><span class="sd">    Example:</span>
+</span><span data-line="297"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
+</span><span data-line="298"><span class="sd">        &gt;&gt;&gt; while not is_ready(task_id):</span>
+</span><span data-line="299"><span class="sd">        &gt;&gt;&gt;     time.sleep(0.1)</span>
+</span><span data-line="300"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id)</span>
+</span><span data-line="301"><span class="sd">    """</span>
+</span><span data-line="302">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="303">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+</span><span data-line="304">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span></div>
+
+</span><span data-line="305">
+</span><span data-line="306">
 <div class="viewcode-block" id="cancel_task">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.cancel_task">[docs]</a>
-</span><span data-line="296"><span class="k">def</span><span class="w"> </span><span class="nf">cancel_task</span><span class="p">(</span>
-</span><span data-line="297">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="298">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="299">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="300"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="301"><span class="w">    </span><span class="sd">"""Cancel a running task.</span>
-</span><span data-line="302">
-</span><span data-line="303"><span class="sd">    Args:</span>
-</span><span data-line="304"><span class="sd">        task_id: Task ID to cancel</span>
-</span><span data-line="305"><span class="sd">        backend: Optional backend (uses default if not provided)</span>
-</span><span data-line="306"><span class="sd">        store: Optional store (uses default if not provided)</span>
-</span><span data-line="307">
-</span><span data-line="308"><span class="sd">    Returns:</span>
-</span><span data-line="309"><span class="sd">        True if cancellation was attempted, False otherwise</span>
-</span><span data-line="310">
-</span><span data-line="311"><span class="sd">    Example:</span>
-</span><span data-line="312"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(long_running_func)</span>
-</span><span data-line="313"><span class="sd">        &gt;&gt;&gt; cancel_task(task_id)</span>
-</span><span data-line="314"><span class="sd">    """</span>
-</span><span data-line="315">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-</span><span data-line="316">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="317">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
-</span><span data-line="318">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div>
+</span><span data-line="307"><span class="k">def</span><span class="w"> </span><span class="nf">cancel_task</span><span class="p">(</span>
+</span><span data-line="308">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="309">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="310">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="311"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="312"><span class="w">    </span><span class="sd">"""Cancel a running task.</span>
+</span><span data-line="313">
+</span><span data-line="314"><span class="sd">    Args:</span>
+</span><span data-line="315"><span class="sd">        task_id: Task ID to cancel</span>
+</span><span data-line="316"><span class="sd">        backend: Optional backend (uses default if not provided)</span>
+</span><span data-line="317"><span class="sd">        store: Optional store (uses default if not provided)</span>
+</span><span data-line="318">
+</span><span data-line="319"><span class="sd">    Returns:</span>
+</span><span data-line="320"><span class="sd">        True if cancellation was attempted, False otherwise</span>
+</span><span data-line="321">
+</span><span data-line="322"><span class="sd">    Example:</span>
+</span><span data-line="323"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(long_running_func)</span>
+</span><span data-line="324"><span class="sd">        &gt;&gt;&gt; cancel_task(task_id)</span>
+</span><span data-line="325"><span class="sd">    """</span>
+</span><span data-line="326">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="327">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="328">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+</span><span data-line="329">    <span class="k">return</span> <span class="n">handle</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div>
 
-</span><span data-line="319">
-</span><span data-line="320">
+</span><span data-line="330">
+</span><span data-line="331">
 <div class="viewcode-block" id="async_task">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.async_task">[docs]</a>
-</span><span data-line="321"><span class="nd">@contextmanager</span>
-</span><span data-line="322"><span class="k">def</span><span class="w"> </span><span class="nf">async_task</span><span class="p">(</span>
-</span><span data-line="323">    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="324">    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-</span><span data-line="325">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="326">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="327">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="328">    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-</span><span data-line="329"><span class="p">):</span>
-</span><span data-line="330"><span class="w">    </span><span class="sd">"""Context manager for async task execution.</span>
-</span><span data-line="331">
-</span><span data-line="332"><span class="sd">    The task is submitted on enter and result retrieved on exit.</span>
-</span><span data-line="333">
-</span><span data-line="334"><span class="sd">    Args:</span>
-</span><span data-line="335"><span class="sd">        func: Function to execute</span>
-</span><span data-line="336"><span class="sd">        *args: Positional arguments</span>
-</span><span data-line="337"><span class="sd">        backend: Optional backend</span>
-</span><span data-line="338"><span class="sd">        store: Optional store</span>
-</span><span data-line="339"><span class="sd">        timeout: Optional timeout for getting result</span>
-</span><span data-line="340"><span class="sd">        **kwargs: Keyword arguments</span>
-</span><span data-line="341">
-</span><span data-line="342"><span class="sd">    Yields:</span>
-</span><span data-line="343"><span class="sd">        ComputationHandle for the task</span>
+</span><span data-line="332"><span class="nd">@contextmanager</span>
+</span><span data-line="333"><span class="k">def</span><span class="w"> </span><span class="nf">async_task</span><span class="p">(</span>
+</span><span data-line="334">    <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="335">    <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+</span><span data-line="336">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="337">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="338">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="339">    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+</span><span data-line="340"><span class="p">):</span>
+</span><span data-line="341"><span class="w">    </span><span class="sd">"""Context manager for async task execution.</span>
+</span><span data-line="342">
+</span><span data-line="343"><span class="sd">    The task is submitted on enter and result retrieved on exit.</span>
 </span><span data-line="344">
-</span><span data-line="345"><span class="sd">    Example:</span>
-</span><span data-line="346"><span class="sd">        &gt;&gt;&gt; with async_task(my_func, 5, multiplier=2) as handle:</span>
-</span><span data-line="347"><span class="sd">        &gt;&gt;&gt;     # Do other work while task runs</span>
-</span><span data-line="348"><span class="sd">        &gt;&gt;&gt;     print("Working...")</span>
-</span><span data-line="349"><span class="sd">        &gt;&gt;&gt; # Result is ready here</span>
-</span><span data-line="350"><span class="sd">        &gt;&gt;&gt; print(f"Result: {handle.result}")</span>
-</span><span data-line="351"><span class="sd">    """</span>
-</span><span data-line="352">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-</span><span data-line="353">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="354">
-</span><span data-line="355">    <span class="c1"># Submit task</span>
-</span><span data-line="356">    <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="357">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
-</span><span data-line="358">
-</span><span data-line="359">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="360">        <span class="k">yield</span> <span class="n">handle</span>
-</span><span data-line="361">    <span class="k">finally</span><span class="p">:</span>
-</span><span data-line="362">        <span class="c1"># Wait for result on exit (blocks until complete or timeout)</span>
-</span><span data-line="363">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="364">            <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-</span><span data-line="365">            <span class="c1"># Attach result to handle for convenience</span>
-</span><span data-line="366">            <span class="n">handle</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
-</span><span data-line="367">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span data-line="368">            <span class="c1"># Attach error to handle</span>
-</span><span data-line="369">            <span class="n">handle</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">e</span></div>
+</span><span data-line="345"><span class="sd">    Args:</span>
+</span><span data-line="346"><span class="sd">        func: Function to execute</span>
+</span><span data-line="347"><span class="sd">        *args: Positional arguments</span>
+</span><span data-line="348"><span class="sd">        backend: Optional backend</span>
+</span><span data-line="349"><span class="sd">        store: Optional store</span>
+</span><span data-line="350"><span class="sd">        timeout: Optional timeout for getting result</span>
+</span><span data-line="351"><span class="sd">        **kwargs: Keyword arguments</span>
+</span><span data-line="352">
+</span><span data-line="353"><span class="sd">    Yields:</span>
+</span><span data-line="354"><span class="sd">        ComputationHandle for the task</span>
+</span><span data-line="355">
+</span><span data-line="356"><span class="sd">    Example:</span>
+</span><span data-line="357"><span class="sd">        &gt;&gt;&gt; with async_task(my_func, 5, multiplier=2) as handle:</span>
+</span><span data-line="358"><span class="sd">        &gt;&gt;&gt;     # Do other work while task runs</span>
+</span><span data-line="359"><span class="sd">        &gt;&gt;&gt;     print("Working...")</span>
+</span><span data-line="360"><span class="sd">        &gt;&gt;&gt; # Result is ready here</span>
+</span><span data-line="361"><span class="sd">        &gt;&gt;&gt; print(f"Result: {handle.result}")</span>
+</span><span data-line="362"><span class="sd">    """</span>
+</span><span data-line="363">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="364">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="365">
+</span><span data-line="366">    <span class="c1"># Submit task</span>
+</span><span data-line="367">    <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="368">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+</span><span data-line="369">
+</span><span data-line="370">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="371">        <span class="k">yield</span> <span class="n">handle</span>
+</span><span data-line="372">    <span class="k">finally</span><span class="p">:</span>
+</span><span data-line="373">        <span class="c1"># Wait for result on exit (blocks until complete or timeout)</span>
+</span><span data-line="374">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="375">            <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+</span><span data-line="376">            <span class="c1"># Attach result to handle for convenience</span>
+</span><span data-line="377">            <span class="n">handle</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+</span><span data-line="378">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="379">            <span class="c1"># Attach error to handle</span>
+</span><span data-line="380">            <span class="n">handle</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">e</span></div>
 
-</span><span data-line="370">
-</span><span data-line="371">
+</span><span data-line="381">
+</span><span data-line="382">
 <div class="viewcode-block" id="get_handle">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.get_handle">[docs]</a>
-</span><span data-line="372"><span class="k">def</span><span class="w"> </span><span class="nf">get_handle</span><span class="p">(</span>
-</span><span data-line="373">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="374">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="375">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="376"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationHandle</span><span class="p">:</span>
-</span><span data-line="377"><span class="w">    </span><span class="sd">"""Get a handle for a task ID.</span>
-</span><span data-line="378">
-</span><span data-line="379"><span class="sd">    Args:</span>
-</span><span data-line="380"><span class="sd">        task_id: Task ID</span>
-</span><span data-line="381"><span class="sd">        backend: Optional backend</span>
-</span><span data-line="382"><span class="sd">        store: Optional store</span>
-</span><span data-line="383">
-</span><span data-line="384"><span class="sd">    Returns:</span>
-</span><span data-line="385"><span class="sd">        ComputationHandle instance</span>
-</span><span data-line="386">
-</span><span data-line="387"><span class="sd">    Example:</span>
-</span><span data-line="388"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="389"><span class="sd">        &gt;&gt;&gt; handle = get_handle(task_id)</span>
-</span><span data-line="390"><span class="sd">        &gt;&gt;&gt; result = handle.get_result(timeout=10)</span>
-</span><span data-line="391"><span class="sd">    """</span>
-</span><span data-line="392">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-</span><span data-line="393">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="394">    <span class="k">return</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span></div>
+</span><span data-line="383"><span class="k">def</span><span class="w"> </span><span class="nf">get_handle</span><span class="p">(</span>
+</span><span data-line="384">    <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="385">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="386">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="387"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationHandle</span><span class="p">:</span>
+</span><span data-line="388"><span class="w">    </span><span class="sd">"""Get a handle for a task ID.</span>
+</span><span data-line="389">
+</span><span data-line="390"><span class="sd">    Args:</span>
+</span><span data-line="391"><span class="sd">        task_id: Task ID</span>
+</span><span data-line="392"><span class="sd">        backend: Optional backend</span>
+</span><span data-line="393"><span class="sd">        store: Optional store</span>
+</span><span data-line="394">
+</span><span data-line="395"><span class="sd">    Returns:</span>
+</span><span data-line="396"><span class="sd">        ComputationHandle instance</span>
+</span><span data-line="397">
+</span><span data-line="398"><span class="sd">    Example:</span>
+</span><span data-line="399"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
+</span><span data-line="400"><span class="sd">        &gt;&gt;&gt; handle = get_handle(task_id)</span>
+</span><span data-line="401"><span class="sd">        &gt;&gt;&gt; result = handle.get_result(timeout=10)</span>
+</span><span data-line="402"><span class="sd">    """</span>
+</span><span data-line="403">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="404">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="405">    <span class="k">return</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span></div>
 
-</span><span data-line="395">
-</span><span data-line="396">
+</span><span data-line="406">
+</span><span data-line="407">
 <div class="viewcode-block" id="submit_many">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.submit_many">[docs]</a>
-</span><span data-line="397"><span class="k">def</span><span class="w"> </span><span class="nf">submit_many</span><span class="p">(</span>
-</span><span data-line="398">    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]],</span>
-</span><span data-line="399">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="400">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="401"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span data-line="402"><span class="w">    </span><span class="sd">"""Submit multiple tasks at once.</span>
-</span><span data-line="403">
-</span><span data-line="404"><span class="sd">    Args:</span>
-</span><span data-line="405"><span class="sd">        tasks: List of (func, args, kwargs) tuples</span>
-</span><span data-line="406"><span class="sd">        backend: Optional backend</span>
-</span><span data-line="407"><span class="sd">        store: Optional store</span>
-</span><span data-line="408">
-</span><span data-line="409"><span class="sd">    Returns:</span>
-</span><span data-line="410"><span class="sd">        List of task IDs</span>
-</span><span data-line="411">
-</span><span data-line="412"><span class="sd">    Example:</span>
-</span><span data-line="413"><span class="sd">        &gt;&gt;&gt; tasks = [</span>
-</span><span data-line="414"><span class="sd">        &gt;&gt;&gt;     (func1, (1,), {}),</span>
-</span><span data-line="415"><span class="sd">        &gt;&gt;&gt;     (func2, (2,), {'multiplier': 3}),</span>
-</span><span data-line="416"><span class="sd">        &gt;&gt;&gt; ]</span>
-</span><span data-line="417"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
-</span><span data-line="418"><span class="sd">    """</span>
-</span><span data-line="419">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
-</span><span data-line="420">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="421">
-</span><span data-line="422">    <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="423">    <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
-</span><span data-line="424">        <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="425">        <span class="n">task_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span><span data-line="426">
-</span><span data-line="427">    <span class="k">return</span> <span class="n">task_ids</span></div>
+</span><span data-line="408"><span class="k">def</span><span class="w"> </span><span class="nf">submit_many</span><span class="p">(</span>
+</span><span data-line="409">    <span class="n">tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]],</span>
+</span><span data-line="410">    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="411">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="412"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="413"><span class="w">    </span><span class="sd">"""Submit multiple tasks at once.</span>
+</span><span data-line="414">
+</span><span data-line="415"><span class="sd">    Args:</span>
+</span><span data-line="416"><span class="sd">        tasks: List of (func, args, kwargs) tuples</span>
+</span><span data-line="417"><span class="sd">        backend: Optional backend</span>
+</span><span data-line="418"><span class="sd">        store: Optional store</span>
+</span><span data-line="419">
+</span><span data-line="420"><span class="sd">    Returns:</span>
+</span><span data-line="421"><span class="sd">        List of task IDs</span>
+</span><span data-line="422">
+</span><span data-line="423"><span class="sd">    Example:</span>
+</span><span data-line="424"><span class="sd">        &gt;&gt;&gt; tasks = [</span>
+</span><span data-line="425"><span class="sd">        &gt;&gt;&gt;     (func1, (1,), {}),</span>
+</span><span data-line="426"><span class="sd">        &gt;&gt;&gt;     (func2, (2,), {'multiplier': 3}),</span>
+</span><span data-line="427"><span class="sd">        &gt;&gt;&gt; ]</span>
+</span><span data-line="428"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
+</span><span data-line="429"><span class="sd">    """</span>
+</span><span data-line="430">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
+</span><span data-line="431">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="432">
+</span><span data-line="433">    <span class="n">task_ids</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="434">    <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+</span><span data-line="435">        <span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="436">        <span class="n">task_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
+</span><span data-line="437">
+</span><span data-line="438">    <span class="k">return</span> <span class="n">task_ids</span></div>
 
-</span><span data-line="428">
-</span><span data-line="429">
+</span><span data-line="439">
+</span><span data-line="440">
 <div class="viewcode-block" id="get_many">
 <a class="viewcode-back" href="../../_autosummary/au.api.html#au.get_many">[docs]</a>
-</span><span data-line="430"><span class="k">def</span><span class="w"> </span><span class="nf">get_many</span><span class="p">(</span>
-</span><span data-line="431">    <span class="n">task_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span data-line="432">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="433">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="434"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-</span><span data-line="435"><span class="w">    </span><span class="sd">"""Get results for multiple tasks.</span>
-</span><span data-line="436">
-</span><span data-line="437"><span class="sd">    Args:</span>
-</span><span data-line="438"><span class="sd">        task_ids: List of task IDs</span>
-</span><span data-line="439"><span class="sd">        timeout: Optional timeout (applies to each task)</span>
-</span><span data-line="440"><span class="sd">        store: Optional store</span>
-</span><span data-line="441">
-</span><span data-line="442"><span class="sd">    Returns:</span>
-</span><span data-line="443"><span class="sd">        List of results</span>
-</span><span data-line="444">
-</span><span data-line="445"><span class="sd">    Example:</span>
-</span><span data-line="446"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
-</span><span data-line="447"><span class="sd">        &gt;&gt;&gt; results = get_many(task_ids, timeout=10)</span>
-</span><span data-line="448"><span class="sd">    """</span>
-</span><span data-line="449">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
-</span><span data-line="450">
-</span><span data-line="451">    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="452">    <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">task_ids</span><span class="p">:</span>
-</span><span data-line="453">        <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="454">        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span><span data-line="441"><span class="k">def</span><span class="w"> </span><span class="nf">get_many</span><span class="p">(</span>
+</span><span data-line="442">    <span class="n">task_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span data-line="443">    <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="444">    <span class="n">store</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationStore</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="445"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+</span><span data-line="446"><span class="w">    </span><span class="sd">"""Get results for multiple tasks.</span>
+</span><span data-line="447">
+</span><span data-line="448"><span class="sd">    Args:</span>
+</span><span data-line="449"><span class="sd">        task_ids: List of task IDs</span>
+</span><span data-line="450"><span class="sd">        timeout: Optional timeout (applies to each task)</span>
+</span><span data-line="451"><span class="sd">        store: Optional store</span>
+</span><span data-line="452">
+</span><span data-line="453"><span class="sd">    Returns:</span>
+</span><span data-line="454"><span class="sd">        List of results</span>
 </span><span data-line="455">
-</span><span data-line="456">    <span class="k">return</span> <span class="n">results</span></div>
+</span><span data-line="456"><span class="sd">    Example:</span>
+</span><span data-line="457"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
+</span><span data-line="458"><span class="sd">        &gt;&gt;&gt; results = get_many(task_ids, timeout=10)</span>
+</span><span data-line="459"><span class="sd">    """</span>
+</span><span data-line="460">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
+</span><span data-line="461">
+</span><span data-line="462">    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="463">    <span class="k">for</span> <span class="n">task_id</span> <span class="ow">in</span> <span class="n">task_ids</span><span class="p">:</span>
+</span><span data-line="464">        <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="465">        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span><span data-line="466">
+</span><span data-line="467">    <span class="k">return</span> <span class="n">results</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -640,7 +651,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=92734c54"></script>
+      <script src="../../_static/documentation_options.js?v=360bc84d"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

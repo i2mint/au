@@ -1,4 +1,4 @@
-> built 2026-10-13 14:44 UTC from daaf0c2 (master) · au 0.1.2. Details: build_info.json
+> built 2026-10-13 14:57 UTC from 3e8b024 (master) · au 0.1.3. Details: build_info.json
 
 # index.html.md
 
@@ -4112,7 +4112,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-13 14:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/daaf0c26ff570013812dfed0dd2ccdcec9543e72"><code>daaf0c2</code></a> on branch <code>master</code>, for **au 0.1.2** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-13 14:57 UTC** from commit <a href="https://github.com/i2mint/au/commit/3e8b0243a16e074179cd97ff810f402eeaa4ed29"><code>3e8b024</code></a> on branch <code>master</code>, for **au 0.1.3** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4121,9 +4121,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/daaf0c26ff570013812dfed0dd2ccdcec9543e72"><code>daaf0c26ff570013812dfed0dd2ccdcec9543e72</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/3e8b0243a16e074179cd97ff810f402eeaa4ed29"><code>3e8b0243a16e074179cd97ff810f402eeaa4ed29</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.2</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.3</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4132,9 +4132,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/38415608892">38415608892</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/38417630238">38417630238</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>a141325341ac2674f96f6459cd65ebbc4c6af553</code> (in the history of the built commit) |
+| Event commit | <code>8547ff099f647878420f5db29c5ede50b1e31504</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4159,13 +4159,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.2/">0.1.2</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.3/">0.1.3</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout daaf0c26ff570013812dfed0dd2ccdcec9543e72
+git checkout 3e8b0243a16e074179cd97ff810f402eeaa4ed29
 pip install "epythet==0.2.16"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
