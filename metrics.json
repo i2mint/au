@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.453558683395386,
-  "commit_message": "Spawn: no up-front pickling (start() is the test), picklable retry wrapper, a failed launch does not leave the key RUNNING (review of #7)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
-  "commit_sha": "ddfef13d2cdf6af77462a24082ca18ccec86798b",
+  "collection_duration_seconds": 7.7845563888549805,
+  "commit_message": "Merge ddfef13d2cdf6af77462a24082ca18ccec86798b into daaf0c26ff570013812dfed0dd2ccdcec9543e72",
+  "commit_sha": "c77e8d3465194e4ec45d61a3c7481e6fd4024216",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.95467561963069,
       "num_classes": 3022,
       "num_functions": 20254,
-      "pypi_version": "0.1.1",
+      "pypi_version": "0.1.2",
       "total_lines": 539322
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-13T14:49:48.178018Z",
+  "timestamp": "2026-10-13T14:49:53.741986Z",
   "workflow_status": {}
 }
