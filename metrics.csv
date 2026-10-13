@@ -1,23 +1,21 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-13T14:40:53.274859Z
-commit_sha,acfcd6fe921b57f13faba5b29f002298b84c2535
-commit_message,"Review of #6: store.get in _mark_running, cancel re-asserts after terminate, temp files in a subdirectory
-
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-13T14:41:03.239445Z
+commit_sha,abd9a184e745b935d1741c88e37443a3d9b18959
+commit_message,Merge acfcd6fe921b57f13faba5b29f002298b84c2535 into 1811ff8b887ead0358f60755d4c1c9acbbe4c84d
 python_version,3.10
-metrics.umpyre_stats.num_functions,20252
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539279
-metrics.umpyre_stats.empty_lines,70599
-metrics.umpyre_stats.comment_lines,35130
-metrics.umpyre_stats.docs_lines,42226
-metrics.umpyre_stats.function_lines,323113
-metrics.umpyre_stats.empty_lines_ratio,0.13091368289883346
-metrics.umpyre_stats.comment_lines_ratio,0.06514253290040962
-metrics.umpyre_stats.function_lines_ratio,0.5991573934827797
-metrics.umpyre_stats.mean_lines_per_function,15.954621765751531
-metrics.umpyre_stats.files_analyzed,1327
+metrics.umpyre_stats.num_functions,20364
+metrics.umpyre_stats.num_classes,3035
+metrics.umpyre_stats.total_lines,541885
+metrics.umpyre_stats.empty_lines,71016
+metrics.umpyre_stats.comment_lines,35315
+metrics.umpyre_stats.docs_lines,42318
+metrics.umpyre_stats.function_lines,324936
+metrics.umpyre_stats.empty_lines_ratio,0.13105363684176533
+metrics.umpyre_stats.comment_lines_ratio,0.06517065429011691
+metrics.umpyre_stats.function_lines_ratio,0.5996401450492264
+metrics.umpyre_stats.mean_lines_per_function,15.956393635827931
+metrics.umpyre_stats.files_analyzed,1342
 metrics.umpyre_stats.pypi_version,0.1.1
 metrics.workflow_status.last_run_status,failure
 metrics.workflow_status.last_success_timestamp,2026-10-13T14:19:26Z
@@ -38,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.428172826766968
+collection_duration_seconds,7.1148388385772705
