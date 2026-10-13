@@ -1,23 +1,23 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-13T14:49:45.360759Z
+timestamp,2026-10-13T14:49:48.178018Z
 commit_sha,ddfef13d2cdf6af77462a24082ca18ccec86798b
 commit_message,"Spawn: no up-front pickling (start() is the test), picklable retry wrapper, a failed launch does not leave the key RUNNING (review of #7)
 
 Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20366
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,541928
-metrics.umpyre_stats.empty_lines,71021
-metrics.umpyre_stats.comment_lines,35318
-metrics.umpyre_stats.docs_lines,42331
-metrics.umpyre_stats.function_lines,324969
-metrics.umpyre_stats.empty_lines_ratio,0.13105246453403405
-metrics.umpyre_stats.comment_lines_ratio,0.06517101902835801
-metrics.umpyre_stats.function_lines_ratio,0.599653459500155
-metrics.umpyre_stats.mean_lines_per_function,15.956447019542374
-metrics.umpyre_stats.files_analyzed,1342
+metrics.umpyre_stats.num_functions,20254
+metrics.umpyre_stats.num_classes,3022
+metrics.umpyre_stats.total_lines,539322
+metrics.umpyre_stats.empty_lines,70604
+metrics.umpyre_stats.comment_lines,35133
+metrics.umpyre_stats.docs_lines,42239
+metrics.umpyre_stats.function_lines,323146
+metrics.umpyre_stats.empty_lines_ratio,0.13091251608501045
+metrics.umpyre_stats.comment_lines_ratio,0.06514290164317421
+metrics.umpyre_stats.function_lines_ratio,0.5991708107586933
+metrics.umpyre_stats.mean_lines_per_function,15.95467561963069
+metrics.umpyre_stats.files_analyzed,1327
 metrics.umpyre_stats.pypi_version,0.1.1
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-13T14:45:04Z
@@ -38,4 +38,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.074686765670776
+collection_duration_seconds,7.453558683395386
