@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.271001577377319,
-  "commit_message": "FileStore on Windows: retry rename/open briefly while another handle holds the file (au#10); un-skip the race test\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
-  "commit_sha": "39ce3e1e3f986ec890e77e55ca119be48dd568e2",
+  "collection_duration_seconds": 4.152555227279663,
+  "commit_message": "ProcessBackend on Windows: no 'fork', spawn with a clear refusal (#7) (#11)\n\n* ProcessBackend: do not ask for 'fork' where it does not exist; refuse unpicklable work under spawn; run the process tests on Windows (#7)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* Spawn: no up-front pickling (start() is the test), picklable retry wrapper, a failed launch does not leave the key RUNNING (review of #7)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* FileStore on Windows: retry rename/open briefly while another handle holds the file (au#10); un-skip the race test\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+  "commit_sha": "8547ff099f647878420f5db29c5ede50b1e31504",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.954332263638607,
       "num_classes": 3022,
       "num_functions": 20255,
-      "pypi_version": "0.1.1",
+      "pypi_version": "0.1.2",
       "total_lines": 539342
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-13T14:54:15.402205Z",
+  "timestamp": "2026-10-13T14:56:49.863332Z",
   "workflow_status": {}
 }
