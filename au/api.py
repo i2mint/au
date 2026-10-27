@@ -5,6 +5,7 @@ Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.
 """
 
+import logging
 from typing import Any, Callable, Optional, TypeVar
 from contextlib import contextmanager
 
@@ -31,13 +32,20 @@ _default_backend: Optional[ComputationBackend] = None
 _default_store: Optional[ComputationStore] = None
 
 
+TASKS_LOGGER = "au.tasks"
+"""Where the simple API logs each task's lifecycle. It has a NullHandler: like
+any library log, it shows only once the app configures logging (au's own
+warnings and errors, on ``au.base``, still reach stderr by default)."""
+logging.getLogger(TASKS_LOGGER).addHandler(logging.NullHandler())
+
+
 def _middleware_from_config(config) -> list[Middleware]:
     """The middleware the observability settings ask for (``logging_enabled``,
     ``logging_level``), refusing a bad setting by its name."""
     if not config.logging_enabled:
         return []
     try:
-        return [LoggingMiddleware(level=config.logging_level)]
+        return [LoggingMiddleware(level=config.logging_level, logger_name=TASKS_LOGGER)]
     except (TypeError, ValueError) as e:
         raise ValueError(f"AU_LOGGING_LEVEL (config.logging_level): {e}") from e
 
