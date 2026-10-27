@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.748947620391846,
-  "commit_message": "Re-review fixes: a failed read never loses a finished job (#12)\n\n- _record_unless_cancelled treats a failing read as \"not cancelled\" and\n  returns what the store holds, so after_compute sees CANCELLED, not the\n  refused COMPLETED.\n- _call_hooks keeps the first BaseException without relying on truthiness\n  and logs any later one.\n- cancel()'s docstring states the new rule and its remaining race.\n- The cancellation test asserts the raise and which hook ran.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "c6f889bb1940e6d4d299f15599515d92b1348e02",
+  "collection_duration_seconds": 7.592813730239868,
+  "commit_message": "Merge c6f889bb1940e6d4d299f15599515d92b1348e02 into 3e8b0243a16e074179cd97ff810f402eeaa4ed29",
+  "commit_sha": "a0ccaab80a6ad76f320adbe8d4291374f66099b9",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:03:24.088898Z",
+  "timestamp": "2026-10-27T13:03:43.337954Z",
   "workflow_status": {}
 }

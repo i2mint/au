@@ -1,18 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:03:24.088898Z
-commit_sha,c6f889bb1940e6d4d299f15599515d92b1348e02
-commit_message,"Re-review fixes: a failed read never loses a finished job (#12)
-
-- _record_unless_cancelled treats a failing read as ""not cancelled"" and
-  returns what the store holds, so after_compute sees CANCELLED, not the
-  refused COMPLETED.
-- _call_hooks keeps the first BaseException without relying on truthiness
-  and logs any later one.
-- cancel()'s docstring states the new rule and its remaining race.
-- The cancellation test asserts the raise and which hook ran.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T13:03:43.337954Z
+commit_sha,a0ccaab80a6ad76f320adbe8d4291374f66099b9
+commit_message,Merge c6f889bb1940e6d4d299f15599515d92b1348e02 into 3e8b0243a16e074179cd97ff810f402eeaa4ed29
 python_version,3.10
 metrics.umpyre_stats.num_functions,20388
 metrics.umpyre_stats.num_classes,3036
@@ -46,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.748947620391846
+collection_duration_seconds,7.592813730239868
