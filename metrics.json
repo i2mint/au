@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.460653066635132,
-  "commit_message": "SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#15)\n\n- SyncTestBackend.launch runs _compute_and_record, so the test double follows\n  the real backends' contract: BaseException recorded then re-raised, one\n  release hook per job, error stored as the exception (was str; see #18).\n- InMemoryStore stamps completed_at on a terminal write, as FileSystemStore\n  does, so results keep their duration.\n- CompositeMiddleware drives its children through _call_hooks: one failing\n  child no longer stops the rest.\n- ComputationBackend._run_middleware_* had no caller left: deleted.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "d8a5d7283a7e69d8b884f3608daec36f1d4c7696",
+  "collection_duration_seconds": 7.9837327003479,
+  "commit_message": "Merge d8a5d7283a7e69d8b884f3608daec36f1d4c7696 into 2cdeefe3573737a7eb27084b156da4ee505cc484",
+  "commit_sha": "483d54b61a4f83aa72c75e490f6f108b70dfa532",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35215,
-      "comment_lines_ratio": 0.06522190077899565,
-      "docs_lines": 42368,
-      "empty_lines": 70705,
-      "empty_lines_ratio": 0.13095313061419528,
-      "files_analyzed": 1332,
-      "function_lines": 323487,
-      "function_lines_ratio": 0.5991321032882284,
-      "mean_lines_per_function": 15.954969173859432,
-      "num_classes": 3021,
-      "num_functions": 20275,
-      "pypi_version": "0.1.4",
-      "total_lines": 539926
+      "comment_lines": 35365,
+      "comment_lines_ratio": 0.06519470847190166,
+      "docs_lines": 42462,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.13108256583070946,
+      "files_analyzed": 1347,
+      "function_lines": 325259,
+      "function_lines_ratio": 0.5996088133143578,
+      "mean_lines_per_function": 15.957366432811657,
+      "num_classes": 3036,
+      "num_functions": 20383,
+      "pypi_version": "0.1.5",
+      "total_lines": 542452
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:31:50.081895Z",
+  "timestamp": "2026-10-27T13:32:05.598478Z",
   "workflow_status": {}
 }
