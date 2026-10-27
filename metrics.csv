@@ -1,20 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:12:26.286473Z
-commit_sha,0f537ac6f42cb4514223d861a58d77f5078deff8
-commit_message,"ProcessBackend runs middleware in the child only; one rebuild rule for queues (#14)
-
-- ProcessBackend hands its middleware to the child, which runs
-  _compute_and_record: the parent no longer calls before_compute without a
-  matching release, and LoggingMiddleware no longer logs the start twice.
-  _worker_function and ProcessBackend._serialize_middleware are gone.
-- Queue workers (StdLibQueue, RQ, Supabase) rebuild middleware by one rule:
-  its class plus Middleware.worker_kwargs() (new, default {}; Logging and
-  SharedMetrics override it). Four serialisers with two rules become one
-  _middleware_configs. A class that rule cannot rebuild is refused at launch
-  instead of being silently dropped.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T13:12:40.658338Z
+commit_sha,aaaa842c1170be236cd71d8e944ddc8087afce5e
+commit_message,Merge 0f537ac6f42cb4514223d861a58d77f5078deff8 into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14
 python_version,3.10
 metrics.umpyre_stats.num_functions,20387
 metrics.umpyre_stats.num_classes,3036
@@ -48,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.153423547744751
+collection_duration_seconds,4.396294593811035
