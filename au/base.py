@@ -797,8 +797,8 @@ def compute_and_record(
     started = None
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
-        _mark_running(store, key)
-        started = datetime.now()
+        started = datetime.now()  # on RUNNING too, so a running job shows it
+        _mark_running(store, key, started_at=started)
         value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
@@ -847,7 +847,9 @@ def _record_unless_cancelled(
     return result
 
 
-def _mark_running(store: "ComputationStore", key: str) -> None:
+def _mark_running(
+    store: "ComputationStore", key: str, *, started_at: datetime | None = None
+) -> None:
     """Record RUNNING, unless the computation was already cancelled or finished.
 
     A worker starts after the caller may have cancelled it; writing RUNNING over
@@ -855,7 +857,9 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
     """
     current = store.get(key)  # a store may raise KeyError for a key not yet written
     if current is None or not current.is_ready:
-        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+        store[key] = ComputationResult(
+            None, ComputationStatus.RUNNING, started_at=started_at
+        )
 
 
 def _explained_start_failure(error: Exception) -> Exception:
@@ -1042,13 +1046,25 @@ class ComputationHandle(Generic[T]):
     store: ComputationStore
     backend: ComputationBackend | None = None  # Add this
 
+    def _current(self) -> ComputationResult:
+        """The stored result; PENDING while the worker has written nothing yet
+        (a store such as InMemoryStore raises KeyError for an unwritten key).
+
+        Like FileSystemStore's reads, a key that will never be written (a typo)
+        reads PENDING too: ``get_result`` then waits for its timeout.
+        """
+        try:
+            return self.store[self.key]
+        except KeyError:
+            return ComputationResult(None, ComputationStatus.PENDING)
+
     def is_ready(self) -> bool:
         """Check if the computation is complete."""
-        return self.store[self.key].is_ready
+        return self._current().is_ready
 
     def get_status(self) -> ComputationStatus:
         """Get the current status of the computation."""
-        return self.store[self.key].status
+        return self._current().status
 
     def get_result(self, *, timeout: float | None = None) -> T:
         """
@@ -1074,7 +1090,7 @@ class ComputationHandle(Generic[T]):
         start_time = time.time()
 
         while True:
-            result = self.store[self.key]
+            result = self._current()
 
             if result.status == ComputationStatus.COMPLETED:
                 return result.value
@@ -1103,6 +1119,9 @@ class ComputationHandle(Generic[T]):
         """
         Attempt to cancel the computation.
 
+        A computation nothing has written yet (the worker has not started) is
+        cancelled too: the worker will find CANCELLED and not run it over.
+
         Writes a first-class :attr:`ComputationStatus.CANCELLED` result (not a
         ``FAILED`` one), so callers can tell a deliberate cancellation apart from
         a genuine failure via :meth:`get_status` without inspecting error text.
@@ -1122,7 +1141,7 @@ class ComputationHandle(Generic[T]):
             result. A worker finishing in the instant between its check and its
             write can still overwrite it (no compare-and-set).
         """
-        result = self.store[self.key]
+        result = self._current()
         if not result.is_ready:
             self.store[self.key] = ComputationResult(
                 None,

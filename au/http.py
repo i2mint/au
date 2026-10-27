@@ -40,6 +40,7 @@ except ImportError:
 from au.base import (
     ComputationStatus,
     ComputationHandle,
+    ComputationResult,
     ComputationBackend,
     ComputationStore,
 )
@@ -52,7 +53,6 @@ from au.api import (
     _get_default_backend,
     _get_default_store,
 )
-
 
 # Pydantic models for API
 
@@ -81,6 +81,7 @@ class TaskStatusResponse(BaseModel):
     task_id: str
     status: str
     created_at: Optional[str] = None
+    started_at: Optional[str] = None
     completed_at: Optional[str] = None
     duration: Optional[float] = None
 
@@ -93,6 +94,7 @@ class TaskResultResponse(BaseModel):
     result: Optional[Any] = None
     error: Optional[str] = None
     created_at: Optional[str] = None
+    started_at: Optional[str] = None
     completed_at: Optional[str] = None
     duration: Optional[float] = None
 
@@ -110,6 +112,24 @@ class TaskCancelResponse(BaseModel):
     task_id: str
     cancelled: bool
     message: str
+
+
+def _timing(result: ComputationResult) -> dict[str, Any]:
+    """The timing fields of a task's response, from its stored result.
+
+    ``created_at`` is when this record was written, ``started_at`` when the run
+    began. A PENDING record gets none: FileSystemStore reports any unknown id as
+    PENDING, stamped with the time of the read.
+    """
+    if result.status == ComputationStatus.PENDING:
+        return {}
+    duration = result.duration
+    return {
+        "created_at": result.created_at.isoformat(),
+        "started_at": result.started_at and result.started_at.isoformat(),
+        "completed_at": result.completed_at and result.completed_at.isoformat(),
+        "duration": None if duration is None else duration.total_seconds(),
+    }
 
 
 def mk_http_interface(
@@ -216,26 +236,10 @@ def mk_http_interface(
     def get_task_status(task_id: str):
         """Get the status of a task."""
         try:
-            status = get_status(task_id, store=_store)
-
-            # Get additional metadata if available
-            handle = ComputationHandle(task_id, _store)
-            metadata = handle.metadata
-
-            response = TaskStatusResponse(
-                task_id=task_id,
-                status=status.value,
+            record = _store[task_id]  # one read: status and timing agree
+            return TaskStatusResponse(
+                task_id=task_id, status=record.status.value, **_timing(record)
             )
-
-            if metadata:
-                if metadata.created_at:
-                    response.created_at = metadata.created_at.isoformat()
-                if metadata.completed_at:
-                    response.completed_at = metadata.completed_at.isoformat()
-                if metadata.duration is not None:
-                    response.duration = metadata.duration
-
-            return response
 
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
@@ -254,6 +258,8 @@ def mk_http_interface(
         If wait=true, blocks until task completes or timeout.
         Otherwise, returns current status immediately.
         """
+        if task_id not in _store:  # else a handle waits on it as PENDING
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
         try:
             handle = ComputationHandle(task_id, _store)
 
@@ -291,24 +297,13 @@ def mk_http_interface(
                     result_value = None
                     error = None
 
-            # Get metadata
-            metadata = handle.metadata
-            response = TaskResultResponse(
+            return TaskResultResponse(
                 task_id=task_id,
                 status=status.value,
                 result=result_value,
                 error=error,
+                **_timing(_store[task_id]),
             )
-
-            if metadata:
-                if metadata.created_at:
-                    response.created_at = metadata.created_at.isoformat()
-                if metadata.completed_at:
-                    response.completed_at = metadata.completed_at.isoformat()
-                if metadata.duration is not None:
-                    response.duration = metadata.duration
-
-            return response
 
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
@@ -339,9 +334,9 @@ def mk_http_interface(
             return TaskCancelResponse(
                 task_id=task_id,
                 cancelled=cancelled,
-                message="Cancellation attempted"
-                if cancelled
-                else "Task not cancellable",
+                message=(
+                    "Cancellation attempted" if cancelled else "Task not cancellable"
+                ),
             )
 
         except HTTPException:
@@ -466,8 +461,10 @@ def mk_flask_interface(
     @app.route("/tasks/<task_id>/status")
     def status(task_id):
         try:
-            status = get_status(task_id, store=_store)
-            return jsonify({"task_id": task_id, "status": status.value})
+            record = _store[task_id]
+            return jsonify(
+                {"task_id": task_id, "status": record.status.value, **_timing(record)}
+            )
         except KeyError:
             return jsonify({"error": "Task not found"}), 404
 
@@ -475,6 +472,8 @@ def mk_flask_interface(
     def result(task_id):
         wait = request.args.get("wait", "false").lower() == "true"
         timeout = request.args.get("timeout", type=float)
+        if task_id not in _store:  # else a handle waits on it as PENDING
+            return jsonify({"error": "Task not found"}), 404
 
         try:
             if wait:
