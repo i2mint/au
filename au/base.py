@@ -553,7 +553,13 @@ class LoggingMiddleware(Middleware):
     >>> middleware = LoggingMiddleware(level=logging.INFO)
     """
 
-    def __init__(self, *, level: int = logging.DEBUG, logger_name: str | None = None):
+    def __init__(
+        self, *, level: int | str = logging.DEBUG, logger_name: str | None = None
+    ):
+        if isinstance(level, str):  # a name, as logging.Logger.setLevel takes
+            level = logging.getLevelName(level.upper())
+            if not isinstance(level, int):
+                raise ValueError(f"Unknown logging level name: {level!r}")
         self.level = level
         self.logger = logging.getLogger(logger_name or __name__)
 

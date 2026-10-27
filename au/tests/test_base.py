@@ -4,6 +4,7 @@ import json
 import os
 import pickle
 import threading
+import logging
 import time
 from pathlib import Path
 from datetime import timedelta
@@ -845,3 +846,25 @@ def test_a_spawned_process_says_when_the_middleware_does_not_pickle(
     with pytest.raises(ValueError, match="middleware that pickles"):
         backend.launch(_inc, (1,), {}, "k", store)
     assert "k" not in backend._processes
+
+
+# --- i2mint/au#17: level names, and SharedMetricsMiddleware at the top level ---
+
+
+@pytest.mark.parametrize("level", ["INFO", "info", logging.INFO])
+def test_logging_middleware_takes_a_level_name_or_number(level, caplog):
+    mw = LoggingMiddleware(level=level, logger_name="au.test17")
+    with caplog.at_level(logging.INFO, logger="au.test17"):
+        mw.before_compute(_inc, (1,), {}, "k")
+    assert mw.level == logging.INFO and "Starting computation k" in caplog.text
+
+
+def test_an_unknown_level_name_is_refused_at_construction():
+    with pytest.raises(ValueError, match="NOISY"):
+        LoggingMiddleware(level="noisy")
+
+
+def test_shared_metrics_middleware_is_exported_from_au():
+    import au
+
+    assert au.SharedMetricsMiddleware is SharedMetricsMiddleware
