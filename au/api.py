@@ -18,6 +18,7 @@ from au.base import (
     ProcessBackend,
     SerializationFormat,
     Middleware,
+    LoggingMiddleware,
 )
 from au.config import get_global_config
 from au.retry import RetryPolicy, retry_with_policy
@@ -30,19 +31,24 @@ _default_backend: Optional[ComputationBackend] = None
 _default_store: Optional[ComputationStore] = None
 
 
+def _middleware_from_config(config) -> list[Middleware]:
+    """The middleware the observability settings ask for (``logging_enabled``,
+    ``logging_level``), refusing a bad setting by its name."""
+    if not config.logging_enabled:
+        return []
+    try:
+        return [LoggingMiddleware(level=config.logging_level)]
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"AU_LOGGING_LEVEL (config.logging_level): {e}") from e
+
+
 def _get_default_backend() -> ComputationBackend:
     """Get or create the default backend based on configuration."""
     global _default_backend
 
     if _default_backend is None:
-        from au.base import LoggingMiddleware
-
         config = get_global_config()
-        middleware = (
-            [LoggingMiddleware(level=config.logging_level)]
-            if config.logging_enabled
-            else []
-        )
+        middleware = _middleware_from_config(config)
 
         # Create backend based on config. Backends take the result store
         # per-launch (submit_task passes it), so no store is bound here.

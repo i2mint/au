@@ -3,6 +3,11 @@
 A lightweight, convention-over-configuration async framework for Python.
 """
 
+import logging
+
+# A library logs, the app decides where it goes: no output unless configured.
+logging.getLogger("au").addHandler(logging.NullHandler())
+
 # Core functionality
 from au.base import (
     async_compute,

@@ -1,10 +1,12 @@
 """Tests for configuration module."""
 
+import logging
 import os
 import pytest
 from pathlib import Path
 import tempfile
 
+from au.testing import InMemoryStore
 from au.config import (
     AUConfig,
     get_config,
@@ -125,23 +127,52 @@ def test_global_config():
 # --- i2mint/au#22: the observability settings reach the simple API ------------
 
 
-@pytest.mark.parametrize(
-    "env, levels",
-    [({"AU_LOGGING_LEVEL": "DEBUG"}, [10]), ({"AU_LOGGING_ENABLED": "false"}, [])],
-)
-def test_logging_settings_reach_the_simple_apis_default_backend(
-    monkeypatch, env, levels
-):
+@pytest.fixture
+def isolated_config(monkeypatch, tmp_path):
+    """Only the environment the test sets: no ambient AU_* nor config file."""
     import au.api
-    from au.base import LoggingMiddleware
 
-    for name, value in env.items():
-        monkeypatch.setenv(name, value)
+    for name in [n for n in os.environ if n.startswith("AU_")]:
+        monkeypatch.delenv(name)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("AU_BACKEND", "thread")
     monkeypatch.setattr(au.api, "_default_backend", None)
     reset_global_config()
-    try:
-        backend = au.api._get_default_backend()
-    finally:
-        reset_global_config()
-    found = [mw.level for mw in backend.middleware if isinstance(mw, LoggingMiddleware)]
-    assert found == levels
+    yield monkeypatch
+    reset_global_config()
+
+
+def test_au_logging_level_sets_the_level_tasks_are_logged_at(isolated_config, caplog):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_LEVEL", "DEBUG")
+    with caplog.at_level(logging.DEBUG, logger="au.base"):
+        store = InMemoryStore()
+        key = au.api.submit_task(abs, -3, store=store)
+        assert au.api.get_result(key, timeout=5, store=store) == 3
+    starts = [r for r in caplog.records if "Starting computation" in r.message]
+    assert [r.levelno for r in starts] == [logging.DEBUG]
+
+
+def test_au_logging_enabled_false_logs_nothing(isolated_config):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_ENABLED", "false")
+    assert au.api._get_default_backend().middleware == []
+
+
+def test_a_bad_logging_level_is_refused_by_its_setting_name(isolated_config):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_LEVEL", "loud")
+    with pytest.raises(ValueError, match="AU_LOGGING_LEVEL.*'loud'"):
+        au.api._get_default_backend()
+
+
+def test_au_logs_nothing_anywhere_unless_the_app_configures_logging():
+    import au
+
+    assert any(
+        isinstance(h, logging.NullHandler) for h in logging.getLogger("au").handlers
+    )
