@@ -80,7 +80,8 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
 
     Args:
         serialized_data: Pickled data containing func, args, kwargs, key,
-                        store_reconstruction_info, and middleware_configs
+                        store_reconstruction_info, and middleware (the
+                        instances themselves, rebuilt here by unpickling)
     """
     try:
         # Deserialize the task data
@@ -90,16 +91,15 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
         kwargs = task_data["kwargs"]
         key = task_data["key"]
         store_info = task_data["store_reconstruction_info"]
-        middleware_configs = task_data.get("middleware_configs", [])
-
-        # Reconstruct the store
         store = _reconstruct_store(store_info)
-
-        # Recreate middleware instances
-        middleware_instances = _reconstruct_middleware(middleware_configs)
+        middleware = task_data.get("middleware")
+        if middleware is None:
+            middleware = _reconstruct_middleware(
+                task_data.get("middleware_configs", [])
+            )
 
         _compute_and_record(
-            func, args, kwargs, key=key, store=store, middleware=middleware_instances
+            func, args, kwargs, key=key, store=store, middleware=middleware
         )
 
     except Exception as e:
@@ -142,23 +142,61 @@ def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
         raise ValueError(f"Unknown store class: {store_class}")
 
 
+def _queue_payload(
+    func: Callable,
+    args: tuple,
+    kwargs: dict,
+    *,
+    key: str,
+    store: "ComputationStore",
+    middleware: list["Middleware"],
+) -> bytes:
+    """The pickled task a queue worker hands to :func:`_au_worker_entrypoint`.
+
+    The middleware travels as instances. One that does not pickle is refused
+    here, at launch, by name, rather than with a bare error from the payload.
+    """
+    task_data = {
+        "func": func,
+        "args": args,
+        "kwargs": kwargs,
+        "key": key,
+        "store_reconstruction_info": store.get_reconstruction_info(),
+        "middleware": middleware,
+    }
+    try:
+        return pickle.dumps(task_data)
+    except Exception:
+        for mw in middleware:
+            try:
+                pickle.dumps(mw)
+            except Exception as e:
+                raise TypeError(
+                    f"The middleware {type(mw).__name__} cannot be sent to a queue "
+                    f"worker, which receives it pickled ({type(e).__name__}: {e}). "
+                    "Make it picklable (e.g. a __getstate__ that drops a lock or a "
+                    "handle, and a __setstate__ that recreates it), or use it with "
+                    "ThreadBackend or ProcessBackend."
+                ) from e
+        raise
+
+
 def _reconstruct_middleware(
     middleware_configs: list[dict[str, Any]],
 ) -> list["Middleware"]:
-    """Reconstruct middleware instances from configuration."""
-    middleware_instances = []
+    """Rebuild middleware from ``{"class": ..., "kwargs": ...}`` configs.
+
+    Exists only for jobs queued by au versions (<= 0.1.4) that sent configs
+    instead of the middleware instances. Those versions skipped a class they
+    could not rebuild, and so does this: the job runs without it.
+    """
+    middleware = []
     for config in middleware_configs:
-        cls = config["class"]
-        mw_kwargs = config.get("kwargs", {})
-
-        if cls.__name__ == "LoggingMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-        elif cls.__name__ == "SharedMetricsMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-        elif cls.__name__ == "MetricsMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-
-    return middleware_instances
+        try:
+            middleware.append(config["class"](**config.get("kwargs", {})))
+        except Exception as e:
+            logger.warning(f"Skipping {config['class'].__name__} middleware: {e}")
+    return middleware
 
 
 class ComputationStatus(Enum):
@@ -538,7 +576,13 @@ class LoggingMiddleware(Middleware):
 
 class MetricsMiddleware(Middleware):
     """
-    Middleware for collecting computation metrics.
+    Middleware for collecting computation metrics, in the copy that runs the
+    computation.
+
+    Every backend but ThreadBackend runs a copy (a child process's, or one a
+    queue worker unpickled), so there the instance you hold counts nothing. Use
+    :class:`SharedMetricsMiddleware` with ProcessBackend to count across
+    processes.
 
     >>> metrics = MetricsMiddleware()
     >>> metrics.get_stats()
@@ -550,6 +594,14 @@ class MetricsMiddleware(Middleware):
         self.completed_computations = 0
         self.failed_computations = 0
         self.total_duration = 0.0
+        self._lock = multiprocessing.Lock()
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Pickle the counts, not the lock, which only crosses by inheritance."""
+        return {k: v for k, v in self.__dict__.items() if k != "_lock"}
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        self.__dict__.update(state)
         self._lock = multiprocessing.Lock()
 
     def before_compute(
@@ -805,8 +857,9 @@ def _explained_start_failure(error: Exception) -> Exception:
     Where processes are spawned (Windows; macOS and Python 3.14 by default if
     the start method is changed) the work crosses by pickle at ``start()``: a
     lambda, a local function, or a name rebound by a decorator fails there with
-    an error that does not say so. Starting is the only honest test of what a
-    spawned process accepts (a ``multiprocessing.Queue`` pickles only then).
+    an error that does not say so, and so does middleware holding a lock or a
+    handle. Starting is the only honest test of what a spawned process accepts
+    (a ``multiprocessing.Queue`` pickles only then).
     """
     # Pickling failures surface as PicklingError, TypeError ("cannot pickle ...")
     # or AttributeError ("Can't get local object ...").
@@ -816,24 +869,10 @@ def _explained_start_failure(error: Exception) -> Exception:
     return ValueError(
         f"The work cannot be sent to a spawned process ({type(error).__name__}: "
         f"{error}). The start method is {multiprocessing.get_start_method()!r}, "
-        "which pickles the function and its arguments: use a module-level "
-        "function, or ThreadBackend."
+        "which pickles the function, its arguments and the middleware: use a "
+        "module-level function and middleware that pickles (e.g. give it a "
+        "__getstate__ that drops a lock or a handle), or ThreadBackend."
     )
-
-
-def _worker_function(
-    func: Callable,
-    args: tuple,
-    kwargs: dict,
-    store: ComputationStore,
-    key: str,
-    middleware_configs: list[dict[str, Any]],
-) -> None:
-    """Global worker function for multiprocessing with middleware support."""
-    middleware = [
-        config["class"](**config.get("kwargs", {})) for config in middleware_configs
-    ]
-    _compute_and_record(func, args, kwargs, key=key, store=store, middleware=middleware)
 
 
 class ProcessBackend(ComputationBackend):
@@ -866,27 +905,6 @@ class ProcessBackend(ComputationBackend):
             # Start method already set, which is fine
             pass
 
-    def _serialize_middleware(self) -> list[dict[str, Any]]:
-        """Serialize middleware for worker process."""
-        configs = []
-        for mw in self.middleware:
-            config = {"class": type(mw)}
-            # Add specific configs for known middleware types
-            if isinstance(mw, LoggingMiddleware):
-                config["kwargs"] = {
-                    "level": mw.level,
-                    "logger_name": (
-                        mw.logger.name if mw.logger.name != __name__ else None
-                    ),
-                }
-            elif isinstance(mw, SharedMetricsMiddleware):
-                # Pass shared state for process-safe metrics
-                config["kwargs"] = mw.get_shared_state()
-            elif isinstance(mw, MetricsMiddleware):
-                config["kwargs"] = {}
-            configs.append(config)
-        return configs
-
     def launch(
         self,
         func: Callable,
@@ -895,19 +913,18 @@ class ProcessBackend(ComputationBackend):
         key: str,
         store: ComputationStore | None = None,
     ) -> None:
-        """Launch computation in a new process."""
+        """Launch computation in a new process.
+
+        The middleware goes to the child with the work and runs there only, so
+        each ``before_compute`` is released by an ``after_compute`` or
+        ``on_error`` in the same process (i2mint/au#14). Count across processes
+        with :class:`SharedMetricsMiddleware`; a plain one counts in the child.
+        """
         store = self._resolve_store(store)
-
-        # Only run non-metrics middleware in the main process
-        main_process_middleware = [
-            mw for mw in self.middleware if not isinstance(mw, SharedMetricsMiddleware)
-        ]
-        _call_hooks(main_process_middleware, "before_compute", func, args, kwargs, key)
-
-        middleware_configs = self._serialize_middleware()
         process = multiprocessing.Process(
-            target=_worker_function,
-            args=(func, args, kwargs, store, key, middleware_configs),
+            target=_compute_and_record,
+            args=(func, args, kwargs),
+            kwargs=dict(key=key, store=store, middleware=self.middleware),
         )
         self._processes[key] = process
         try:
@@ -973,15 +990,9 @@ class StdLibQueueBackend(ComputationBackend):
         self._ensure_started()
 
         # Serialize task data
-        task_data = {
-            "func": func,
-            "args": args,
-            "kwargs": kwargs,
-            "key": key,
-            "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware_configs": self._serialize_middleware(),
-        }
-        serialized_data = pickle.dumps(task_data)
+        serialized_data = _queue_payload(
+            func, args, kwargs, key=key, store=store, middleware=self.middleware
+        )
 
         # Submit to executor
         future = self._executor.submit(_au_worker_entrypoint, serialized_data)
@@ -999,27 +1010,6 @@ class StdLibQueueBackend(ComputationBackend):
         if self._executor:
             self._executor.shutdown(wait=True)
             self._started = False
-
-    def _serialize_middleware(self) -> list[dict[str, Any]]:
-        """Serialize middleware for worker process."""
-        configs = []
-        for mw in self.middleware:
-            config = {"class": type(mw)}
-            # Add specific configs for known middleware types
-            if isinstance(mw, LoggingMiddleware):
-                config["kwargs"] = {
-                    "level": mw.level,
-                    "logger_name": (
-                        mw.logger.name if mw.logger.name != __name__ else None
-                    ),
-                }
-            elif isinstance(mw, SharedMetricsMiddleware):
-                # Pass shared state for process-safe metrics
-                config["kwargs"] = mw.get_shared_state()
-            elif isinstance(mw, MetricsMiddleware):
-                config["kwargs"] = {}
-            configs.append(config)
-        return configs
 
     def __enter__(self):
         """Context manager entry."""
@@ -1169,10 +1159,16 @@ def async_compute(
         serialization: Format for storing results
         middleware: List of middleware components
 
+    The default backend runs each call with a copy of its middleware, in a
+    child process: a plain :class:`MetricsMiddleware` counts there, not in the
+    instance you hold. Use :class:`SharedMetricsMiddleware` to count across
+    processes.
+
     Example:
+        >>> metrics = SharedMetricsMiddleware()
         >>> @async_compute(
         ...     ttl_seconds=7200,
-        ...     middleware=[LoggingMiddleware(), MetricsMiddleware()]
+        ...     middleware=[LoggingMiddleware(), metrics]
         ... )
         ... def slow_computation(x: int) -> int:
         ...     return x * x

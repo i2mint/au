@@ -1,4 +1,9 @@
 import contextlib
+import functools
+import json
+import os
+import pickle
+import threading
 import time
 from pathlib import Path
 from datetime import timedelta
@@ -8,6 +13,7 @@ from au.base import (
     FileSystemStore,
     ProcessBackend,
     StdLibQueueBackend,
+    Middleware,
     LoggingMiddleware,
     MetricsMiddleware,
     SharedMetricsMiddleware,
@@ -65,7 +71,8 @@ def test_custom_backend_and_store(tmp_path):
     inc = async_compute(backend=backend, store=store)(_inc)
 
     handle = inc(10)
-    assert handle.get_status() in (ComputationStatus.PENDING, ComputationStatus.RUNNING)
+    # A fast child can already be done here: only a failure would be wrong.
+    assert handle.get_status() != ComputationStatus.FAILED
     result = handle.get_result(timeout=5)
     assert result == 11
     assert handle.get_status() == ComputationStatus.COMPLETED
@@ -102,6 +109,9 @@ def test_middleware_and_metrics(tmp_path):
         assert h.is_ready(), f"Computation {h.key} did not complete in time"
         results.append(h.get_result(timeout=0.1))
     assert results == [i * i for i in range(5)]
+    # after_compute runs once COMPLETED is written: let the children finish.
+    while metrics.get_stats()["completed"] < 5 and time.time() < deadline:
+        time.sleep(0.05)
     stats = metrics.get_stats()
     assert stats["total"] == 5
     assert stats["completed"] == 5
@@ -666,3 +676,172 @@ def test_a_queue_job_raising_a_base_exception_ends_failed_and_says_what(tmp_path
             )
             == 8
         ), "the queue worker did not survive"
+
+
+# --- i2mint/au#14: one middleware lifecycle; middleware crosses by pickle -----
+
+
+def test_process_backend_runs_the_middleware_in_the_child_only(tmp_path, seen_dir):
+    """The parent used to run ``before_compute`` and never release it."""
+    store, mw = FileSystemStore(tmp_path, auto_cleanup=False), _Recorder()
+    backend = ProcessBackend(store, middleware=[mw, _Tagged("child", seen_dir)])
+    assert async_compute(backend=backend, store=store)(_inc)(1).get_result(timeout=5)
+    assert not mw.in_flight and mw.calls == []
+    deadline = time.time() + 5  # the child writes its note after the result
+    while not (seen_dir / "child.json").exists() and time.time() < deadline:
+        time.sleep(0.05)
+    assert _seen(seen_dir, "child")["pid"] != os.getpid()
+
+
+class _Tagged(Middleware):
+    """Carries constructor state, and writes what it saw to a file any process
+    can read: a worker runs an unpickled copy, not this instance."""
+
+    def __init__(self, tag, out_dir):
+        self.tag, self.out_dir = tag, out_dir
+
+    def before_compute(self, func, args, kwargs, key):
+        pass
+
+    def after_compute(self, key, result):
+        note = {"tag": self.tag, "id": id(self), "pid": os.getpid()}
+        (Path(self.out_dir) / f"{self.tag}.json").write_text(json.dumps(note))
+
+    def on_error(self, key, error):
+        pass
+
+
+class _HoldsAThreadLock(Middleware):
+    def __init__(self):
+        self.lock = threading.Lock()
+
+    def before_compute(self, func, args, kwargs, key):
+        pass
+
+    def after_compute(self, key, result):
+        pass
+
+    def on_error(self, key, error):
+        pass
+
+
+def _seen(out_dir, tag):
+    return json.loads((Path(out_dir) / f"{tag}.json").read_text())
+
+
+def _note_completion(out_dir, task_id, **event):
+    (Path(out_dir) / "completed").write_text(task_id)
+
+
+@pytest.fixture
+def seen_dir(tmp_path):
+    """Where middleware notes what it saw, apart from the store's own files."""
+    path = tmp_path / "seen"
+    path.mkdir()
+    return path
+
+
+@pytest.mark.parametrize("use_processes", [False, True])
+def test_a_queue_worker_runs_the_middleware_it_was_given(
+    tmp_path, seen_dir, use_processes
+):
+    """A class outside au's three used to be dropped without a word."""
+    store, mw = FileSystemStore(tmp_path, auto_cleanup=False), _Tagged("mine", seen_dir)
+    backend = StdLibQueueBackend(
+        store, use_processes=use_processes, middleware=[mw, MetricsMiddleware()]
+    )
+    with backend:
+        handle = async_compute(backend=backend, store=store)(_inc)(1)
+        assert handle.get_result(timeout=10) == 2
+    seen = _seen(seen_dir, "mine")
+    assert seen["tag"] == "mine"
+    if use_processes:
+        assert seen["pid"] != os.getpid()
+    else:
+        assert seen["id"] != id(mw), "the worker ran this instance, not a copy"
+
+
+def test_au_observability_middleware_runs_on_a_queue(tmp_path, seen_dir):
+    """Composite, hooks and tracing used to be refused or rebuilt without state."""
+    from au.hooks import create_observability_middleware
+
+    on_complete = functools.partial(_note_completion, seen_dir)
+    mw = create_observability_middleware(enable_tracing=True, on_complete=on_complete)
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    backend = StdLibQueueBackend(store, use_processes=True, middleware=[mw])
+    with backend:
+        handle = async_compute(backend=backend, store=store)(_inc)(1)
+        assert handle.get_result(timeout=10) == 2
+    assert (seen_dir / "completed").read_text() == handle.key
+
+
+@pytest.mark.parametrize("make", [_HoldsAThreadLock, SharedMetricsMiddleware])
+def test_a_middleware_that_does_not_pickle_is_refused_at_launch_by_name(tmp_path, make):
+    """SharedMetricsMiddleware's counters cross only by inheritance (ProcessBackend)."""
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    backend = StdLibQueueBackend(store, use_processes=False, middleware=[make()])
+    with backend, pytest.raises(TypeError, match=f"{make.__name__} .*picklable"):
+        async_compute(backend=backend, store=store)(_inc)(1)
+    assert list(store) == []
+
+
+def test_metrics_middleware_pickles_with_its_counts_and_a_lock_of_its_own():
+    metrics = MetricsMiddleware()
+    metrics.before_compute(_inc, (1,), {}, "k")
+    copy = pickle.loads(pickle.dumps(metrics))
+    copy.before_compute(_inc, (1,), {}, "k")
+    assert (metrics.get_stats()["total"], copy.get_stats()["total"]) == (1, 2)
+
+
+def test_a_job_queued_with_middleware_configs_still_runs(tmp_path, seen_dir):
+    """Payloads queued by au <= 0.1.4: configs, not instances, and a class it
+    could not rebuild (a required argument, no kwargs) is skipped, not fatal."""
+    from au.base import _au_worker_entrypoint
+    from au.hooks import CompositeMiddleware
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    key = store.create_key()
+    logging_config = {"class": LoggingMiddleware, "kwargs": {"level": 10}}
+    task_data = dict(
+        func=_inc,
+        args=(1,),
+        kwargs={},
+        key=key,
+        store_reconstruction_info=store.get_reconstruction_info(),
+        middleware_configs=[
+            logging_config,
+            {"class": MetricsMiddleware, "kwargs": {}},
+            {"class": CompositeMiddleware},
+            {"class": _Tagged},
+        ],
+    )
+    _au_worker_entrypoint(pickle.dumps(task_data))
+    assert store[key].value == 2
+
+
+def test_spawned_process_backend_runs_au_and_custom_middleware(
+    tmp_path, seen_dir, spawn_start_method
+):
+    import multiprocessing
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    middleware = [LoggingMiddleware(), MetricsMiddleware(), _Tagged("spawn", seen_dir)]
+    backend = ProcessBackend(store, middleware=middleware)
+    multiprocessing.set_start_method("spawn", force=True)  # the backend forces fork
+    handle = async_compute(backend=backend, store=store)(_inc)(1)
+    assert handle.get_result(timeout=30) == 2
+    backend._processes[handle.key].join(30)
+    assert _seen(seen_dir, "spawn")["tag"] == "spawn"
+
+
+def test_a_spawned_process_says_when_the_middleware_does_not_pickle(
+    tmp_path, spawn_start_method
+):
+    import multiprocessing
+
+    store = FileSystemStore(tmp_path)
+    backend = ProcessBackend(store, middleware=[_HoldsAThreadLock()])
+    multiprocessing.set_start_method("spawn", force=True)
+    with pytest.raises(ValueError, match="middleware that pickles"):
+        backend.launch(_inc, (1,), {}, "k", store)
+    assert "k" not in backend._processes
