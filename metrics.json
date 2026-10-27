@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.746378421783447,
-  "commit_message": "Merge 0f537ac6f42cb4514223d861a58d77f5078deff8 into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14",
-  "commit_sha": "aaaa842c1170be236cd71d8e944ddc8087afce5e",
+  "collection_duration_seconds": 6.221884489059448,
+  "commit_message": "Queue backends send middleware pickled: one rebuild rule (#14)\n\nProcessBackend already hands its middleware instances to the child. The\nqueue backends (StdLibQueueBackend, RQ, Supabase) now do the same: the\ninstances go in task_data[\"middleware\"] and the worker runs the unpickled\ncopies. This replaces the worker_kwargs() rebuild, which refused\nCompositeMiddleware, dropped HooksMiddleware callbacks and TracingMiddleware's\nservice_name, and could not carry SharedMetricsMiddleware.\n\n- Delete Middleware.worker_kwargs and its overrides, _middleware_configs and\n  the inspect import.\n- Add _picklable_middleware, shared by the queue backends: a middleware that\n  does not pickle (a thread lock, SharedMetricsMiddleware's Values) is refused\n  at launch with a TypeError that names it and says how to make it picklable.\n- Keep _reconstruct_middleware, minimal, only for payloads queued with\n  middleware_configs by older au versions.\n- MetricsMiddleware pickles: __getstate__/__setstate__ drop and recreate its\n  lock.\n- ProcessBackend's spawn refusal also covers middleware that does not pickle.\n- Document that MetricsMiddleware counts per process, so with the default\n  ProcessBackend the parent's instance counts nothing; point to\n  SharedMetricsMiddleware (async_compute docstring, MetricsMiddleware\n  docstring, README Observability).\n- Tests: custom middleware with constructor state on StdLibQueueBackend in\n  thread and process mode (thread mode proves an unpickled copy ran),\n  create_observability_middleware with hooks and tracing on a queue, clear\n  refusals for a lock-holding middleware and SharedMetricsMiddleware, a\n  MetricsMiddleware pickle round trip, a legacy middleware_configs payload,\n  and ProcessBackend under spawn with Logging, Metrics and custom middleware\n  plus its refusal of unpicklable middleware.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "80506458d39fc19bc770bf4ef04e6b08a829f69a",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35222,
-      "comment_lines_ratio": 0.06523232835815367,
-      "docs_lines": 42358,
-      "empty_lines": 70712,
-      "empty_lines_ratio": 0.13096100172794736,
-      "files_analyzed": 1332,
-      "function_lines": 323510,
-      "function_lines_ratio": 0.5991513981927856,
-      "mean_lines_per_function": 15.95295626017062,
-      "num_classes": 3021,
-      "num_functions": 20279,
+      "comment_lines": 35370,
+      "comment_lines_ratio": 0.06519995944588329,
+      "docs_lines": 42467,
+      "empty_lines": 71112,
+      "empty_lines_ratio": 0.13108565213784712,
+      "files_analyzed": 1347,
+      "function_lines": 325290,
+      "function_lines_ratio": 0.5996294828428436,
+      "mean_lines_per_function": 15.956538801138036,
+      "num_classes": 3036,
+      "num_functions": 20386,
       "pypi_version": "0.1.4",
-      "total_lines": 539947
+      "total_lines": 542485
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-10-27T13:07:31Z",
+      "last_success_timestamp": "2026-10-27T13:13:00Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/40509242411",
+      "run_url": "https://github.com/i2mint/au/actions/runs/40509904498",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:12:53.257048Z",
+  "timestamp": "2026-10-27T13:22:01.382679Z",
   "workflow_status": {}
 }
