@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 7.310579538345337,
+  "commit_message": "Merge bb0af93cd8ef7f9add2c82a3b259aa4271779ca9 into 3e8b0243a16e074179cd97ff810f402eeaa4ed29",
+  "commit_sha": "d5fe2b18994821777cffc047e2ee91ee5c5a3eba",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35378,
+      "comment_lines_ratio": 0.06521362448248276,
+      "docs_lines": 42430,
+      "empty_lines": 71111,
+      "empty_lines_ratio": 0.13108163408258894,
+      "files_analyzed": 1347,
+      "function_lines": 325313,
+      "function_lines_ratio": 0.5996619317448673,
+      "mean_lines_per_function": 15.956884289007702,
+      "num_classes": 3036,
+      "num_functions": 20387,
+      "pypi_version": "0.1.3",
+      "total_lines": 542494
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T12:53:36Z",
+      "recent_failure_count": 1,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40507221952",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T12:53:52.543435Z",
+  "workflow_status": {}
+}
