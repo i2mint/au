@@ -7,7 +7,7 @@ It requires the 'rq' and 'redis' packages to be installed.
 
 import contextlib
 import pickle
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 from collections.abc import Callable
 
 # Import for type checking only
@@ -29,7 +29,7 @@ try:
     from au.base import (
         ComputationBackend,
         _au_worker_entrypoint,
-        _picklable_middleware,
+        _queue_payload,
     )
 except ImportError:
     # Handle case where we're importing this before base is fully loaded
@@ -76,15 +76,9 @@ class RQBackend(ComputationBackend):
         """Enqueue computation task to RQ."""
         store = self._resolve_store(store)
         # Serialize task data
-        task_data = {
-            "func": func,
-            "args": args,
-            "kwargs": kwargs,
-            "key": key,
-            "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware": _picklable_middleware(self.middleware),
-        }
-        serialized_data = pickle.dumps(task_data)
+        serialized_data = _queue_payload(
+            func, args, kwargs, key=key, store=store, middleware=self.middleware
+        )
 
         # Enqueue to RQ
         self.rq_queue.enqueue(

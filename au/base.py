@@ -142,25 +142,43 @@ def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
         raise ValueError(f"Unknown store class: {store_class}")
 
 
-def _picklable_middleware(middleware: list["Middleware"]) -> list["Middleware"]:
-    """Return ``middleware`` once each one is known to pickle.
+def _queue_payload(
+    func: Callable,
+    args: tuple,
+    kwargs: dict,
+    *,
+    key: str,
+    store: "ComputationStore",
+    middleware: list["Middleware"],
+) -> bytes:
+    """The pickled task a queue worker hands to :func:`_au_worker_entrypoint`.
 
-    A queue worker receives the middleware instances pickled with the work. One
-    that does not pickle is refused here, at launch, by name, rather than with a
-    bare pickling error from the whole payload.
+    The middleware travels as instances. One that does not pickle is refused
+    here, at launch, by name, rather than with a bare error from the payload.
     """
-    for mw in middleware:
-        try:
-            pickle.dumps(mw)
-        except Exception as e:
-            raise TypeError(
-                f"The middleware {type(mw).__name__} cannot be sent to a queue "
-                f"worker, which receives it pickled ({type(e).__name__}: {e}). "
-                "Make it picklable (e.g. a __getstate__ that drops a lock or a "
-                "handle, and a __setstate__ that recreates it), or use it with "
-                "ThreadBackend or ProcessBackend."
-            ) from e
-    return middleware
+    task_data = {
+        "func": func,
+        "args": args,
+        "kwargs": kwargs,
+        "key": key,
+        "store_reconstruction_info": store.get_reconstruction_info(),
+        "middleware": middleware,
+    }
+    try:
+        return pickle.dumps(task_data)
+    except Exception:
+        for mw in middleware:
+            try:
+                pickle.dumps(mw)
+            except Exception as e:
+                raise TypeError(
+                    f"The middleware {type(mw).__name__} cannot be sent to a queue "
+                    f"worker, which receives it pickled ({type(e).__name__}: {e}). "
+                    "Make it picklable (e.g. a __getstate__ that drops a lock or a "
+                    "handle, and a __setstate__ that recreates it), or use it with "
+                    "ThreadBackend or ProcessBackend."
+                ) from e
+        raise
 
 
 def _reconstruct_middleware(
@@ -168,10 +186,17 @@ def _reconstruct_middleware(
 ) -> list["Middleware"]:
     """Rebuild middleware from ``{"class": ..., "kwargs": ...}`` configs.
 
-    Exists only for jobs queued by au versions that sent configs instead of the
-    middleware instances; a job queued now carries the instances.
+    Exists only for jobs queued by au versions (<= 0.1.4) that sent configs
+    instead of the middleware instances. Those versions skipped a class they
+    could not rebuild, and so does this: the job runs without it.
     """
-    return [c["class"](**c.get("kwargs", {})) for c in middleware_configs]
+    middleware = []
+    for config in middleware_configs:
+        try:
+            middleware.append(config["class"](**config.get("kwargs", {})))
+        except Exception as e:
+            logger.warning(f"Skipping {config['class'].__name__} middleware: {e}")
+    return middleware
 
 
 class ComputationStatus(Enum):
@@ -551,13 +576,13 @@ class LoggingMiddleware(Middleware):
 
 class MetricsMiddleware(Middleware):
     """
-    Middleware for collecting computation metrics, in the process that runs
-    the computation.
+    Middleware for collecting computation metrics, in the copy that runs the
+    computation.
 
-    It counts per process: a worker process (ProcessBackend, the default of
-    :func:`async_compute`, or a queue worker) runs its own copy, so the instance
-    you hold counts nothing there. Use :class:`SharedMetricsMiddleware` with
-    ProcessBackend to count across processes.
+    Every backend but ThreadBackend runs a copy (a child process's, or one a
+    queue worker unpickled), so there the instance you hold counts nothing. Use
+    :class:`SharedMetricsMiddleware` with ProcessBackend to count across
+    processes.
 
     >>> metrics = MetricsMiddleware()
     >>> metrics.get_stats()
@@ -965,15 +990,9 @@ class StdLibQueueBackend(ComputationBackend):
         self._ensure_started()
 
         # Serialize task data
-        task_data = {
-            "func": func,
-            "args": args,
-            "kwargs": kwargs,
-            "key": key,
-            "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware": _picklable_middleware(self.middleware),
-        }
-        serialized_data = pickle.dumps(task_data)
+        serialized_data = _queue_payload(
+            func, args, kwargs, key=key, store=store, middleware=self.middleware
+        )
 
         # Submit to executor
         future = self._executor.submit(_au_worker_entrypoint, serialized_data)
@@ -1140,8 +1159,8 @@ def async_compute(
         serialization: Format for storing results
         middleware: List of middleware components
 
-    The default backend runs each call, and its middleware, in a child
-    process: a plain :class:`MetricsMiddleware` counts there, not in the
+    The default backend runs each call with a copy of its middleware, in a
+    child process: a plain :class:`MetricsMiddleware` counts there, not in the
     instance you hold. Use :class:`SharedMetricsMiddleware` to count across
     processes.
 
@@ -1155,8 +1174,6 @@ def async_compute(
         ...     return x * x
         >>> handle = slow_computation(5)  # Returns immediately
         >>> result = handle.get_result(timeout=10)
-        >>> metrics.get_stats()["completed"]  # doctest: +SKIP
-        1
     """
     if store is None:
         store = FileSystemStore(

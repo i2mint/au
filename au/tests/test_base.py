@@ -71,7 +71,8 @@ def test_custom_backend_and_store(tmp_path):
     inc = async_compute(backend=backend, store=store)(_inc)
 
     handle = inc(10)
-    assert handle.get_status() in (ComputationStatus.PENDING, ComputationStatus.RUNNING)
+    # A fast child can already be done here: only a failure would be wrong.
+    assert handle.get_status() != ComputationStatus.FAILED
     result = handle.get_result(timeout=5)
     assert result == 11
     assert handle.get_status() == ComputationStatus.COMPLETED
@@ -108,6 +109,9 @@ def test_middleware_and_metrics(tmp_path):
         assert h.is_ready(), f"Computation {h.key} did not complete in time"
         results.append(h.get_result(timeout=0.1))
     assert results == [i * i for i in range(5)]
+    # after_compute runs once COMPLETED is written: let the children finish.
+    while metrics.get_stats()["completed"] < 5 and time.time() < deadline:
+        time.sleep(0.05)
     stats = metrics.get_stats()
     assert stats["total"] == 5
     assert stats["completed"] == 5
@@ -677,12 +681,16 @@ def test_a_queue_job_raising_a_base_exception_ends_failed_and_says_what(tmp_path
 # --- i2mint/au#14: one middleware lifecycle; middleware crosses by pickle -----
 
 
-def test_process_backend_runs_the_middleware_in_the_child_only(tmp_path):
+def test_process_backend_runs_the_middleware_in_the_child_only(tmp_path, seen_dir):
     """The parent used to run ``before_compute`` and never release it."""
     store, mw = FileSystemStore(tmp_path, auto_cleanup=False), _Recorder()
-    backend = ProcessBackend(store, middleware=[mw])
+    backend = ProcessBackend(store, middleware=[mw, _Tagged("child", seen_dir)])
     assert async_compute(backend=backend, store=store)(_inc)(1).get_result(timeout=5)
     assert not mw.in_flight and mw.calls == []
+    deadline = time.time() + 5  # the child writes its note after the result
+    while not (seen_dir / "child.json").exists() and time.time() < deadline:
+        time.sleep(0.05)
+    assert _seen(seen_dir, "child")["pid"] != os.getpid()
 
 
 class _Tagged(Middleware):
@@ -786,23 +794,29 @@ def test_metrics_middleware_pickles_with_its_counts_and_a_lock_of_its_own():
 
 
 def test_a_job_queued_with_middleware_configs_still_runs(tmp_path, seen_dir):
-    """Payloads queued by au versions that sent configs, not instances."""
+    """Payloads queued by au <= 0.1.4: configs, not instances, and a class it
+    could not rebuild (a required argument, no kwargs) is skipped, not fatal."""
     from au.base import _au_worker_entrypoint
+    from au.hooks import CompositeMiddleware
 
     store = FileSystemStore(tmp_path, auto_cleanup=False)
     key = store.create_key()
-    config = {"class": _Tagged, "kwargs": {"tag": "old", "out_dir": str(seen_dir)}}
+    logging_config = {"class": LoggingMiddleware, "kwargs": {"level": 10}}
     task_data = dict(
         func=_inc,
         args=(1,),
         kwargs={},
         key=key,
         store_reconstruction_info=store.get_reconstruction_info(),
-        middleware_configs=[config],
+        middleware_configs=[
+            logging_config,
+            {"class": MetricsMiddleware, "kwargs": {}},
+            {"class": CompositeMiddleware},
+            {"class": _Tagged},
+        ],
     )
     _au_worker_entrypoint(pickle.dumps(task_data))
     assert store[key].value == 2
-    assert _seen(seen_dir, "old")["tag"] == "old"
 
 
 def test_spawned_process_backend_runs_au_and_custom_middleware(

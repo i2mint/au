@@ -32,7 +32,7 @@ try:
     from au.base import (
         ComputationBackend,
         _au_worker_entrypoint,
-        _picklable_middleware,
+        _queue_payload,
     )
 except ImportError:
     # Handle case where we're importing this before base is fully loaded
@@ -125,15 +125,9 @@ class SupabaseQueueBackend(ComputationBackend):
         """Enqueue task to Supabase PostgreSQL table."""
         store = self._resolve_store(store)
         # Serialize task data
-        task_data = {
-            "func": func,
-            "args": args,
-            "kwargs": kwargs,
-            "key": key,
-            "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware": _picklable_middleware(self.middleware),
-        }
-        serialized_data = pickle.dumps(task_data)
+        serialized_data = _queue_payload(
+            func, args, kwargs, key=key, store=store, middleware=self.middleware
+        )
 
         # Insert into queue table
         try:
