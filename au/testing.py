@@ -17,7 +17,7 @@ from au.base import (
     ComputationResult,
     ComputationStatus,
     Middleware,
-    _compute_and_record,
+    compute_and_record,
 )
 
 
@@ -48,9 +48,7 @@ class InMemoryStore(ComputationStore):
         return self._data[key]
 
     def __setitem__(self, key: str, value: ComputationResult) -> None:
-        """Store result by key, stamping completion as FileSystemStore does."""
-        if value.is_ready and value.completed_at is None:
-            value.completed_at = datetime.now()
+        """Store result by key."""
         self._data[key] = value
 
     def __delitem__(self, key: str) -> None:
@@ -115,6 +113,10 @@ class SyncTestBackend(ComputationBackend):
     ) -> None:
         """Execute function synchronously and store result immediately.
 
+        Runs the body every au worker runs, so it records results as they do:
+        ``result.error`` is the exception itself, and a ``BaseException`` is
+        recorded FAILED, then re-raised to the caller.
+
         Args:
             func: Function to execute
             args: Positional arguments
@@ -129,7 +131,7 @@ class SyncTestBackend(ComputationBackend):
 
         # The body every au worker runs: the same recording, middleware
         # lifecycle and BaseException handling as the real backends.
-        _compute_and_record(
+        compute_and_record(
             func, args, kwargs, key=key, store=store, middleware=self.middleware
         )
 

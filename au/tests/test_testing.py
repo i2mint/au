@@ -1,5 +1,7 @@
 """Tests for testing utilities module."""
 
+import time
+
 import pytest
 
 from au.testing import (
@@ -10,7 +12,12 @@ from au.testing import (
     create_test_backend,
     create_test_store,
 )
-from au.base import ComputationResult, ComputationStatus, MetricsMiddleware
+from au.base import (
+    ComputationResult,
+    ComputationStatus,
+    MetricsMiddleware,
+    Middleware,
+)
 
 
 def simple_func(x: int) -> int:
@@ -223,9 +230,8 @@ def _interrupted():
     raise _Interrupt("stop")
 
 
-class _Releases(MetricsMiddleware):
+class _Releases(Middleware):
     def __init__(self):
-        super().__init__()
         self.in_flight, self.calls = set(), []
 
     def before_compute(self, func, args, kwargs, key):
@@ -251,11 +257,17 @@ def test_sync_backend_records_a_base_exception_and_lets_it_through():
     assert mw.calls == [("error", _Interrupt)] and not mw.in_flight
 
 
-def test_sync_backend_results_carry_their_completion_time():
+def _naps(seconds):
+    time.sleep(seconds)
+    return seconds
+
+
+def test_a_result_duration_is_the_time_the_job_ran():
+    """created_at used to be taken after the call returned: duration ~0."""
     store = InMemoryStore()
     key = store.create_key()
-    SyncTestBackend().launch(simple_func, (1,), {}, key, store)
-    assert store[key].duration is not None
+    SyncTestBackend().launch(_naps, (0.2,), {}, key, store)
+    assert store[key].duration.total_seconds() >= 0.2
 
 
 def test_a_failing_middleware_in_a_composite_does_not_stop_the_others():

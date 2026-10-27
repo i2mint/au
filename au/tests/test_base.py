@@ -528,11 +528,11 @@ def _interrupted():
 
 
 def test_a_base_exception_is_recorded_as_failed_then_re_raised():
-    from au.base import _compute_and_record
+    from au.base import compute_and_record
 
     store, mw = {}, _Recorder()
     with pytest.raises(_Interrupt):
-        _compute_and_record(_interrupted, (), {}, key="k", store=store, middleware=[mw])
+        compute_and_record(_interrupted, (), {}, key="k", store=store, middleware=[mw])
     assert store["k"].status == ComputationStatus.FAILED
     assert isinstance(store["k"].error, _Interrupt)
     assert mw.calls == [("error", "k", _Interrupt)] and not mw.in_flight
@@ -559,10 +559,10 @@ def test_a_base_exception_is_recorded_as_failed_then_re_raised():
     ],
 )
 def test_a_store_that_fails_to_write_still_gets_the_release_hook(refused, recorded):
-    from au.base import _compute_and_record
+    from au.base import compute_and_record
 
     store, mw = _Refusing(*refused), _Recorder()
-    _compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
+    compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
     assert mw.calls == [("error", "k", OSError)] and not mw.in_flight
     assert (store["k"].status if "k" in store else None) == recorded
 
@@ -591,7 +591,7 @@ def test_a_thread_backend_job_raising_a_base_exception_ends_failed(monkeypatch):
 
 
 def test_a_cancellation_is_final_whatever_the_cancelled_job_then_does():
-    from au.base import _compute_and_record
+    from au.base import compute_and_record
 
     def cancelled_then(outcome):
         def job():
@@ -606,7 +606,7 @@ def test_a_cancellation_is_final_whatever_the_cancelled_job_then_does():
     ]:
         store, mw = {}, _Recorder()
         with pytest.raises(raised) if raised else contextlib.nullcontext():
-            _compute_and_record(
+            compute_and_record(
                 cancelled_then(outcome), (), {}, key="k", store=store, middleware=[mw]
             )
         assert store["k"].status == ComputationStatus.CANCELLED
@@ -625,10 +625,10 @@ class _ForgetfulStore(dict):
 
 
 def test_a_store_read_that_fails_does_not_lose_a_finished_job():
-    from au.base import _compute_and_record
+    from au.base import compute_and_record
 
     store, mw = _ForgetfulStore(), _Recorder()
-    _compute_and_record(_double, (21,), {}, key="k", store=store, middleware=[mw])
+    compute_and_record(_double, (21,), {}, key="k", store=store, middleware=[mw])
     assert dict.get(store, "k").value == 42
     assert [c[0] for c in mw.calls] == ["after"]
 
@@ -639,12 +639,12 @@ def _interrupted_hook(*args):
 
 @pytest.mark.parametrize("hook", ["before_compute", "after_compute"])
 def test_a_hook_raising_a_base_exception_does_not_strand_the_others(hook):
-    from au.base import _compute_and_record
+    from au.base import compute_and_record
 
     store, mw, interrupting = {}, _Recorder(), MetricsMiddleware()
     setattr(interrupting, hook, _interrupted_hook)
     with pytest.raises(_Interrupt):
-        _compute_and_record(
+        compute_and_record(
             _double,
             (2,),
             {},

@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 import logging
 
-from au.base import Middleware, ComputationResult, _call_hooks
+from au.base import Middleware, ComputationResult, call_hooks
 
 
 def _func_name(func: Any) -> str:
@@ -304,15 +304,15 @@ class CompositeMiddleware(Middleware):
         self, func: Callable, args: tuple, kwargs: dict, key: str
     ) -> None:
         """Call before_compute on all middleware (base.Middleware protocol)."""
-        _call_hooks(self.middlewares, "before_compute", func, args, kwargs, key)
+        call_hooks(self.middlewares, "before_compute", func, args, kwargs, key)
 
     def after_compute(self, key: str, result: "ComputationResult") -> None:
         """Call after_compute on all middleware (base.Middleware protocol)."""
-        _call_hooks(self.middlewares, "after_compute", key, result)
+        call_hooks(self.middlewares, "after_compute", key, result)
 
     def on_error(self, key: str, error: Exception) -> None:
         """Call on_error on all middleware (base.Middleware protocol)."""
-        _call_hooks(self.middlewares, "on_error", key, error)
+        call_hooks(self.middlewares, "on_error", key, error)
 
 
 # Pre-configured middleware combinations
