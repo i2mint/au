@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:17:26.617688Z
+timestamp,2026-10-27T14:17:28.435840Z
 commit_sha,d87613072f6344dae816c4823bbd89b53c759812
 commit_message,"Review fixes: au logs nothing unless configured; a bad level names its setting (#22)
 
@@ -16,18 +16,18 @@ commit_message,"Review fixes: au logs nothing unless configured; a bad level nam
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20386
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542522
-metrics.umpyre_stats.empty_lines,71110
-metrics.umpyre_stats.comment_lines,35363
-metrics.umpyre_stats.docs_lines,42480
-metrics.umpyre_stats.function_lines,325323
-metrics.umpyre_stats.empty_lines_ratio,0.13107302561002135
-metrics.umpyre_stats.comment_lines_ratio,0.06518261010613395
-metrics.umpyre_stats.function_lines_ratio,0.5996494151389252
-metrics.umpyre_stats.mean_lines_per_function,15.958157559109193
-metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.num_functions,20278
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539996
+metrics.umpyre_stats.empty_lines,70709
+metrics.umpyre_stats.comment_lines,35213
+metrics.umpyre_stats.docs_lines,42386
+metrics.umpyre_stats.function_lines,323551
+metrics.umpyre_stats.empty_lines_ratio,0.13094356254490774
+metrics.umpyre_stats.comment_lines_ratio,0.06520974229438736
+metrics.umpyre_stats.function_lines_ratio,0.5991729568367173
+metrics.umpyre_stats.mean_lines_per_function,15.95576486833021
+metrics.umpyre_stats.files_analyzed,1332
 metrics.umpyre_stats.pypi_version,0.1.8
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T14:15:34Z
@@ -48,4 +48,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.863758087158203
+collection_duration_seconds,7.84758186340332
