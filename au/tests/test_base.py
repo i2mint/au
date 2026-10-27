@@ -4,6 +4,7 @@ import json
 import os
 import pickle
 import threading
+import logging
 import time
 from pathlib import Path
 from datetime import timedelta
@@ -845,3 +846,41 @@ def test_a_spawned_process_says_when_the_middleware_does_not_pickle(
     with pytest.raises(ValueError, match="middleware that pickles"):
         backend.launch(_inc, (1,), {}, "k", store)
     assert "k" not in backend._processes
+
+
+# --- i2mint/au#17: level names, and SharedMetricsMiddleware at the top level ---
+
+
+@pytest.mark.parametrize("level", ["INFO", "info", logging.INFO])
+def test_logging_middleware_takes_a_level_name_or_number(level, caplog):
+    mw = LoggingMiddleware(level=level, logger_name="au.test17")
+    with caplog.at_level(logging.INFO, logger="au.test17"):
+        mw.before_compute(_inc, (1,), {}, "k")
+    assert mw.level == logging.INFO and "Starting computation k" in caplog.text
+
+
+def test_a_custom_level_name_is_found_as_registered():
+    logging.addLevelName(5, "trace17")
+    assert LoggingMiddleware(level="trace17").level == 5
+
+
+@pytest.mark.parametrize(
+    "level, error, says", [("noisy", ValueError, "'noisy'"), (20.0, TypeError, "20.0")]
+)
+def test_a_level_that_is_not_one_is_refused_at_construction(level, error, says):
+    with pytest.raises(error, match=says):
+        LoggingMiddleware(level=level)
+
+
+def test_observability_middleware_hands_its_level_name_to_logging_middleware():
+    from au.hooks import create_observability_middleware
+
+    stack = create_observability_middleware(logging_level="DEBUG")
+    (logging_mw,) = [m for m in stack.middlewares if isinstance(m, LoggingMiddleware)]
+    assert logging_mw.level == logging.DEBUG
+
+
+def test_shared_metrics_middleware_is_exported_from_au():
+    import au
+
+    assert au.SharedMetricsMiddleware is SharedMetricsMiddleware

@@ -550,10 +550,24 @@ class LoggingMiddleware(Middleware):
     """
     Middleware for logging computation lifecycle.
 
-    >>> middleware = LoggingMiddleware(level=logging.INFO)
+    >>> LoggingMiddleware(level=logging.INFO).level
+    20
+    >>> LoggingMiddleware(level="INFO").level
+    20
     """
 
-    def __init__(self, *, level: int = logging.DEBUG, logger_name: str | None = None):
+    def __init__(
+        self, *, level: int | str = logging.DEBUG, logger_name: str | None = None
+    ):
+        if isinstance(level, str):  # a level name: exact, else case-insensitive
+            resolved = logging.getLevelName(level)
+            if not isinstance(resolved, int):
+                resolved = logging.getLevelName(level.upper())
+            if not isinstance(resolved, int):
+                raise ValueError(f"Unknown logging level name: {level!r}")
+            level = resolved
+        elif not isinstance(level, int):
+            raise TypeError(f"level must be an int or a level name, not {level!r}")
         self.level = level
         self.logger = logging.getLogger(logger_name or __name__)
 

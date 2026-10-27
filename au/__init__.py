@@ -19,6 +19,7 @@ from au.base import (
     Middleware,
     LoggingMiddleware,
     MetricsMiddleware,
+    SharedMetricsMiddleware,
     temporary_async_compute,
 )
 
@@ -133,6 +134,7 @@ __all__ = [
     "Middleware",
     "LoggingMiddleware",
     "MetricsMiddleware",
+    "SharedMetricsMiddleware",
     "temporary_async_compute",
     # API
     "submit_task",

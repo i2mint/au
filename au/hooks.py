@@ -319,7 +319,7 @@ class CompositeMiddleware(Middleware):
 
 
 def create_observability_middleware(
-    logging_level: str = "INFO",
+    logging_level: int | str = "INFO",
     enable_metrics: bool = True,
     enable_tracing: bool = False,
     on_start: Optional[TaskEventHandler] = None,
@@ -341,17 +341,10 @@ def create_observability_middleware(
     """
     from au.base import LoggingMiddleware
 
-    # LoggingMiddleware.log() needs an int level; accept a level name too.
-    level = (
-        getattr(logging, logging_level.upper(), logging.INFO)
-        if isinstance(logging_level, str)
-        else logging_level
-    )
-
     middlewares = []
 
     # Add logging
-    middlewares.append(LoggingMiddleware(level=level))
+    middlewares.append(LoggingMiddleware(level=logging_level))
 
     # Add hooks if provided
     if on_start or on_complete or on_error:
