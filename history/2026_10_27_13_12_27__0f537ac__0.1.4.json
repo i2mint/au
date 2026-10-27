@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 5.153423547744751,
+  "commit_message": "ProcessBackend runs middleware in the child only; one rebuild rule for queues (#14)\n\n- ProcessBackend hands its middleware to the child, which runs\n  _compute_and_record: the parent no longer calls before_compute without a\n  matching release, and LoggingMiddleware no longer logs the start twice.\n  _worker_function and ProcessBackend._serialize_middleware are gone.\n- Queue workers (StdLibQueue, RQ, Supabase) rebuild middleware by one rule:\n  its class plus Middleware.worker_kwargs() (new, default {}; Logging and\n  SharedMetrics override it). Four serialisers with two rules become one\n  _middleware_configs. A class that rule cannot rebuild is refused at launch\n  instead of being silently dropped.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "0f537ac6f42cb4514223d861a58d77f5078deff8",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35372,
+      "comment_lines_ratio": 0.06520508854818581,
+      "docs_lines": 42452,
+      "empty_lines": 71113,
+      "empty_lines_ratio": 0.13109039528234584,
+      "files_analyzed": 1347,
+      "function_lines": 325282,
+      "function_lines_ratio": 0.5996279999188899,
+      "mean_lines_per_function": 15.95536371216952,
+      "num_classes": 3036,
+      "num_functions": 20387,
+      "pypi_version": "0.1.4",
+      "total_lines": 542473
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T13:07:31Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40509242411",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T13:12:26.286473Z",
+  "workflow_status": {}
+}
