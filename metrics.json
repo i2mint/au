@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 4.705158710479736,
-  "commit_message": "Merge 185662c5ac7020b768418e85435876450add532e into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
-  "commit_sha": "ddfe38c579ce783b47e2753399b9ebb83b5f34f4",
+  "collection_duration_seconds": 7.889423131942749,
+  "commit_message": "Re-review fixes: a queue job that cannot be set up fails too (#20)\n\n- _au_worker_entrypoint re-raises after recording a setup failure (a bad\n  pickle, a store it cannot rebuild), so the queue does not mark it done.\n- The dropped-middleware warning is a warnings.warn, shown once per call\n  site; wrapper.backend is documented as the backend it was decorated with.\n- The import-time task in the mock test uses an in-memory store.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "185662c5ac7020b768418e85435876450add532e",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.958155506499878,
       "num_classes": 3036,
       "num_functions": 20385,
-      "pypi_version": "0.1.7",
+      "pypi_version": "0.1.6",
       "total_lines": 542498
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:59:38.399690Z",
+  "timestamp": "2026-10-27T13:59:46.860201Z",
   "workflow_status": {}
 }

@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 7.889423131942749,
+  "commit_message": "Re-review fixes: a queue job that cannot be set up fails too (#20)\n\n- _au_worker_entrypoint re-raises after recording a setup failure (a bad\n  pickle, a store it cannot rebuild), so the queue does not mark it done.\n- The dropped-middleware warning is a warnings.warn, shown once per call\n  site; wrapper.backend is documented as the backend it was decorated with.\n- The import-time task in the mock test uses an in-memory store.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "185662c5ac7020b768418e85435876450add532e",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.0651836504466376,
+      "docs_lines": 42477,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.1310714509546579,
+      "files_analyzed": 1347,
+      "function_lines": 325307,
+      "function_lines_ratio": 0.5996464503094943,
+      "mean_lines_per_function": 15.958155506499878,
+      "num_classes": 3036,
+      "num_functions": 20385,
+      "pypi_version": "0.1.6",
+      "total_lines": 542498
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T13:57:49Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40516376124",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T13:59:46.860201Z",
+  "workflow_status": {}
+}

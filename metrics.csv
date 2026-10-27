@@ -1,8 +1,16 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:59:38.399690Z
-commit_sha,ddfe38c579ce783b47e2753399b9ebb83b5f34f4
-commit_message,Merge 185662c5ac7020b768418e85435876450add532e into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40
+timestamp,2026-10-27T13:59:46.860201Z
+commit_sha,185662c5ac7020b768418e85435876450add532e
+commit_message,"Re-review fixes: a queue job that cannot be set up fails too (#20)
+
+- _au_worker_entrypoint re-raises after recording a setup failure (a bad
+  pickle, a store it cannot rebuild), so the queue does not mark it done.
+- The dropped-middleware warning is a warnings.warn, shown once per call
+  site; wrapper.backend is documented as the backend it was decorated with.
+- The import-time task in the mock test uses an in-memory store.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
 metrics.umpyre_stats.num_functions,20385
 metrics.umpyre_stats.num_classes,3036
@@ -16,7 +24,7 @@ metrics.umpyre_stats.comment_lines_ratio,0.0651836504466376
 metrics.umpyre_stats.function_lines_ratio,0.5996464503094943
 metrics.umpyre_stats.mean_lines_per_function,15.958155506499878
 metrics.umpyre_stats.files_analyzed,1347
-metrics.umpyre_stats.pypi_version,0.1.7
+metrics.umpyre_stats.pypi_version,0.1.6
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:57:49Z
 metrics.workflow_status.recent_failure_count,0
@@ -36,4 +44,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,4.705158710479736
+collection_duration_seconds,7.889423131942749
