@@ -666,3 +666,85 @@ def test_a_queue_job_raising_a_base_exception_ends_failed_and_says_what(tmp_path
             )
             == 8
         ), "the queue worker did not survive"
+
+
+# --- i2mint/au#14: one middleware lifecycle, one reconstruction rule -----------
+
+
+def test_process_backend_runs_the_middleware_in_the_child_only(tmp_path):
+    """The parent used to run ``before_compute`` and never release it."""
+    store, mw = FileSystemStore(tmp_path, auto_cleanup=False), _Recorder()
+    backend = ProcessBackend(store, middleware=[mw])
+    assert async_compute(backend=backend, store=store)(_inc)(1).get_result(timeout=5)
+    assert not mw.in_flight and mw.calls == []
+
+
+class _Tally(MetricsMiddleware):
+    """Records on the class: a queue worker runs a rebuilt instance, not this one."""
+
+    seen: list = []
+
+    def __init__(self, tag="default"):
+        super().__init__()
+        self.tag = tag
+
+    def before_compute(self, func, args, kwargs, key):
+        _Tally.seen.append(("before", self.tag))
+
+    def after_compute(self, key, result):
+        _Tally.seen.append(("after", self.tag))
+
+
+class _NeedsATag(_Tally):
+    def __init__(self, tag):
+        super().__init__(tag)
+
+
+class _RebuildableTag(_NeedsATag):
+    def worker_kwargs(self):
+        return {"tag": self.tag}
+
+
+@pytest.mark.parametrize(
+    "middleware, seen",
+    [
+        (_Tally(), [("before", "default"), ("after", "default")]),
+        (_RebuildableTag("mine"), [("before", "mine"), ("after", "mine")]),
+    ],
+)
+def test_a_queue_worker_rebuilds_every_middleware(tmp_path, middleware, seen):
+    """A class outside au's three used to be dropped without a word."""
+    _Tally.seen.clear()
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    backend = StdLibQueueBackend(store, use_processes=False, middleware=[middleware])
+    with backend:
+        handle = async_compute(backend=backend, store=store)(_inc)(1)
+        assert handle.get_result(timeout=5) == 2
+    assert _Tally.seen == seen
+
+
+def test_a_middleware_a_worker_cannot_rebuild_is_refused_at_launch(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    backend = StdLibQueueBackend(
+        store, use_processes=False, middleware=[_NeedsATag("x")]
+    )
+    with backend, pytest.raises(TypeError, match="worker_kwargs"):
+        async_compute(backend=backend, store=store)(_inc)(1)
+
+
+def test_au_middleware_round_trips_through_its_worker_config():
+    import logging
+
+    from au.base import _middleware_configs, _reconstruct_middleware
+
+    logging_mw = LoggingMiddleware(level=logging.INFO, logger_name="au.test")
+    shared = SharedMetricsMiddleware()
+    rebuilt_logging, rebuilt_shared, rebuilt_metrics = _reconstruct_middleware(
+        _middleware_configs([logging_mw, shared, MetricsMiddleware()])
+    )
+    assert (rebuilt_logging.level, rebuilt_logging.logger) == (
+        logging.INFO,
+        logging_mw.logger,
+    )
+    assert rebuilt_shared.total_computations is shared.total_computations
+    assert isinstance(rebuilt_metrics, MetricsMiddleware)

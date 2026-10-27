@@ -57,6 +57,7 @@ from functools import wraps
 from pathlib import Path
 from typing import Any, Generic, Optional, TypeVar, Union, List, Dict
 from collections.abc import Callable
+import inspect
 import json
 import logging
 import multiprocessing
@@ -142,23 +143,32 @@ def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
         raise ValueError(f"Unknown store class: {store_class}")
 
 
+def _middleware_configs(middleware: list["Middleware"]) -> list[dict[str, Any]]:
+    """How each middleware is rebuilt in a queue worker: its class and its
+    :meth:`Middleware.worker_kwargs`.
+
+    Refuses, at launch, a middleware those cannot rebuild, rather than letting the
+    worker fail (or, as before, silently drop it).
+    """
+    configs = []
+    for mw in middleware:
+        cls, kwargs = type(mw), mw.worker_kwargs()
+        try:
+            inspect.signature(cls).bind(**kwargs)
+        except TypeError as e:
+            raise TypeError(
+                f"{cls.__name__} cannot be rebuilt in a worker from {kwargs} ({e}): "
+                "override its worker_kwargs() to return its constructor's arguments."
+            ) from None
+        configs.append({"class": cls, "kwargs": kwargs})
+    return configs
+
+
 def _reconstruct_middleware(
     middleware_configs: list[dict[str, Any]],
 ) -> list["Middleware"]:
-    """Reconstruct middleware instances from configuration."""
-    middleware_instances = []
-    for config in middleware_configs:
-        cls = config["class"]
-        mw_kwargs = config.get("kwargs", {})
-
-        if cls.__name__ == "LoggingMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-        elif cls.__name__ == "SharedMetricsMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-        elif cls.__name__ == "MetricsMiddleware":
-            middleware_instances.append(cls(**mw_kwargs))
-
-    return middleware_instances
+    """Rebuild the middleware :func:`_middleware_configs` described."""
+    return [config["class"](**config["kwargs"]) for config in middleware_configs]
 
 
 class ComputationStatus(Enum):
@@ -507,6 +517,15 @@ class Middleware(ABC):
         """Called when computation fails."""
         pass
 
+    def worker_kwargs(self) -> dict[str, Any]:
+        """Constructor arguments that rebuild this middleware in a queue worker.
+
+        Queue backends (``StdLibQueueBackend``, RQ, Supabase) send each
+        middleware as its class plus these, and rebuild it on the worker. Override
+        when the constructor needs arguments.
+        """
+        return {}
+
 
 class LoggingMiddleware(Middleware):
     """
@@ -518,6 +537,9 @@ class LoggingMiddleware(Middleware):
     def __init__(self, *, level: int = logging.DEBUG, logger_name: str | None = None):
         self.level = level
         self.logger = logging.getLogger(logger_name or __name__)
+
+    def worker_kwargs(self) -> dict[str, Any]:
+        return {"level": self.level, "logger_name": self.logger.name}
 
     def before_compute(
         self, func: Callable, args: tuple, kwargs: dict, key: str
@@ -634,6 +656,9 @@ class SharedMetricsMiddleware(Middleware):
                 "failed": self.failed_computations.value,
                 "avg_duration": avg_duration,
             }
+
+    def worker_kwargs(self) -> dict[str, Any]:
+        return self.get_shared_state()
 
     def get_shared_state(self):
         return dict(
@@ -816,24 +841,9 @@ def _explained_start_failure(error: Exception) -> Exception:
     return ValueError(
         f"The work cannot be sent to a spawned process ({type(error).__name__}: "
         f"{error}). The start method is {multiprocessing.get_start_method()!r}, "
-        "which pickles the function and its arguments: use a module-level "
-        "function, or ThreadBackend."
+        "which pickles the function, its arguments and the middleware: use a "
+        "module-level function, or ThreadBackend."
     )
-
-
-def _worker_function(
-    func: Callable,
-    args: tuple,
-    kwargs: dict,
-    store: ComputationStore,
-    key: str,
-    middleware_configs: list[dict[str, Any]],
-) -> None:
-    """Global worker function for multiprocessing with middleware support."""
-    middleware = [
-        config["class"](**config.get("kwargs", {})) for config in middleware_configs
-    ]
-    _compute_and_record(func, args, kwargs, key=key, store=store, middleware=middleware)
 
 
 class ProcessBackend(ComputationBackend):
@@ -866,27 +876,6 @@ class ProcessBackend(ComputationBackend):
             # Start method already set, which is fine
             pass
 
-    def _serialize_middleware(self) -> list[dict[str, Any]]:
-        """Serialize middleware for worker process."""
-        configs = []
-        for mw in self.middleware:
-            config = {"class": type(mw)}
-            # Add specific configs for known middleware types
-            if isinstance(mw, LoggingMiddleware):
-                config["kwargs"] = {
-                    "level": mw.level,
-                    "logger_name": (
-                        mw.logger.name if mw.logger.name != __name__ else None
-                    ),
-                }
-            elif isinstance(mw, SharedMetricsMiddleware):
-                # Pass shared state for process-safe metrics
-                config["kwargs"] = mw.get_shared_state()
-            elif isinstance(mw, MetricsMiddleware):
-                config["kwargs"] = {}
-            configs.append(config)
-        return configs
-
     def launch(
         self,
         func: Callable,
@@ -895,19 +884,18 @@ class ProcessBackend(ComputationBackend):
         key: str,
         store: ComputationStore | None = None,
     ) -> None:
-        """Launch computation in a new process."""
+        """Launch computation in a new process.
+
+        The middleware goes to the child with the work and runs there only, so
+        each ``before_compute`` is released by an ``after_compute`` or
+        ``on_error`` in the same process (i2mint/au#14). Count across processes
+        with :class:`SharedMetricsMiddleware`; a plain one counts in the child.
+        """
         store = self._resolve_store(store)
-
-        # Only run non-metrics middleware in the main process
-        main_process_middleware = [
-            mw for mw in self.middleware if not isinstance(mw, SharedMetricsMiddleware)
-        ]
-        _call_hooks(main_process_middleware, "before_compute", func, args, kwargs, key)
-
-        middleware_configs = self._serialize_middleware()
         process = multiprocessing.Process(
-            target=_worker_function,
-            args=(func, args, kwargs, store, key, middleware_configs),
+            target=_compute_and_record,
+            args=(func, args, kwargs),
+            kwargs=dict(key=key, store=store, middleware=self.middleware),
         )
         self._processes[key] = process
         try:
@@ -979,7 +967,7 @@ class StdLibQueueBackend(ComputationBackend):
             "kwargs": kwargs,
             "key": key,
             "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware_configs": self._serialize_middleware(),
+            "middleware_configs": _middleware_configs(self.middleware),
         }
         serialized_data = pickle.dumps(task_data)
 
@@ -999,27 +987,6 @@ class StdLibQueueBackend(ComputationBackend):
         if self._executor:
             self._executor.shutdown(wait=True)
             self._started = False
-
-    def _serialize_middleware(self) -> list[dict[str, Any]]:
-        """Serialize middleware for worker process."""
-        configs = []
-        for mw in self.middleware:
-            config = {"class": type(mw)}
-            # Add specific configs for known middleware types
-            if isinstance(mw, LoggingMiddleware):
-                config["kwargs"] = {
-                    "level": mw.level,
-                    "logger_name": (
-                        mw.logger.name if mw.logger.name != __name__ else None
-                    ),
-                }
-            elif isinstance(mw, SharedMetricsMiddleware):
-                # Pass shared state for process-safe metrics
-                config["kwargs"] = mw.get_shared_state()
-            elif isinstance(mw, MetricsMiddleware):
-                config["kwargs"] = {}
-            configs.append(config)
-        return configs
 
     def __enter__(self):
         """Context manager entry."""

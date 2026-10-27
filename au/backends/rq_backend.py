@@ -26,7 +26,11 @@ with contextlib.suppress(ImportError):
 
 # Import base classes
 try:
-    from au.base import ComputationBackend, _au_worker_entrypoint
+    from au.base import (
+        ComputationBackend,
+        _au_worker_entrypoint,
+        _middleware_configs,
+    )
 except ImportError:
     # Handle case where we're importing this before base is fully loaded
     pass
@@ -78,7 +82,7 @@ class RQBackend(ComputationBackend):
             "kwargs": kwargs,
             "key": key,
             "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware_configs": self._serialize_middleware(),
+            "middleware_configs": _middleware_configs(self.middleware),
         }
         serialized_data = pickle.dumps(task_data)
 
@@ -104,23 +108,3 @@ class RQBackend(ComputationBackend):
 
             logger = logging.getLogger(__name__)
             logger.warning(f"Could not terminate RQ job {key}: {e}")
-
-    def _serialize_middleware(self) -> list[dict[str, Any]]:
-        """Serialize middleware for worker process."""
-        configs = []
-        for mw in self.middleware:
-            config = {"class": type(mw)}
-            # Add specific configs for known middleware types
-            if hasattr(mw, "level") and hasattr(mw, "logger"):  # LoggingMiddleware
-                config["kwargs"] = {
-                    "level": mw.level,
-                    "logger_name": (
-                        mw.logger.name if mw.logger.name != __name__ else None
-                    ),
-                }
-            elif hasattr(mw, "get_shared_state"):  # SharedMetricsMiddleware
-                config["kwargs"] = mw.get_shared_state()
-            else:  # Basic middleware like MetricsMiddleware
-                config["kwargs"] = {}
-            configs.append(config)
-        return configs
