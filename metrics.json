@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.679963111877441,
-  "commit_message": "Merge 185662c5ac7020b768418e85435876450add532e into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
-  "commit_sha": "ddfe38c579ce783b47e2753399b9ebb83b5f34f4",
+  "collection_duration_seconds": 6.060168981552124,
+  "commit_message": "mock_async works; results keep the run's duration; failures report their cause (#23)\n\n* mock_async works; results keep the run's duration; failures report their cause (#20)\n\n- mock_async swaps a default-backend seam that async_compute and the simple\n  API both read (it set an attribute nothing read, so tasks ran on a\n  ProcessBackend); @async_compute may be used bare, as the README shows.\n- ComputationResult.started_at: a worker records when the run began, so\n  duration is the run's (it was ~0); TTL still counts from created_at.\n- get_result chains the original error as __cause__.\n- A failure the store will not record is raised after on_error, instead of\n  only logged with RUNNING left behind for good.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Review fixes: mock reaches import-time tasks; queue jobs fail with their cause (#20)\n\n- async_compute looks up the default backend per call, so mock_async also\n  reaches functions decorated at import time; it warns when the swapped\n  backend drops middleware given to async_compute.\n- @async_compute bare detection checks for .launch, not the class, so a\n  callable backend (a mock) is not wrapped as the function.\n- _au_worker_entrypoint's fallback covers only the task's setup: a failure\n  compute_and_record raises now reaches the queue (future, RQ job, Supabase\n  status) with its cause, instead of being swallowed and its cause\n  overwritten by the write error.\n- The unrecordable failure is logged as well as raised; started_at is taken\n  right before the call.\n- Tests: import-time decoration, a callable backend, the entrypoint; faster\n  TTL guard; the mock test writes nowhere outside memory.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Re-review fixes: a queue job that cannot be set up fails too (#20)\n\n- _au_worker_entrypoint re-raises after recording a setup failure (a bad\n  pickle, a store it cannot rebuild), so the queue does not mark it done.\n- The dropped-middleware warning is a warnings.warn, shown once per call\n  site; wrapper.backend is documented as the backend it was decorated with.\n- The import-time task in the mock test uses an in-memory store.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "27a77753f3314712f4e8ad4329cc72d5654937d4",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-10-27T13:57:49Z",
+      "last_success_timestamp": "2026-10-27T14:01:57Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/40516376124",
+      "run_url": "https://github.com/i2mint/au/actions/runs/40516837057",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:59:49.035955Z",
+  "timestamp": "2026-10-27T14:07:38.325884Z",
   "workflow_status": {}
 }
