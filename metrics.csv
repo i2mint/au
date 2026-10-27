@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:23:47.811731Z
+timestamp,2026-10-27T14:23:52.334516Z
 commit_sha,2694108df7cf038f33bf16c428978da952756707
 commit_message,"HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (part of #24)
 
@@ -12,18 +12,18 @@ commit_message,"HTTP endpoints report timing; RUNNING says when it began; mock k
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20387
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542525
-metrics.umpyre_stats.empty_lines,71106
-metrics.umpyre_stats.comment_lines,35360
-metrics.umpyre_stats.docs_lines,42484
-metrics.umpyre_stats.function_lines,325294
-metrics.umpyre_stats.empty_lines_ratio,0.13106492788350768
-metrics.umpyre_stats.comment_lines_ratio,0.06517671996682181
-metrics.umpyre_stats.function_lines_ratio,0.5995926455002074
-metrics.umpyre_stats.mean_lines_per_function,15.955952322558494
-metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.num_functions,20279
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539999
+metrics.umpyre_stats.empty_lines,70705
+metrics.umpyre_stats.comment_lines,35210
+metrics.umpyre_stats.docs_lines,42390
+metrics.umpyre_stats.function_lines,323522
+metrics.umpyre_stats.empty_lines_ratio,0.13093542765819938
+metrics.umpyre_stats.comment_lines_ratio,0.06520382445152677
+metrics.umpyre_stats.function_lines_ratio,0.5991159242887487
+metrics.umpyre_stats.mean_lines_per_function,15.953548005325706
+metrics.umpyre_stats.files_analyzed,1332
 metrics.umpyre_stats.pypi_version,0.1.8
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T14:23:36Z
@@ -44,4 +44,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.745429515838623
+collection_duration_seconds,7.813096761703491
