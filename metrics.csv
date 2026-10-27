@@ -1,33 +1,22 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:51:14.766118Z
-commit_sha,3f5c44c99a41b38df801fcc658feda87f06f6d2c
-commit_message,"mock_async works; results keep the run's duration; failures report their cause (#20)
-
-- mock_async swaps a default-backend seam that async_compute and the simple
-  API both read (it set an attribute nothing read, so tasks ran on a
-  ProcessBackend); @async_compute may be used bare, as the README shows.
-- ComputationResult.started_at: a worker records when the run began, so
-  duration is the run's (it was ~0); TTL still counts from created_at.
-- get_result chains the original error as __cause__.
-- A failure the store will not record is raised after on_error, instead of
-  only logged with RUNNING left behind for good.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T13:51:17.639483Z
+commit_sha,9556a909c392a9316ad597b60dab660d8c7a9983
+commit_message,Merge 3f5c44c99a41b38df801fcc658feda87f06f6d2c into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40
 python_version,3.10
-metrics.umpyre_stats.num_functions,20384
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542490
-metrics.umpyre_stats.empty_lines,71106
-metrics.umpyre_stats.comment_lines,35362
-metrics.umpyre_stats.docs_lines,42474
-metrics.umpyre_stats.function_lines,325285
-metrics.umpyre_stats.empty_lines_ratio,0.13107338384117678
-metrics.umpyre_stats.comment_lines_ratio,0.06518461169791148
-metrics.umpyre_stats.function_lines_ratio,0.5996147394422017
-metrics.umpyre_stats.mean_lines_per_function,15.957859105180534
-metrics.umpyre_stats.files_analyzed,1347
-metrics.umpyre_stats.pypi_version,0.1.6
+metrics.umpyre_stats.num_functions,20276
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539964
+metrics.umpyre_stats.empty_lines,70705
+metrics.umpyre_stats.comment_lines,35212
+metrics.umpyre_stats.docs_lines,42380
+metrics.umpyre_stats.function_lines,323513
+metrics.umpyre_stats.empty_lines_ratio,0.13094391477950382
+metrics.umpyre_stats.comment_lines_ratio,0.06521175485773126
+metrics.umpyre_stats.function_lines_ratio,0.5991380906875273
+metrics.umpyre_stats.mean_lines_per_function,15.955464588676268
+metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.pypi_version,0.1.7
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:49:54Z
 metrics.workflow_status.recent_failure_count,0
@@ -47,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.726547718048096
+collection_duration_seconds,4.90895938873291
