@@ -179,7 +179,7 @@ data-aria-dark="Switch to auto color mode">
 <td><p>Create a test store with optional configuration.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.mock_async" title="au.testing.mock_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mock_async</span></code></a>([backend])</p></td>
-<td><p>Context manager for mocking async execution.</p></td>
+<td><p>Run every task launched inside the block on a synchronous test backend.</p></td>
 </tr>
 </tbody>
 </table>
@@ -516,14 +516,16 @@ recorded FAILED, then re-raised to the caller.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="au.testing.mock_async">
 <span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">mock_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#mock_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.mock_async" title="Link to this definition">#</a></dt>
-<dd><p>Context manager for mocking async execution.</p>
+<dd><p>Run every task launched inside the block on a synchronous test backend.</p>
+<p>It becomes the default backend of <a class="reference internal" href="au.html#au.async_compute" title="au.async_compute"><code class="xref py py-func docutils literal notranslate"><span class="pre">au.async_compute()</span></code></a> (for functions
+decorated inside the block) and of the simple API (<code class="docutils literal notranslate"><span class="pre">au.submit_task</span></code>, …).</p>
 <p>Usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">with</span> <span class="n">mock_async</span><span class="p">()</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
 </span><span data-line="2">    <span class="nd">@async_compute</span>
 </span><span data-line="3">    <span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 </span><span data-line="4">        <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
 </span><span data-line="5">
-</span><span data-line="6">    <span class="n">handle</span> <span class="o">=</span> <span class="n">my_func</span><span class="o">.</span><span class="n">async_run</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="6">    <span class="n">handle</span> <span class="o">=</span> <span class="n">my_func</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </span><span data-line="7">    <span class="k">assert</span> <span class="n">mock</span><span class="o">.</span><span class="n">task_count</span> <span class="o">==</span> <span class="mi">1</span>
 </span><span data-line="8">    <span class="k">assert</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span> <span class="o">==</span> <span class="mi">10</span>
 </span></pre></div>
@@ -580,7 +582,7 @@ recorded FAILED, then re-raised to the caller.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=ca7ad2ea"></script>
+      <script src="../_static/documentation_options.js?v=22607128"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

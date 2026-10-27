@@ -6,10 +6,10 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 
 ### Functions
 
-| [`create_test_backend`](#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.   |
-|------------------------------------------------------------------------------------|------------------------------------------------------|
-| [`create_test_store`](#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.     |
-| [`mock_async`](#au.testing.mock_async)([backend])             | Context manager for mocking async execution.         |
+| [`create_test_backend`](#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.                      |
+|------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`create_test_store`](#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.                        |
+| [`mock_async`](#au.testing.mock_async)([backend])             | Run every task launched inside the block on a synchronous test backend. |
 
 ### Classes
 
@@ -227,7 +227,10 @@ Create a test store with optional configuration.
 
 ### au.testing.mock_async(backend=None)
 
-Context manager for mocking async execution.
+Run every task launched inside the block on a synchronous test backend.
+
+It becomes the default backend of [`au.async_compute()`](au.html.md#au.async_compute) (for functions
+decorated inside the block) and of the simple API (`au.submit_task`, …).
 
 Usage:
 
@@ -237,7 +240,7 @@ with mock_async() as mock:
     def my_func(n: int) -> int:
         return n * 2
 
-    handle = my_func.async_run(n=5)
+    handle = my_func(5)
     assert mock.task_count == 1
     assert handle.get_result() == 10
 ```

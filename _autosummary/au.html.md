@@ -25,7 +25,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`set_global_config`](#au.set_global_config)(config)                         | Set the global configuration instance.                                         |
 | [`reset_global_config`](#au.reset_global_config)()                             | Reset the global configuration to None.                                        |
 | [`retry_with_policy`](#au.retry_with_policy)(func[, args, kwargs, policy])   | Execute a function with retry policy.                                          |
-| [`mock_async`](#au.mock_async)([backend])                             | Context manager for mocking async execution.                                   |
+| [`mock_async`](#au.mock_async)([backend])                             | Run every task launched inside the block on a synchronous test backend.        |
 | [`create_test_backend`](#au.create_test_backend)(\*\*kwargs)                   | Create a test backend with optional configuration.                             |
 | [`create_test_store`](#au.create_test_store)(\*\*kwargs)                     | Create a test store with optional configuration.                               |
 | [`depends_on`](#au.depends_on)(\*dependency_funcs)                    | Decorator to specify task dependencies.                                        |
@@ -192,7 +192,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
+### *class* au.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None, started_at=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -206,7 +206,7 @@ True
 
 #### *property* duration *: [timedelta](https://docs.python.org/3/library/datetime.html#datetime.timedelta) | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
-Get computation duration if completed.
+How long the run took (from the record’s creation, if no start).
 
 #### *property* is_ready *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -1159,7 +1159,9 @@ Check if all dependencies are completed.
 Decorator to make functions asynchronous with status tracking.
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](au.base.html.md#au.base.ComputationBackend) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: ProcessBackend)
+  * **backend** ([`ComputationBackend`](au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
+    `_default_backend`, else ProcessBackend). `@async_compute` may
+    also be used bare, without parentheses.
   * **store** ([`ComputationStore`](au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -1497,7 +1499,10 @@ Create a FastAPI application for task management.
 
 ### au.mock_async(backend=None)
 
-Context manager for mocking async execution.
+Run every task launched inside the block on a synchronous test backend.
+
+It becomes the default backend of [`au.async_compute()`](#au.async_compute) (for functions
+decorated inside the block) and of the simple API (`au.submit_task`, …).
 
 Usage:
 
@@ -1507,7 +1512,7 @@ with mock_async() as mock:
     def my_func(n: int) -> int:
         return n * 2
 
-    handle = my_func.async_run(n=5)
+    handle = my_func(5)
     assert mock.task_count == 1
     assert handle.get_result() == 10
 ```

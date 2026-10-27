@@ -191,7 +191,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.base.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
+### *class* au.base.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None, started_at=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -205,7 +205,7 @@ True
 
 #### *property* duration *: [timedelta](https://docs.python.org/3/library/datetime.html#datetime.timedelta) | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
-Get computation duration if completed.
+How long the run took (from the record’s creation, if no start).
 
 #### *property* is_ready *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -523,7 +523,9 @@ Launch computation in a new thread.
 Decorator to make functions asynchronous with status tracking.
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](#au.base.ComputationBackend) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: ProcessBackend)
+  * **backend** ([`ComputationBackend`](#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
+    `_default_backend`, else ProcessBackend). `@async_compute` may
+    also be used bare, without parentheses.
   * **store** ([`ComputationStore`](#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)

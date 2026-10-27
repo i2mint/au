@@ -1,4 +1,4 @@
-> built 2026-10-27 13:49 UTC from 6e4540a (master) · au 0.1.7. Details: build_info.json
+> built 2026-10-27 14:08 UTC from 04e39a8 (master) · au 0.1.8. Details: build_info.json
 
 # index.html.md
 
@@ -1140,7 +1140,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.base.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
+### *class* au.base.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None, started_at=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1154,7 +1154,7 @@ True
 
 #### *property* duration *: [timedelta](https://docs.python.org/3/library/datetime.html#datetime.timedelta) | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
-Get computation duration if completed.
+How long the run took (from the record’s creation, if no start).
 
 #### *property* is_ready *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -1472,7 +1472,9 @@ Launch computation in a new thread.
 Decorator to make functions asynchronous with status tracking.
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: ProcessBackend)
+  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
+    `_default_backend`, else ProcessBackend). `@async_compute` may
+    also be used bare, without parentheses.
   * **store** ([`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -1910,7 +1912,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`set_global_config`](_autosummary/au.html.md#au.set_global_config)(config)                         | Set the global configuration instance.                                         |
 | [`reset_global_config`](_autosummary/au.html.md#au.reset_global_config)()                             | Reset the global configuration to None.                                        |
 | [`retry_with_policy`](_autosummary/au.html.md#au.retry_with_policy)(func[, args, kwargs, policy])   | Execute a function with retry policy.                                          |
-| [`mock_async`](_autosummary/au.html.md#au.mock_async)([backend])                             | Context manager for mocking async execution.                                   |
+| [`mock_async`](_autosummary/au.html.md#au.mock_async)([backend])                             | Run every task launched inside the block on a synchronous test backend.        |
 | [`create_test_backend`](_autosummary/au.html.md#au.create_test_backend)(\*\*kwargs)                   | Create a test backend with optional configuration.                             |
 | [`create_test_store`](_autosummary/au.html.md#au.create_test_store)(\*\*kwargs)                     | Create a test store with optional configuration.                               |
 | [`depends_on`](_autosummary/au.html.md#au.depends_on)(\*dependency_funcs)                    | Decorator to specify task dependencies.                                        |
@@ -2077,7 +2079,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
+### *class* au.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None, started_at=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2091,7 +2093,7 @@ True
 
 #### *property* duration *: [timedelta](https://docs.python.org/3/library/datetime.html#datetime.timedelta) | [None](https://docs.python.org/3/builtins/constants.html#None)*
 
-Get computation duration if completed.
+How long the run took (from the record’s creation, if no start).
 
 #### *property* is_ready *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
@@ -3044,7 +3046,9 @@ Check if all dependencies are completed.
 Decorator to make functions asynchronous with status tracking.
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: ProcessBackend)
+  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
+    `_default_backend`, else ProcessBackend). `@async_compute` may
+    also be used bare, without parentheses.
   * **store** ([`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -3382,7 +3386,10 @@ Create a FastAPI application for task management.
 
 ### au.mock_async(backend=None)
 
-Context manager for mocking async execution.
+Run every task launched inside the block on a synchronous test backend.
+
+It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) (for functions
+decorated inside the block) and of the simple API (`au.submit_task`, …).
 
 Usage:
 
@@ -3392,7 +3399,7 @@ with mock_async() as mock:
     def my_func(n: int) -> int:
         return n * 2
 
-    handle = my_func.async_run(n=5)
+    handle = my_func(5)
     assert mock.task_count == 1
     assert handle.get_result() == 10
 ```
@@ -3874,10 +3881,10 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 
 ### Functions
 
-| [`create_test_backend`](_autosummary/au.testing.html.md#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.   |
-|------------------------------------------------------------------------------------|------------------------------------------------------|
-| [`create_test_store`](_autosummary/au.testing.html.md#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.     |
-| [`mock_async`](_autosummary/au.testing.html.md#au.testing.mock_async)([backend])             | Context manager for mocking async execution.         |
+| [`create_test_backend`](_autosummary/au.testing.html.md#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.                      |
+|------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [`create_test_store`](_autosummary/au.testing.html.md#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.                        |
+| [`mock_async`](_autosummary/au.testing.html.md#au.testing.mock_async)([backend])             | Run every task launched inside the block on a synchronous test backend. |
 
 ### Classes
 
@@ -4095,7 +4102,10 @@ Create a test store with optional configuration.
 
 ### au.testing.mock_async(backend=None)
 
-Context manager for mocking async execution.
+Run every task launched inside the block on a synchronous test backend.
+
+It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) (for functions
+decorated inside the block) and of the simple API (`au.submit_task`, …).
 
 Usage:
 
@@ -4105,7 +4115,7 @@ with mock_async() as mock:
     def my_func(n: int) -> int:
         return n * 2
 
-    handle = my_func.async_run(n=5)
+    handle = my_func(5)
     assert mock.task_count == 1
     assert handle.get_result() == 10
 ```
@@ -4374,7 +4384,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 13:49 UTC** from commit <a href="https://github.com/i2mint/au/commit/6e4540ace398ffc3525887f4fe73dbd0b3aa6d40"><code>6e4540a</code></a> on branch <code>master</code>, for **au 0.1.7** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 14:08 UTC** from commit <a href="https://github.com/i2mint/au/commit/04e39a8f3b4dcfcc27e4a378c20566804f5b59bf"><code>04e39a8</code></a> on branch <code>master</code>, for **au 0.1.8** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4383,9 +4393,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/6e4540ace398ffc3525887f4fe73dbd0b3aa6d40"><code>6e4540ace398ffc3525887f4fe73dbd0b3aa6d40</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/04e39a8f3b4dcfcc27e4a378c20566804f5b59bf"><code>04e39a8f3b4dcfcc27e4a378c20566804f5b59bf</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.7</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.8</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4394,9 +4404,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40515173231">40515173231</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40517996089">40517996089</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>df5af6c3034fd6f5193498901b20c3021b31d8a0</code> (in the history of the built commit) |
+| Event commit | <code>27a77753f3314712f4e8ad4329cc72d5654937d4</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4421,13 +4431,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.7/">0.1.7</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.8/">0.1.8</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40
+git checkout 04e39a8f3b4dcfcc27e4a378c20566804f5b59bf
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
