@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 6.745429515838623,
+  "commit_message": "HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (part of #24)\n\n- The status and result endpoints read created_at/completed_at/duration\n  from the stored result (they read them off handle.metadata, a plain dict,\n  so they were never sent); one _timing helper for both.\n- _mark_running writes started_at, so a running job shows when it began.\n- mock_async also swaps the simple API's default store for an in-memory one.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "2694108df7cf038f33bf16c428978da952756707",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35360,
+      "comment_lines_ratio": 0.06517671996682181,
+      "docs_lines": 42484,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.13106492788350768,
+      "files_analyzed": 1347,
+      "function_lines": 325294,
+      "function_lines_ratio": 0.5995926455002074,
+      "mean_lines_per_function": 15.955952322558494,
+      "num_classes": 3036,
+      "num_functions": 20387,
+      "pypi_version": "0.1.8",
+      "total_lines": 542525
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T14:23:36Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40520527102",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T14:23:47.811731Z",
+  "workflow_status": {}
+}

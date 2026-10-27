@@ -1,62 +1,34 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:22:08.802368Z
-commit_sha,ecbc7257a954af04e6448f7cb316daa1db5c3efd
-commit_message,"The simple API applies the logging settings (AU_LOGGING_LEVEL, AU_LOGGING_ENABLED) (#26)
+timestamp,2026-10-27T14:23:47.811731Z
+commit_sha,2694108df7cf038f33bf16c428978da952756707
+commit_message,"HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (part of #24)
 
-* The simple API applies the logging settings (AU_LOGGING_LEVEL, AU_LOGGING_ENABLED) (#22)
+- The status and result endpoints read created_at/completed_at/duration
+  from the stored result (they read them off handle.metadata, a plain dict,
+  so they were never sent); one _timing helper for both.
+- _mark_running writes started_at, so a running job shows when it began.
+- mock_async also swaps the simple API's default store for an in-memory one.
 
-The default backend the simple API builds now carries a LoggingMiddleware
-at config.logging_level when config.logging_enabled (default True, as
-documented). Both settings were loaded and never read.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Review fixes: au logs nothing unless configured; a bad level names its setting (#22)
-
-- A NullHandler on the ""au"" logger: a failing task no longer prints a
-  traceback to stderr in an app that has not configured logging (the
-  caller gets the error from get_result anyway).
-- _middleware_from_config builds the middleware and re-raises a bad
-  AU_LOGGING_LEVEL under the setting's name.
-- The config docs say logging_level is the level task start/end is logged
-  at, not a filter.
-- Tests: AU_LOGGING_LEVEL changes what is logged (caplog), isolated from
-  ambient AU_* variables and config files; the refusal; the NullHandler.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Re-review fixes: quiet only the task logger, keep au's own errors visible (#22)
-
-The NullHandler on ""au"" also hid errors au catches and only logs (a result
-the store could not write, a failing hook), which master printed to stderr.
-The simple API's task logging now goes to its own ""au.tasks"" logger, and
-only that one has a NullHandler. The test fixture also sets USERPROFILE,
-which Path.home() reads on Windows.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
----------
-
-Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20386
+metrics.umpyre_stats.num_functions,20387
 metrics.umpyre_stats.num_classes,3036
 metrics.umpyre_stats.total_lines,542525
-metrics.umpyre_stats.empty_lines,71110
-metrics.umpyre_stats.comment_lines,35362
-metrics.umpyre_stats.docs_lines,42480
-metrics.umpyre_stats.function_lines,325323
-metrics.umpyre_stats.empty_lines_ratio,0.13107230081563062
-metrics.umpyre_stats.comment_lines_ratio,0.06518040643288328
-metrics.umpyre_stats.function_lines_ratio,0.5996460992580988
-metrics.umpyre_stats.mean_lines_per_function,15.958157559109193
+metrics.umpyre_stats.empty_lines,71106
+metrics.umpyre_stats.comment_lines,35360
+metrics.umpyre_stats.docs_lines,42484
+metrics.umpyre_stats.function_lines,325294
+metrics.umpyre_stats.empty_lines_ratio,0.13106492788350768
+metrics.umpyre_stats.comment_lines_ratio,0.06517671996682181
+metrics.umpyre_stats.function_lines_ratio,0.5995926455002074
+metrics.umpyre_stats.mean_lines_per_function,15.955952322558494
 metrics.umpyre_stats.files_analyzed,1347
 metrics.umpyre_stats.pypi_version,0.1.8
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T14:20:30Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T14:23:36Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40519993016
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40520527102
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -72,4 +44,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.38154673576355
+collection_duration_seconds,6.745429515838623
