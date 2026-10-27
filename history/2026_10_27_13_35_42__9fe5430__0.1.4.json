@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 7.861047029495239,
+  "commit_message": "Review fixes: real durations, one completion stamp, public helper names (#15)\n\n- compute_and_record takes created_at before the call, so a result's\n  duration is the run's (it was ~0 on every backend).\n- ComputationResult stamps completed_at on a terminal result when made; the\n  two stores' copies of that stamp are gone.\n- _compute_and_record / _call_hooks are used across modules: renamed\n  compute_and_record / call_hooks.\n- error and on_error are annotated BaseException; SyncTestBackend's\n  docstring says what it records.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "9fe5430b578d487620f76e406d3459eeada35117",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35365,
+      "comment_lines_ratio": 0.06519386718627583,
+      "docs_lines": 42466,
+      "empty_lines": 71107,
+      "empty_lines_ratio": 0.13108271777221872,
+      "files_analyzed": 1347,
+      "function_lines": 325265,
+      "function_lines_ratio": 0.5996121365854378,
+      "mean_lines_per_function": 15.956877943485086,
+      "num_classes": 3036,
+      "num_functions": 20384,
+      "pypi_version": "0.1.4",
+      "total_lines": 542459
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T13:34:22Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40512747077",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T13:35:41.459713Z",
+  "workflow_status": {}
+}

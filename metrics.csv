@@ -1,8 +1,19 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:35:34.802185Z
-commit_sha,c034af31a329547fb704c85d6c7e5b9ec695dab9
-commit_message,Merge 9fe5430b578d487620f76e406d3459eeada35117 into 2cdeefe3573737a7eb27084b156da4ee505cc484
+timestamp,2026-10-27T13:35:41.459713Z
+commit_sha,9fe5430b578d487620f76e406d3459eeada35117
+commit_message,"Review fixes: real durations, one completion stamp, public helper names (#15)
+
+- compute_and_record takes created_at before the call, so a result's
+  duration is the run's (it was ~0 on every backend).
+- ComputationResult stamps completed_at on a terminal result when made; the
+  two stores' copies of that stamp are gone.
+- _compute_and_record / _call_hooks are used across modules: renamed
+  compute_and_record / call_hooks.
+- error and on_error are annotated BaseException; SyncTestBackend's
+  docstring says what it records.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
 metrics.umpyre_stats.num_functions,20384
 metrics.umpyre_stats.num_classes,3036
@@ -16,7 +27,7 @@ metrics.umpyre_stats.comment_lines_ratio,0.06519386718627583
 metrics.umpyre_stats.function_lines_ratio,0.5996121365854378
 metrics.umpyre_stats.mean_lines_per_function,15.956877943485086
 metrics.umpyre_stats.files_analyzed,1347
-metrics.umpyre_stats.pypi_version,0.1.5
+metrics.umpyre_stats.pypi_version,0.1.4
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:34:22Z
 metrics.workflow_status.recent_failure_count,0
@@ -36,4 +47,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.556577920913696
+collection_duration_seconds,7.861047029495239

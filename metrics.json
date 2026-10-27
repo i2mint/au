@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 5.556577920913696,
-  "commit_message": "Merge 9fe5430b578d487620f76e406d3459eeada35117 into 2cdeefe3573737a7eb27084b156da4ee505cc484",
-  "commit_sha": "c034af31a329547fb704c85d6c7e5b9ec695dab9",
+  "collection_duration_seconds": 7.861047029495239,
+  "commit_message": "Review fixes: real durations, one completion stamp, public helper names (#15)\n\n- compute_and_record takes created_at before the call, so a result's\n  duration is the run's (it was ~0 on every backend).\n- ComputationResult stamps completed_at on a terminal result when made; the\n  two stores' copies of that stamp are gone.\n- _compute_and_record / _call_hooks are used across modules: renamed\n  compute_and_record / call_hooks.\n- error and on_error are annotated BaseException; SyncTestBackend's\n  docstring says what it records.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "9fe5430b578d487620f76e406d3459eeada35117",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.956877943485086,
       "num_classes": 3036,
       "num_functions": 20384,
-      "pypi_version": "0.1.5",
+      "pypi_version": "0.1.4",
       "total_lines": 542459
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:35:34.802185Z",
+  "timestamp": "2026-10-27T13:35:41.459713Z",
   "workflow_status": {}
 }
