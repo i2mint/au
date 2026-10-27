@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:22:04.850100Z
+timestamp,2026-10-27T14:22:08.802368Z
 commit_sha,ecbc7257a954af04e6448f7cb316daa1db5c3efd
 commit_message,"The simple API applies the logging settings (AU_LOGGING_LEVEL, AU_LOGGING_ENABLED) (#26)
 
@@ -40,18 +40,18 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20278
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539999
-metrics.umpyre_stats.empty_lines,70709
-metrics.umpyre_stats.comment_lines,35212
-metrics.umpyre_stats.docs_lines,42386
-metrics.umpyre_stats.function_lines,323551
-metrics.umpyre_stats.empty_lines_ratio,0.13094283507932422
-metrics.umpyre_stats.comment_lines_ratio,0.06520752816208919
-metrics.umpyre_stats.function_lines_ratio,0.5991696280919039
-metrics.umpyre_stats.mean_lines_per_function,15.95576486833021
-metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.num_functions,20386
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542525
+metrics.umpyre_stats.empty_lines,71110
+metrics.umpyre_stats.comment_lines,35362
+metrics.umpyre_stats.docs_lines,42480
+metrics.umpyre_stats.function_lines,325323
+metrics.umpyre_stats.empty_lines_ratio,0.13107230081563062
+metrics.umpyre_stats.comment_lines_ratio,0.06518040643288328
+metrics.umpyre_stats.function_lines_ratio,0.5996460992580988
+metrics.umpyre_stats.mean_lines_per_function,15.958157559109193
+metrics.umpyre_stats.files_analyzed,1347
 metrics.umpyre_stats.pypi_version,0.1.8
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T14:20:30Z
@@ -72,4 +72,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,4.687845230102539
+collection_duration_seconds,6.38154673576355
