@@ -1,67 +1,26 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:39:56.125680Z
-commit_sha,efb4ce6f7fd47552fa7d8a5cc95dc6c10c99e072
-commit_message,"SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#19)
-
-* SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#15)
-
-- SyncTestBackend.launch runs _compute_and_record, so the test double follows
-  the real backends' contract: BaseException recorded then re-raised, one
-  release hook per job, error stored as the exception (was str; see #18).
-- InMemoryStore stamps completed_at on a terminal write, as FileSystemStore
-  does, so results keep their duration.
-- CompositeMiddleware drives its children through _call_hooks: one failing
-  child no longer stops the rest.
-- ComputationBackend._run_middleware_* had no caller left: deleted.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Review fixes: real durations, one completion stamp, public helper names (#15)
-
-- compute_and_record takes created_at before the call, so a result's
-  duration is the run's (it was ~0 on every backend).
-- ComputationResult stamps completed_at on a terminal result when made; the
-  two stores' copies of that stamp are gone.
-- _compute_and_record / _call_hooks are used across modules: renamed
-  compute_and_record / call_hooks.
-- error and on_error are annotated BaseException; SyncTestBackend's
-  docstring says what it records.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Re-review fixes: keep TTL from created_at; stable completion time on read (#15)
-
-- Revert created_at=start: TTL expiry counts from created_at, so a job longer
-  than its TTL was expired the moment it finished. The duration question
-  goes to #20.
-- FileSystemStore._deserialize restores the stored completed_at instead of
-  letting __post_init__ stamp the read time.
-- on_error overrides are annotated BaseException like the protocol.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
----------
-
-Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T13:44:32.249895Z
+commit_sha,0b06e64f8ac2a1fc2d447ded3659fd381d7d3aed
+commit_message,Merge 8fd8074171c76e601e39a1465cd18506c31b8c97 into aab88233c2ae276beff656b7b2d95cd0691c85e6
 python_version,3.10
-metrics.umpyre_stats.num_functions,20276
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539928
-metrics.umpyre_stats.empty_lines,70706
-metrics.umpyre_stats.comment_lines,35216
-metrics.umpyre_stats.docs_lines,42372
-metrics.umpyre_stats.function_lines,323488
-metrics.umpyre_stats.empty_lines_ratio,0.13095449763672193
-metrics.umpyre_stats.comment_lines_ratio,0.06522351128298588
-metrics.umpyre_stats.function_lines_ratio,0.5991317360833296
-metrics.umpyre_stats.mean_lines_per_function,15.95423160386664
-metrics.umpyre_stats.files_analyzed,1332
-metrics.umpyre_stats.pypi_version,0.1.5
+metrics.umpyre_stats.num_functions,20384
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542455
+metrics.umpyre_stats.empty_lines,71106
+metrics.umpyre_stats.comment_lines,35365
+metrics.umpyre_stats.docs_lines,42466
+metrics.umpyre_stats.function_lines,325259
+metrics.umpyre_stats.empty_lines_ratio,0.13108184089002775
+metrics.umpyre_stats.comment_lines_ratio,0.0651943479182605
+metrics.umpyre_stats.function_lines_ratio,0.599605497230185
+metrics.umpyre_stats.mean_lines_per_function,15.956583594976452
+metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.pypi_version,0.1.6
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T13:38:33Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T13:41:36Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40513641024
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40514210134
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -77,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.46774697303772
+collection_duration_seconds,5.071789026260376
