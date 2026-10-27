@@ -83,46 +83,36 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
                         store_reconstruction_info, and middleware (the
                         instances themselves, rebuilt here by unpickling)
     """
+    task_data: dict = {}
     try:
-        # Deserialize the task data
         task_data = pickle.loads(serialized_data)
         func = task_data["func"]
         args = task_data["args"]
         kwargs = task_data["kwargs"]
         key = task_data["key"]
-        store_info = task_data["store_reconstruction_info"]
-        store = _reconstruct_store(store_info)
+        store = _reconstruct_store(task_data["store_reconstruction_info"])
         middleware = task_data.get("middleware")
         if middleware is None:
             middleware = _reconstruct_middleware(
                 task_data.get("middleware_configs", [])
             )
-
-        compute_and_record(
-            func, args, kwargs, key=key, store=store, middleware=middleware
-        )
-
     except Exception as e:
+        # The task could not even be set up: record that, if it says where.
         logger.error(f"Worker entrypoint failed: {e}", exc_info=True)
-        # Always write a failed result to the store on error
         try:
-            # Try to extract key and store if possible
-            key = (
-                task_data["key"]
-                if "task_data" in locals() and "key" in task_data
-                else None
-            )
-            store = (
-                _reconstruct_store(task_data["store_reconstruction_info"])
-                if "task_data" in locals() and "store_reconstruction_info" in task_data
-                else None
-            )
-            if key and store:
-                store[key] = ComputationResult(None, ComputationStatus.FAILED, error=e)
+            if "key" in task_data and "store_reconstruction_info" in task_data:
+                store = _reconstruct_store(task_data["store_reconstruction_info"])
+                failure = ComputationResult(None, ComputationStatus.FAILED, error=e)
+                _record_unless_cancelled(store, task_data["key"], failure)
         except Exception as inner_e:
             logger.error(
                 f"Failed to write failed result in worker entrypoint: {inner_e}"
             )
+        return
+
+    # Outside the handler above: what compute_and_record raises (a BaseException,
+    # or a failure the store would not record) reaches the queue's own record.
+    compute_and_record(func, args, kwargs, key=key, store=store, middleware=middleware)
 
 
 def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
@@ -803,10 +793,11 @@ def compute_and_record(
     ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
     then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
-    started = datetime.now()
+    started = None
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
+        started = datetime.now()
         value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
@@ -823,9 +814,9 @@ def compute_and_record(
         except Exception as e:
             unrecorded = e
         call_hooks(middleware, "on_error", key, error)
+        if unrecorded is not None:
+            logger.error(f"Could not record the failure of {key}: {unrecorded!r}")
         if not isinstance(error, Exception):
-            if unrecorded is not None:
-                logger.error(f"Could not record the failure of {key}: {unrecorded!r}")
             raise
         if unrecorded is not None:
             # The store holds RUNNING for good: fail loudly, so the worker's
@@ -1200,7 +1191,7 @@ def async_compute(
         >>> handle = slow_computation(5)  # Returns immediately
         >>> result = handle.get_result(timeout=10)
     """
-    if callable(backend) and not isinstance(backend, ComputationBackend):
+    if callable(backend) and not hasattr(backend, "launch"):
         decorate = async_compute(
             store=store,
             base_path=base_path,
@@ -1217,15 +1208,30 @@ def async_compute(
             serialization=serialization,  # This was missing - use the passed serialization
         )
 
-    if backend is None:
-        backend = _default_backend or ProcessBackend(store, middleware=middleware)
+    backend_given = backend is not None
+    if not backend_given:
+        backend = ProcessBackend(store, middleware=middleware)
+
+    def _active_backend() -> ComputationBackend:
+        """The default backend is looked up per call, so that one swapped in
+        later (:func:`au.testing.mock_async`) also reaches functions decorated
+        before, at import time."""
+        if backend_given or _default_backend is None:
+            return backend
+        if middleware:
+            logger.warning(
+                f"{type(_default_backend).__name__} replaces the default backend: "
+                "the middleware given to async_compute does not run"
+            )
+        return _default_backend
 
     def decorator(func: Callable[..., T]) -> Callable[..., ComputationHandle[T]]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> ComputationHandle[T]:
             key = store.create_key()
-            backend.launch(func, args, kwargs, key, store)
-            return ComputationHandle(key, store, backend)
+            active = _active_backend()
+            active.launch(func, args, kwargs, key, store)
+            return ComputationHandle(key, store, active)
 
         # Attach utility methods
         wrapper.cleanup_expired = lambda: store.cleanup_expired()

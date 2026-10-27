@@ -910,8 +910,8 @@ def test_a_long_job_is_not_expired_the_moment_it_finishes(tmp_path):
     """TTL still counts from the record's creation, not the run's start."""
     from au.base import compute_and_record
 
-    store = FileSystemStore(tmp_path, ttl_seconds=1, auto_cleanup=False)
-    compute_and_record(_naps, (1.2,), {}, key="k", store=store, middleware=[])
+    store = FileSystemStore(tmp_path, ttl_seconds=0.1, auto_cleanup=False)
+    compute_and_record(_naps, (0.15,), {}, key="k", store=store, middleware=[])
     assert not store.is_expired(store["k"])
 
 
@@ -930,20 +930,59 @@ def test_get_result_chains_the_original_error():
     assert isinstance(raised.value.__cause__, KeyError)
 
 
-def test_mock_async_runs_bare_decorated_tasks_and_the_simple_api_synchronously():
+@async_compute
+def _decorated_at_import(x):
+    return x + 100
+
+
+def test_mock_async_runs_every_default_backed_task_synchronously():
     import au.api
     import au.base
-    from au.testing import mock_async
+    from au.testing import InMemoryStore, mock_async
 
     before = (au.base._default_backend, au.api._default_backend)
     with mock_async() as mock:
 
-        @async_compute
+        @async_compute(store=InMemoryStore())
         def task(x):
             return x * 2
 
         assert task(5).get_result() == 10
-        key = au.api.submit_task(_double, 4)
-        assert au.api.get_result(key, timeout=1) == 8
-        assert mock.task_count == 2
+        # Decorated before the block, as module code is: looked up per call.
+        assert _decorated_at_import(1).get_result(timeout=1) == 101
+        assert au.api.submit_task(_double, 4, store=InMemoryStore())
+        assert mock.task_count == 3
     assert (au.base._default_backend, au.api._default_backend) == before
+
+
+def test_a_backend_that_is_callable_is_not_taken_for_the_function():
+    from unittest.mock import MagicMock
+
+    from au.testing import InMemoryStore
+
+    backend = MagicMock()  # callable, and not a ComputationBackend
+    async_compute(backend=backend, store=InMemoryStore())(_double)(3)
+    assert backend.launch.call_args.args[:3] == (_double, (3,), {})
+
+
+def test_a_queue_job_whose_failure_cannot_be_recorded_fails_its_queue_job(
+    monkeypatch,
+):
+    """The entrypoint used to swallow it, and overwrite the cause."""
+    import au.base as base
+
+    store = _Refusing(ComputationStatus.FAILED)
+    monkeypatch.setattr(base, "_reconstruct_store", lambda info: store)
+    payload = pickle.dumps(
+        dict(
+            func=_fails,
+            args=(),
+            kwargs={},
+            key="k",
+            store_reconstruction_info={},
+            middleware=[],
+        )
+    )
+    with pytest.raises(OSError) as raised:
+        base._au_worker_entrypoint(payload)
+    assert isinstance(raised.value.__cause__, KeyError)
