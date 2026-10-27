@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 import logging
 
-from au.base import Middleware, ComputationResult
+from au.base import Middleware, ComputationResult, call_hooks
 
 
 def _func_name(func: Any) -> str:
@@ -131,7 +131,7 @@ class HooksMiddleware(Middleware):
                 timestamp=event.timestamp,
             )
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Called when computation fails (base.Middleware protocol)."""
         event = TaskEvent(
             task_id=key,
@@ -210,7 +210,7 @@ class TracingMiddleware(Middleware):
 
             logging.debug(f"[TRACE] Completed span {span['span_id']} for {key}")
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Mark span as failed (base.Middleware protocol)."""
         if key in self._spans:
             span = self._spans[key]
@@ -257,7 +257,7 @@ class MetricsCollectorMiddleware(Middleware):
         if duration is not None:
             self._durations.append(duration)
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Record error metrics (base.Middleware protocol)."""
         self._status_counts["error"] += 1
 
@@ -304,18 +304,15 @@ class CompositeMiddleware(Middleware):
         self, func: Callable, args: tuple, kwargs: dict, key: str
     ) -> None:
         """Call before_compute on all middleware (base.Middleware protocol)."""
-        for middleware in self.middlewares:
-            middleware.before_compute(func, args, kwargs, key)
+        call_hooks(self.middlewares, "before_compute", func, args, kwargs, key)
 
     def after_compute(self, key: str, result: "ComputationResult") -> None:
         """Call after_compute on all middleware (base.Middleware protocol)."""
-        for middleware in self.middlewares:
-            middleware.after_compute(key, result)
+        call_hooks(self.middlewares, "after_compute", key, result)
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Call on_error on all middleware (base.Middleware protocol)."""
-        for middleware in self.middlewares:
-            middleware.on_error(key, error)
+        call_hooks(self.middlewares, "on_error", key, error)
 
 
 # Pre-configured middleware combinations

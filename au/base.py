@@ -98,7 +98,7 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
                 task_data.get("middleware_configs", [])
             )
 
-        _compute_and_record(
+        compute_and_record(
             func, args, kwargs, key=key, store=store, middleware=middleware
         )
 
@@ -237,11 +237,16 @@ class ComputationResult:
 
     value: Any
     status: ComputationStatus
-    error: Exception | None = None
+    error: BaseException | None = None
     created_at: datetime = field(default_factory=datetime.now)
     completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     terminal_reason: str | None = None
+
+    def __post_init__(self):
+        # A terminal result is stamped when made, whatever store holds it.
+        if self.is_ready and self.completed_at is None:
+            self.completed_at = datetime.now()
 
     @property
     def is_ready(self) -> bool:
@@ -416,19 +421,18 @@ class FileSystemStore(ComputationStore):
         else:  # PICKLE
             obj = pickle.loads(data)
 
-        return ComputationResult(
+        result = ComputationResult(
             value=obj.get("value"),
             status=ComputationStatus(obj["status"]),
             error=Exception(obj["error"]) if obj.get("error") else None,
             created_at=datetime.fromisoformat(obj["created_at"]),
-            completed_at=(
-                datetime.fromisoformat(obj["completed_at"])
-                if obj.get("completed_at")
-                else None
-            ),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
         )
+        # What was stored, not the read time __post_init__ would stamp.
+        completed_at = obj.get("completed_at")
+        result.completed_at = completed_at and datetime.fromisoformat(completed_at)
+        return result
 
     def __getitem__(self, key: str) -> ComputationResult:
         self._maybe_cleanup()
@@ -460,10 +464,6 @@ class FileSystemStore(ComputationStore):
 
     def __setitem__(self, key: str, result: ComputationResult) -> None:
         path = self._get_path(key)
-
-        # Update completion time if transitioning to ready state
-        if result.is_ready and result.completed_at is None:
-            result.completed_at = datetime.now()
 
         # A temp file of its own per write, on the same filesystem so the rename
         # is atomic. A shared ``<key>.json.tmp`` let two writers of one key (the
@@ -541,8 +541,8 @@ class Middleware(ABC):
         pass
 
     @abstractmethod
-    def on_error(self, key: str, error: Exception) -> None:
-        """Called when computation fails."""
+    def on_error(self, key: str, error: BaseException) -> None:
+        """Called when computation fails (``error`` may be a BaseException)."""
         pass
 
 
@@ -569,7 +569,7 @@ class LoggingMiddleware(Middleware):
         duration_str = f" in {duration.total_seconds():.2f}s" if duration else ""
         self.logger.log(self.level, f"Completed computation {key}{duration_str}")
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Log computation error."""
         self.logger.error(f"Computation {key} failed: {error}", exc_info=True)
 
@@ -618,7 +618,7 @@ class MetricsMiddleware(Middleware):
             if result.duration:
                 self.total_duration += result.duration.total_seconds()
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Update failure metrics."""
         with self._lock:
             self.failed_computations += 1
@@ -744,22 +744,8 @@ class ComputationBackend(ABC):
         """Attempt to terminate the computation. Default: do nothing."""
         pass
 
-    def _run_middleware_before(
-        self, func: Callable, args: tuple, kwargs: dict, key: str
-    ) -> None:
-        """Run all middleware before hooks."""
-        _call_hooks(self.middleware, "before_compute", func, args, kwargs, key)
 
-    def _run_middleware_after(self, key: str, result: ComputationResult) -> None:
-        """Run all middleware after hooks."""
-        _call_hooks(self.middleware, "after_compute", key, result)
-
-    def _run_middleware_error(self, key: str, error: Exception) -> None:
-        """Run all middleware error hooks."""
-        _call_hooks(self.middleware, "on_error", key, error)
-
-
-def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
+def call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
     """Call ``hook`` on every middleware, whatever the others raise.
 
     A failing hook is logged. A ``BaseException`` from one is re-raised once all
@@ -780,7 +766,7 @@ def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
         raise interrupt
 
 
-def _compute_and_record(
+def compute_and_record(
     func: Callable,
     args: tuple,
     kwargs: dict,
@@ -800,7 +786,7 @@ def _compute_and_record(
     then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
     try:
-        _call_hooks(middleware, "before_compute", func, args, kwargs, key)
+        call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
         result = _record_unless_cancelled(
             store,
@@ -813,11 +799,11 @@ def _compute_and_record(
             _record_unless_cancelled(store, key, failure)
         except Exception:
             logger.exception(f"Could not record the failure of {key}")
-        _call_hooks(middleware, "on_error", key, error)
+        call_hooks(middleware, "on_error", key, error)
         if not isinstance(error, Exception):
             raise
     else:
-        _call_hooks(middleware, "after_compute", key, result)
+        call_hooks(middleware, "after_compute", key, result)
 
 
 def _record_unless_cancelled(
@@ -922,7 +908,7 @@ class ProcessBackend(ComputationBackend):
         """
         store = self._resolve_store(store)
         process = multiprocessing.Process(
-            target=_compute_and_record,
+            target=compute_and_record,
             args=(func, args, kwargs),
             kwargs=dict(key=key, store=store, middleware=self.middleware),
         )
@@ -1234,7 +1220,7 @@ class ThreadBackend(ComputationBackend):
         store = self._resolve_store(store)
 
         def _worker():
-            _compute_and_record(
+            compute_and_record(
                 func, args, kwargs, key=key, store=store, middleware=self.middleware
             )
 
