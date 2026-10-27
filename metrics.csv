@@ -1,8 +1,36 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:04:17.318919Z
-commit_sha,c6f889bb1940e6d4d299f15599515d92b1348e02
-commit_message,"Re-review fixes: a failed read never loses a finished job (#12)
+timestamp,2026-10-27T13:05:58.697512Z
+commit_sha,dafeed2a83b2487049daa9b1a9d438af5ddba2cf
+commit_message,"Workers record every failure and always run the middleware release hook (#13)
+
+* Workers record every failure and always run the middleware release hook (#12)
+
+ThreadBackend, ProcessBackend's worker and the queue entrypoint each carried
+their own copy of compute/record/hooks, and all three caught only Exception
+and wrote RUNNING outside the try. One _compute_and_record now runs in all
+three: a BaseException is recorded FAILED then re-raised, a failing store
+write (RUNNING, COMPLETED or FAILED) still ends in on_error, and exactly one
+of after_compute / on_error follows every before_compute. The three hook
+loops become one _call_hooks.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* Review fixes: a cancellation is final, hooks cannot strand each other (#12)
+
+- The worker's COMPLETED/FAILED write no longer overwrites a CANCELLED record
+  (a cancelled job ending in a BaseException used to leave CANCELLED; the
+  first pass turned it into FAILED).
+- _call_hooks runs every middleware even when one raises a BaseException,
+  then re-raises it; before_compute runs inside the try, so a hook interrupt
+  is recorded FAILED and still followed by on_error.
+- FileSystemStore keeps the exception type name when str(error) is empty.
+- Hook and record failures are logged with tracebacks.
+- Tests: cancellation is final, interrupting hooks, the queue path.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+* Re-review fixes: a failed read never loses a finished job (#12)
 
 - _record_unless_cancelled treats a failing read as ""not cancelled"" and
   returns what the store holds, so after_compute sees CANCELLED, not the
@@ -12,20 +40,24 @@ commit_message,"Re-review fixes: a failed read never loses a finished job (#12)
 - cancel()'s docstring states the new rule and its remaining race.
 - The cancellation test asserts the raise and which hook ran.
 
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20280
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,540012
-metrics.umpyre_stats.empty_lines,70714
-metrics.umpyre_stats.comment_lines,35229
-metrics.umpyre_stats.docs_lines,42348
-metrics.umpyre_stats.function_lines,323583
-metrics.umpyre_stats.empty_lines_ratio,0.13094894187536574
-metrics.umpyre_stats.comment_lines_ratio,0.06523743916801848
-metrics.umpyre_stats.function_lines_ratio,0.5992144619008466
-metrics.umpyre_stats.mean_lines_per_function,15.955769230769231
-metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.num_functions,20388
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542538
+metrics.umpyre_stats.empty_lines,71115
+metrics.umpyre_stats.comment_lines,35379
+metrics.umpyre_stats.docs_lines,42442
+metrics.umpyre_stats.function_lines,325355
+metrics.umpyre_stats.empty_lines_ratio,0.1310783760768831
+metrics.umpyre_stats.comment_lines_ratio,0.0652101788261836
+metrics.umpyre_stats.function_lines_ratio,0.5996907129085889
+metrics.umpyre_stats.mean_lines_per_function,15.958161663723759
+metrics.umpyre_stats.files_analyzed,1347
 metrics.umpyre_stats.pypi_version,0.1.3
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:03:51Z
@@ -46,4 +78,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.098496437072754
+collection_duration_seconds,7.843643426895142
