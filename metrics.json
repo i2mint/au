@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.536346435546875,
-  "commit_message": "Merge cf226dea81fbdf9b9a97ea70adc3d4f13e713944 into 04e39a8f3b4dcfcc27e4a378c20566804f5b59bf",
-  "commit_sha": "96daf662f59c33a33d679af1c8464a72e0b77b7a",
+  "collection_duration_seconds": 7.7827088832855225,
+  "commit_message": "The simple API applies the logging settings (AU_LOGGING_LEVEL, AU_LOGGING_ENABLED) (#22)\n\nThe default backend the simple API builds now carries a LoggingMiddleware\nat config.logging_level when config.logging_enabled (default True, as\ndocumented). Both settings were loaded and never read.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "cf226dea81fbdf9b9a97ea70adc3d4f13e713944",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35362,
-      "comment_lines_ratio": 0.06518220862288253,
-      "docs_lines": 42477,
-      "empty_lines": 71107,
-      "empty_lines_ratio": 0.13107039501576007,
-      "files_analyzed": 1347,
-      "function_lines": 325319,
-      "function_lines_ratio": 0.5996553058929789,
-      "mean_lines_per_function": 15.958744174638214,
-      "num_classes": 3036,
-      "num_functions": 20385,
+      "comment_lines": 35212,
+      "comment_lines_ratio": 0.06520933953598625,
+      "docs_lines": 42383,
+      "empty_lines": 70706,
+      "empty_lines_ratio": 0.13094091676790423,
+      "files_analyzed": 1332,
+      "function_lines": 323547,
+      "function_lines_ratio": 0.5991788645589499,
+      "mean_lines_per_function": 15.956354490309216,
+      "num_classes": 3021,
+      "num_functions": 20277,
       "pypi_version": "0.1.8",
-      "total_lines": 542510
+      "total_lines": 539984
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:14:33.557935Z",
+  "timestamp": "2026-10-27T14:14:44.031198Z",
   "workflow_status": {}
 }

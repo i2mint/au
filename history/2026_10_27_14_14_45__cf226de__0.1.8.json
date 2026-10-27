@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 7.7827088832855225,
+  "commit_message": "The simple API applies the logging settings (AU_LOGGING_LEVEL, AU_LOGGING_ENABLED) (#22)\n\nThe default backend the simple API builds now carries a LoggingMiddleware\nat config.logging_level when config.logging_enabled (default True, as\ndocumented). Both settings were loaded and never read.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "cf226dea81fbdf9b9a97ea70adc3d4f13e713944",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35212,
+      "comment_lines_ratio": 0.06520933953598625,
+      "docs_lines": 42383,
+      "empty_lines": 70706,
+      "empty_lines_ratio": 0.13094091676790423,
+      "files_analyzed": 1332,
+      "function_lines": 323547,
+      "function_lines_ratio": 0.5991788645589499,
+      "mean_lines_per_function": 15.956354490309216,
+      "num_classes": 3021,
+      "num_functions": 20277,
+      "pypi_version": "0.1.8",
+      "total_lines": 539984
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T14:12:29Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40518344616",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T14:14:44.031198Z",
+  "workflow_status": {}
+}
