@@ -1,20 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T12:58:31.984824Z
-commit_sha,a4b80f4f5058bff9d12c06dbf4192c3a72a284a4
-commit_message,"Review fixes: a cancellation is final, hooks cannot strand each other (#12)
-
-- The worker's COMPLETED/FAILED write no longer overwrites a CANCELLED record
-  (a cancelled job ending in a BaseException used to leave CANCELLED; the
-  first pass turned it into FAILED).
-- _call_hooks runs every middleware even when one raises a BaseException,
-  then re-raises it; before_compute runs inside the try, so a hook interrupt
-  is recorded FAILED and still followed by on_error.
-- FileSystemStore keeps the exception type name when str(error) is empty.
-- Hook and record failures are logged with tracebacks.
-- Tests: cancellation is final, interrupting hooks, the queue path.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T12:58:40.178936Z
+commit_sha,a7c55d769fb84844b6f4137f743b79f7ba132519
+commit_message,Merge a4b80f4f5058bff9d12c06dbf4192c3a72a284a4 into 3e8b0243a16e074179cd97ff810f402eeaa4ed29
 python_version,3.10
 metrics.umpyre_stats.num_functions,20388
 metrics.umpyre_stats.num_classes,3036
@@ -48,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.443143129348755
+collection_duration_seconds,6.146556377410889
