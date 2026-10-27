@@ -1,22 +1,38 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:56:23.476912Z
-commit_sha,c710ec25ef1a216eee5beb209d529b39dd9befcc
-commit_message,Merge 89fcfc6d44c28e25ce7b869fe820e8bceadc77e0 into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40
+timestamp,2026-10-27T13:56:30.340816Z
+commit_sha,89fcfc6d44c28e25ce7b869fe820e8bceadc77e0
+commit_message,"Review fixes: mock reaches import-time tasks; queue jobs fail with their cause (#20)
+
+- async_compute looks up the default backend per call, so mock_async also
+  reaches functions decorated at import time; it warns when the swapped
+  backend drops middleware given to async_compute.
+- @async_compute bare detection checks for .launch, not the class, so a
+  callable backend (a mock) is not wrapped as the function.
+- _au_worker_entrypoint's fallback covers only the task's setup: a failure
+  compute_and_record raises now reaches the queue (future, RQ job, Supabase
+  status) with its cause, instead of being swallowed and its cause
+  overwritten by the write error.
+- The unrecordable failure is logged as well as raised; started_at is taken
+  right before the call.
+- Tests: import-time decoration, a callable backend, the entrypoint; faster
+  TTL guard; the mock test writes nowhere outside memory.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20277
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539970
-metrics.umpyre_stats.empty_lines,70705
-metrics.umpyre_stats.comment_lines,35212
-metrics.umpyre_stats.docs_lines,42383
-metrics.umpyre_stats.function_lines,323533
-metrics.umpyre_stats.empty_lines_ratio,0.13094245976628333
-metrics.umpyre_stats.comment_lines_ratio,0.06521103024242088
-metrics.umpyre_stats.function_lines_ratio,0.5991684723225364
-metrics.umpyre_stats.mean_lines_per_function,15.955664052867782
-metrics.umpyre_stats.files_analyzed,1332
-metrics.umpyre_stats.pypi_version,0.1.7
+metrics.umpyre_stats.num_functions,20385
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542496
+metrics.umpyre_stats.empty_lines,71106
+metrics.umpyre_stats.comment_lines,35362
+metrics.umpyre_stats.docs_lines,42477
+metrics.umpyre_stats.function_lines,325305
+metrics.umpyre_stats.empty_lines_ratio,0.1310719341709432
+metrics.umpyre_stats.comment_lines_ratio,0.0651838907567982
+metrics.umpyre_stats.function_lines_ratio,0.5996449743408246
+metrics.umpyre_stats.mean_lines_per_function,15.958057395143488
+metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.pypi_version,0.1.6
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:51:39Z
 metrics.workflow_status.recent_failure_count,0
@@ -36,4 +52,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.1707000732421875
+collection_duration_seconds,7.951136589050293

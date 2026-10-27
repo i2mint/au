@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.1707000732421875,
-  "commit_message": "Merge 89fcfc6d44c28e25ce7b869fe820e8bceadc77e0 into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
-  "commit_sha": "c710ec25ef1a216eee5beb209d529b39dd9befcc",
+  "collection_duration_seconds": 7.951136589050293,
+  "commit_message": "Review fixes: mock reaches import-time tasks; queue jobs fail with their cause (#20)\n\n- async_compute looks up the default backend per call, so mock_async also\n  reaches functions decorated at import time; it warns when the swapped\n  backend drops middleware given to async_compute.\n- @async_compute bare detection checks for .launch, not the class, so a\n  callable backend (a mock) is not wrapped as the function.\n- _au_worker_entrypoint's fallback covers only the task's setup: a failure\n  compute_and_record raises now reaches the queue (future, RQ job, Supabase\n  status) with its cause, instead of being swallowed and its cause\n  overwritten by the write error.\n- The unrecordable failure is logged as well as raised; started_at is taken\n  right before the call.\n- Tests: import-time decoration, a callable backend, the entrypoint; faster\n  TTL guard; the mock test writes nowhere outside memory.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "89fcfc6d44c28e25ce7b869fe820e8bceadc77e0",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35212,
-      "comment_lines_ratio": 0.06521103024242088,
-      "docs_lines": 42383,
-      "empty_lines": 70705,
-      "empty_lines_ratio": 0.13094245976628333,
-      "files_analyzed": 1332,
-      "function_lines": 323533,
-      "function_lines_ratio": 0.5991684723225364,
-      "mean_lines_per_function": 15.955664052867782,
-      "num_classes": 3021,
-      "num_functions": 20277,
-      "pypi_version": "0.1.7",
-      "total_lines": 539970
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.0651838907567982,
+      "docs_lines": 42477,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.1310719341709432,
+      "files_analyzed": 1347,
+      "function_lines": 325305,
+      "function_lines_ratio": 0.5996449743408246,
+      "mean_lines_per_function": 15.958057395143488,
+      "num_classes": 3036,
+      "num_functions": 20385,
+      "pypi_version": "0.1.6",
+      "total_lines": 542496
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:56:23.476912Z",
+  "timestamp": "2026-10-27T13:56:30.340816Z",
   "workflow_status": {}
 }
