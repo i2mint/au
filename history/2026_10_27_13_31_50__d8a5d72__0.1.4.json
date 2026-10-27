@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 6.460653066635132,
+  "commit_message": "SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#15)\n\n- SyncTestBackend.launch runs _compute_and_record, so the test double follows\n  the real backends' contract: BaseException recorded then re-raised, one\n  release hook per job, error stored as the exception (was str; see #18).\n- InMemoryStore stamps completed_at on a terminal write, as FileSystemStore\n  does, so results keep their duration.\n- CompositeMiddleware drives its children through _call_hooks: one failing\n  child no longer stops the rest.\n- ComputationBackend._run_middleware_* had no caller left: deleted.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "d8a5d7283a7e69d8b884f3608daec36f1d4c7696",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35215,
+      "comment_lines_ratio": 0.06522190077899565,
+      "docs_lines": 42368,
+      "empty_lines": 70705,
+      "empty_lines_ratio": 0.13095313061419528,
+      "files_analyzed": 1332,
+      "function_lines": 323487,
+      "function_lines_ratio": 0.5991321032882284,
+      "mean_lines_per_function": 15.954969173859432,
+      "num_classes": 3021,
+      "num_functions": 20275,
+      "pypi_version": "0.1.4",
+      "total_lines": 539926
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T13:28:44Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40512078082",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T13:31:50.081895Z",
+  "workflow_status": {}
+}

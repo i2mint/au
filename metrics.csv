@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:31:47.185171Z
+timestamp,2026-10-27T13:31:50.081895Z
 commit_sha,d8a5d7283a7e69d8b884f3608daec36f1d4c7696
 commit_message,"SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#15)
 
@@ -15,18 +15,18 @@ commit_message,"SyncTestBackend and CompositeMiddleware use the shared worker bo
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20383
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542452
-metrics.umpyre_stats.empty_lines,71106
-metrics.umpyre_stats.comment_lines,35365
-metrics.umpyre_stats.docs_lines,42462
-metrics.umpyre_stats.function_lines,325259
-metrics.umpyre_stats.empty_lines_ratio,0.13108256583070946
-metrics.umpyre_stats.comment_lines_ratio,0.06519470847190166
-metrics.umpyre_stats.function_lines_ratio,0.5996088133143578
-metrics.umpyre_stats.mean_lines_per_function,15.957366432811657
-metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.num_functions,20275
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539926
+metrics.umpyre_stats.empty_lines,70705
+metrics.umpyre_stats.comment_lines,35215
+metrics.umpyre_stats.docs_lines,42368
+metrics.umpyre_stats.function_lines,323487
+metrics.umpyre_stats.empty_lines_ratio,0.13095313061419528
+metrics.umpyre_stats.comment_lines_ratio,0.06522190077899565
+metrics.umpyre_stats.function_lines_ratio,0.5991321032882284
+metrics.umpyre_stats.mean_lines_per_function,15.954969173859432
+metrics.umpyre_stats.files_analyzed,1332
 metrics.umpyre_stats.pypi_version,0.1.4
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:28:44Z
@@ -47,4 +47,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.552989959716797
+collection_duration_seconds,6.460653066635132
