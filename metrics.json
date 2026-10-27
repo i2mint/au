@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 8.152384996414185,
-  "commit_message": "ProcessBackend runs middleware in the child only; one rebuild rule for queues (#14)\n\n- ProcessBackend hands its middleware to the child, which runs\n  _compute_and_record: the parent no longer calls before_compute without a\n  matching release, and LoggingMiddleware no longer logs the start twice.\n  _worker_function and ProcessBackend._serialize_middleware are gone.\n- Queue workers (StdLibQueue, RQ, Supabase) rebuild middleware by one rule:\n  its class plus Middleware.worker_kwargs() (new, default {}; Logging and\n  SharedMetrics override it). Four serialisers with two rules become one\n  _middleware_configs. A class that rule cannot rebuild is refused at launch\n  instead of being silently dropped.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "0f537ac6f42cb4514223d861a58d77f5078deff8",
+  "collection_duration_seconds": 7.746378421783447,
+  "commit_message": "Merge 0f537ac6f42cb4514223d861a58d77f5078deff8 into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14",
+  "commit_sha": "aaaa842c1170be236cd71d8e944ddc8087afce5e",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:12:46.087583Z",
+  "timestamp": "2026-10-27T13:12:53.257048Z",
   "workflow_status": {}
 }
