@@ -61,7 +61,7 @@ Get info needed to reconstruct this store.
 * **Returns:**
   Dictionary with store type and parameters
 
-### *class* au.testing.MockTaskTracker(task_count=0, tasks_by_name=<factory>, all_tasks=<factory>)
+### *class* au.testing.MockTaskTracker(task_count=0, tasks_by_name=dict(), all_tasks=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -71,13 +71,22 @@ Tracks task executions for testing.
 
 Total number of tasks executed
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### tasks_by_name
 
 Dictionary mapping function names to call records
 
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`TaskCallRecord`](#au.testing.TaskCallRecord)]]
+
 #### all_tasks
 
 List of all task call records
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`TaskCallRecord`](#au.testing.TaskCallRecord)]
 
 #### call_count(func_name)
 
@@ -163,7 +172,7 @@ No-op for synchronous backend (already completed).
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.testing.TaskCallRecord(func_name, args, kwargs, timestamp=<factory>)
+### *class* au.testing.TaskCallRecord(func_name, args, kwargs, timestamp=time())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

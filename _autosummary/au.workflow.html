@@ -7,6 +7,7 @@
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
     <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -366,7 +367,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TaskState.PENDING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowTask" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tuple()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TaskState.PENDING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowTask" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A task in a workflow with dependencies.</p>
 <dl class="field-list simple">
@@ -375,48 +376,88 @@ data-aria-dark="Switch to auto color mode">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.func">
 <span class="sig-name descname"><span class="pre">func</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.func" title="Link to this definition">#</a></dt>
 <dd><p>Function to execute</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.args">
 <span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.args" title="Link to this definition">#</a></dt>
 <dd><p>Positional arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.kwargs">
 <span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.kwargs" title="Link to this definition">#</a></dt>
 <dd><p>Keyword arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.depends_on">
 <span class="sig-name descname"><span class="pre">depends_on</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.depends_on" title="Link to this definition">#</a></dt>
 <dd><p>List of task IDs this task depends on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.task_id">
 <span class="sig-name descname"><span class="pre">task_id</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.task_id" title="Link to this definition">#</a></dt>
 <dd><p>Unique task ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.state">
 <span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.state" title="Link to this definition">#</a></dt>
 <dd><p>Current state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.workflow.TaskState" title="au.workflow.TaskState"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskState</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.result">
 <span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.result" title="Link to this definition">#</a></dt>
 <dd><p>Result value (when completed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.workflow.WorkflowTask.error">
 <span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#au.workflow.WorkflowTask.error" title="Link to this definition">#</a></dt>
 <dd><p>Error message (when failed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -504,7 +545,7 @@ require integration with the async_compute decorator.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=360bc84d"></script>
+      <script src="../_static/documentation_options.js?v=fd825880"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

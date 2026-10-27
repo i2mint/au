@@ -7,6 +7,7 @@
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
     <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -548,7 +549,7 @@ data-aria-dark="Switch to auto color mode">
 <dd><p>Call after_compute on all middleware (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,7 +560,7 @@ data-aria-dark="Switch to auto color mode">
 <dd><p>Call before_compute on all middleware (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -570,7 +571,7 @@ data-aria-dark="Switch to auto color mode">
 <dd><p>Call on_error on all middleware (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -589,8 +590,8 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.ComputationHandle">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">ComputationHandle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ComputationHandle" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T</span></code>]</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">ComputationHandle</span></span><span class="sig-paren">[</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">]</span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ComputationHandle" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generic" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a>[<code class="docutils literal notranslate"><span class="pre">T</span></code>]</p>
 <p>Handle to check status and retrieve results of async computation.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="s2">"test-key"</span><span class="p">,</span> <span class="n">FileSystemStore</span><span class="p">(</span><span class="s2">"/tmp"</span><span class="p">))</span>
 </span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">is_ready</span><span class="p">()</span>
@@ -621,9 +622,11 @@ a genuine failure via <a class="reference internal" href="#au.get_status" title=
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Only a backend that can stop the work (<code class="docutils literal notranslate"><span class="pre">ProcessBackend</span></code>) makes
-CANCELLED final. A thread, or a pool task that is already running,
-cannot be stopped and may still write its own result afterwards.</p>
+<p>A thread, or a pool task that is already running, cannot be
+stopped; the au workers keep CANCELLED final anyway by not writing
+their outcome over it. <code class="docutils literal notranslate"><span class="pre">after_compute</span></code> then receives the CANCELLED
+result. A worker finishing in the instant between its check and its
+write can still overwrite it (no compare-and-set).</p>
 </div>
 </dd></dl>
 
@@ -633,7 +636,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 <dd><p>Get the computation result, optionally waiting for completion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Maximum seconds to wait. None means no waiting.</p>
+<dd class="field-odd"><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Maximum seconds to wait. None means no waiting.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -642,7 +645,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 </ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">T</span></code>)</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="docutils literal notranslate"><span class="pre">T</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -679,7 +682,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.ComputationResult">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">ComputationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal_reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ComputationResult" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">ComputationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.now()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal_reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ComputationResult" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Result of a computation with metadata.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="s2">"done"</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
@@ -829,7 +832,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 <dd><p>Called after successful computation (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -840,7 +843,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 <dd><p>Called before computation starts (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -865,7 +868,7 @@ cannot be stopped and may still write its own result afterwards.</p>
 <dd><p>Called when computation fails (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -901,7 +904,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Clear all stored results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -949,7 +952,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Log computation completion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -960,7 +963,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Log computation start.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -971,7 +974,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Log computation error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -992,7 +995,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Record successful completion metrics (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1003,7 +1006,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Track function invocation (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1028,7 +1031,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Record error metrics (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1051,7 +1054,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Update completion metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1062,7 +1065,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Increment total computations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1084,7 +1087,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Update failure metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1102,7 +1105,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Called after computation completes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1113,7 +1116,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Called before computation starts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1124,7 +1127,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Called when computation fails.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1133,7 +1136,7 @@ Useful for testing without filesystem dependencies.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.MockTaskTracker">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">MockTaskTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks_by_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_tasks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.MockTaskTracker" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">MockTaskTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tasks_by_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_tasks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#MockTaskTracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.MockTaskTracker" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Tracks task executions for testing.</p>
 <dl class="field-list simple">
@@ -1142,18 +1145,33 @@ Useful for testing without filesystem dependencies.</p>
 <dt class="sig sig-object py" id="au.MockTaskTracker.task_count">
 <span class="sig-name descname"><span class="pre">task_count</span></span><a class="headerlink" href="#au.MockTaskTracker.task_count" title="Link to this definition">#</a></dt>
 <dd><p>Total number of tasks executed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.MockTaskTracker.tasks_by_name">
 <span class="sig-name descname"><span class="pre">tasks_by_name</span></span><a class="headerlink" href="#au.MockTaskTracker.tasks_by_name" title="Link to this definition">#</a></dt>
 <dd><p>Dictionary mapping function names to call records</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="au.testing.html#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.MockTaskTracker.all_tasks">
 <span class="sig-name descname"><span class="pre">all_tasks</span></span><a class="headerlink" href="#au.MockTaskTracker.all_tasks" title="Link to this definition">#</a></dt>
 <dd><p>List of all task call records</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="au.testing.html#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1244,7 +1262,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Launch computation in a new process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1255,7 +1273,7 @@ Useful for testing without filesystem dependencies.</p>
 <dd><p>Attempt to terminate the computation. Default: do nothing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1264,7 +1282,7 @@ Useful for testing without filesystem dependencies.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.RetryPolicy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">RetryPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BackoffStrategy.EXPONENTIAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.RetryPolicy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">RetryPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BackoffStrategy.EXPONENTIAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.RetryPolicy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Configuration for retry behavior.</p>
 <dl class="field-list simple">
@@ -1273,42 +1291,77 @@ Useful for testing without filesystem dependencies.</p>
 <dt class="sig sig-object py" id="au.RetryPolicy.max_attempts">
 <span class="sig-name descname"><span class="pre">max_attempts</span></span><a class="headerlink" href="#au.RetryPolicy.max_attempts" title="Link to this definition">#</a></dt>
 <dd><p>Maximum number of retry attempts (including initial try)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.backoff">
 <span class="sig-name descname"><span class="pre">backoff</span></span><a class="headerlink" href="#au.RetryPolicy.backoff" title="Link to this definition">#</a></dt>
 <dd><p>Backoff strategy (exponential, linear, constant)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.retry.html#au.retry.BackoffStrategy" title="au.retry.BackoffStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.initial_delay">
 <span class="sig-name descname"><span class="pre">initial_delay</span></span><a class="headerlink" href="#au.RetryPolicy.initial_delay" title="Link to this definition">#</a></dt>
 <dd><p>Initial delay in seconds before first retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.max_delay">
 <span class="sig-name descname"><span class="pre">max_delay</span></span><a class="headerlink" href="#au.RetryPolicy.max_delay" title="Link to this definition">#</a></dt>
 <dd><p>Maximum delay between retries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.retry_on">
 <span class="sig-name descname"><span class="pre">retry_on</span></span><a class="headerlink" href="#au.RetryPolicy.retry_on" title="Link to this definition">#</a></dt>
 <dd><p>List of exception types to retry on (empty means retry all)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.dont_retry_on">
 <span class="sig-name descname"><span class="pre">dont_retry_on</span></span><a class="headerlink" href="#au.RetryPolicy.dont_retry_on" title="Link to this definition">#</a></dt>
 <dd><p>List of exception types to never retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryPolicy.on_retry">
 <span class="sig-name descname"><span class="pre">on_retry</span></span><a class="headerlink" href="#au.RetryPolicy.on_retry" title="Link to this definition">#</a></dt>
 <dd><p>Optional callback called before each retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>], <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1352,7 +1405,7 @@ Useful for testing without filesystem dependencies.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.RetryState">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">RetryState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.RetryState" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">RetryState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.RetryState" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>State tracking for retries.</p>
 <dl class="field-list simple">
@@ -1361,30 +1414,55 @@ Useful for testing without filesystem dependencies.</p>
 <dt class="sig sig-object py" id="au.RetryState.attempt_count">
 <span class="sig-name descname"><span class="pre">attempt_count</span></span><a class="headerlink" href="#au.RetryState.attempt_count" title="Link to this definition">#</a></dt>
 <dd><p>Number of attempts made</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryState.last_error">
 <span class="sig-name descname"><span class="pre">last_error</span></span><a class="headerlink" href="#au.RetryState.last_error" title="Link to this definition">#</a></dt>
 <dd><p>Last exception encountered</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryState.will_retry">
 <span class="sig-name descname"><span class="pre">will_retry</span></span><a class="headerlink" href="#au.RetryState.will_retry" title="Link to this definition">#</a></dt>
 <dd><p>Whether another retry will be attempted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryState.next_retry_at">
 <span class="sig-name descname"><span class="pre">next_retry_at</span></span><a class="headerlink" href="#au.RetryState.next_retry_at" title="Link to this definition">#</a></dt>
 <dd><p>Timestamp of next retry attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.RetryState.retry_history">
 <span class="sig-name descname"><span class="pre">retry_history</span></span><a class="headerlink" href="#au.RetryState.retry_history" title="Link to this definition">#</a></dt>
 <dd><p>List of (timestamp, exception) tuples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1433,7 +1511,7 @@ task queuing. Not persistent across application restarts.</p>
 <dd><p>Launch computation using executor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1444,7 +1522,7 @@ task queuing. Not persistent across application restarts.</p>
 <dd><p>Shutdown the executor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1455,7 +1533,7 @@ task queuing. Not persistent across application restarts.</p>
 <dd><p>Attempt to cancel a running task.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1499,11 +1577,11 @@ making it ideal for testing without the complexity of actual async execution.</p
 <li><p><strong>args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span>) – Positional arguments</p></li>
 <li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Keyword arguments</p></li>
 <li><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Result key</p></li>
-<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (falls back to the backend’s own store)</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Store for results (falls back to the backend’s own store)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1517,7 +1595,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dd class="field-odd"><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Computation key</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1526,7 +1604,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.TaskEvent">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">TaskEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/hooks.html#TaskEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.TaskEvent" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">TaskEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.now()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/hooks.html#TaskEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.TaskEvent" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Event fired during task lifecycle.</p>
 <dl class="field-list simple">
@@ -1535,24 +1613,44 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dt class="sig sig-object py" id="au.TaskEvent.task_id">
 <span class="sig-name descname"><span class="pre">task_id</span></span><a class="headerlink" href="#au.TaskEvent.task_id" title="Link to this definition">#</a></dt>
 <dd><p>Task identifier</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.TaskEvent.event_type">
 <span class="sig-name descname"><span class="pre">event_type</span></span><a class="headerlink" href="#au.TaskEvent.event_type" title="Link to this definition">#</a></dt>
 <dd><p>Type of event (start, complete, error, retry)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.TaskEvent.timestamp">
 <span class="sig-name descname"><span class="pre">timestamp</span></span><a class="headerlink" href="#au.TaskEvent.timestamp" title="Link to this definition">#</a></dt>
 <dd><p>When event occurred</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.TaskEvent.data">
 <span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#au.TaskEvent.data" title="Link to this definition">#</a></dt>
 <dd><p>Event-specific data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1693,7 +1791,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dd><p>Launch computation in a new thread.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1714,7 +1812,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dd><p>Complete the trace span (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1725,7 +1823,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dd><p>Start a new trace span (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1736,7 +1834,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dd><p>Mark span as failed (base.Middleware protocol).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1762,11 +1860,11 @@ making it ideal for testing without the complexity of actual async execution.</p
 <li><p><strong>args</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span>) – Positional arguments</p></li>
 <li><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Keyword arguments</p></li>
 <li><p><strong>key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Result key</p></li>
-<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (falls back to the backend’s own store)</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Store for results (falls back to the backend’s own store)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1830,7 +1928,7 @@ making it ideal for testing without the complexity of actual async execution.</p
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.WorkflowTask">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">WorkflowTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TaskState.PENDING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.WorkflowTask" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">WorkflowTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tuple()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">dict()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depends_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TaskState.PENDING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowTask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.WorkflowTask" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A task in a workflow with dependencies.</p>
 <dl class="field-list simple">
@@ -1839,48 +1937,88 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dt class="sig sig-object py" id="au.WorkflowTask.func">
 <span class="sig-name descname"><span class="pre">func</span></span><a class="headerlink" href="#au.WorkflowTask.func" title="Link to this definition">#</a></dt>
 <dd><p>Function to execute</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.args">
 <span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#au.WorkflowTask.args" title="Link to this definition">#</a></dt>
 <dd><p>Positional arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.kwargs">
 <span class="sig-name descname"><span class="pre">kwargs</span></span><a class="headerlink" href="#au.WorkflowTask.kwargs" title="Link to this definition">#</a></dt>
 <dd><p>Keyword arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.depends_on">
 <span class="sig-name descname"><span class="pre">depends_on</span></span><a class="headerlink" href="#au.WorkflowTask.depends_on" title="Link to this definition">#</a></dt>
 <dd><p>List of task IDs this task depends on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.task_id">
 <span class="sig-name descname"><span class="pre">task_id</span></span><a class="headerlink" href="#au.WorkflowTask.task_id" title="Link to this definition">#</a></dt>
 <dd><p>Unique task ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.state">
 <span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#au.WorkflowTask.state" title="Link to this definition">#</a></dt>
 <dd><p>Current state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.workflow.html#au.workflow.TaskState" title="au.workflow.TaskState"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskState</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.result">
 <span class="sig-name descname"><span class="pre">result</span></span><a class="headerlink" href="#au.WorkflowTask.result" title="Link to this definition">#</a></dt>
 <dd><p>Result value (when completed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.WorkflowTask.error">
 <span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#au.WorkflowTask.error" title="Link to this definition">#</a></dt>
 <dd><p>Error message (when failed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1909,12 +2047,12 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Backend to execute computations (default: ProcessBackend)</p></li>
-<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Store for results (default: FileSystemStore)</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Backend to execute computations (default: ProcessBackend)</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Store for results (default: FileSystemStore)</p></li>
 <li><p><strong>base_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path for FileSystemStore if no store provided</p></li>
-<li><p><strong>ttl_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Time-to-live for results (default: 1 hour)</p></li>
+<li><p><strong>ttl_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Time-to-live for results (default: 1 hour)</p></li>
 <li><p><strong>serialization</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.SerializationFormat" title="au.base.SerializationFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></span>) – Format for storing results</p></li>
-<li><p><strong>middleware</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="au.base.html#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – List of middleware components</p></li>
+<li><p><strong>middleware</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="au.base.html#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a>] | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – List of middleware components</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -2375,7 +2513,7 @@ require integration with the async_compute decorator.</p>
 <dd><p>Reset the global configuration to None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2414,7 +2552,7 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a></span>) – Backend to use by default</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2428,7 +2566,7 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a></span>) – Store to use by default</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2442,7 +2580,7 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.config.html#au.config.AUConfig" title="au.config.AUConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AUConfig</span></code></a></span>) – AUConfig instance to use globally</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2608,7 +2746,7 @@ key re-runs.</p></li>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=360bc84d"></script>
+      <script src="../_static/documentation_options.js?v=fd825880"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

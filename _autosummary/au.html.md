@@ -155,9 +155,11 @@ a genuine failure via [`get_status()`](#au.get_status) without inspecting error 
   True if cancelled, False if already in a terminal state.
 
 #### NOTE
-Only a backend that can stop the work (`ProcessBackend`) makes
-CANCELLED final. A thread, or a pool task that is already running,
-cannot be stopped and may still write its own result afterwards.
+A thread, or a pool task that is already running, cannot be
+stopped; the au workers keep CANCELLED final anyway by not writing
+their outcome over it. `after_compute` then receives the CANCELLED
+result. A worker finishing in the instant between its check and its
+write can still overwrite it (no compare-and-set).
 
 #### get_result(, timeout=None)
 
@@ -169,7 +171,7 @@ Get the computation result, optionally waiting for completion.
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If timeout expires before completion.
   * [**Exception**](https://docs.python.org/3/builtins/exceptions.html#Exception) – If the computation failed.
 * **Return type:**
-  [`TypeVar`](https://docs.python.org/3/library/typing.html#typing.TypeVar)(`T`)
+  `T`
 
 #### get_status()
 
@@ -189,7 +191,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.ComputationResult(value, status, error=None, created_at=<factory>, completed_at=None, metadata=<factory>, terminal_reason=None)
+### *class* au.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -503,7 +505,7 @@ Called when computation fails.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.MockTaskTracker(task_count=0, tasks_by_name=<factory>, all_tasks=<factory>)
+### *class* au.MockTaskTracker(task_count=0, tasks_by_name=dict(), all_tasks=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -513,13 +515,22 @@ Tracks task executions for testing.
 
 Total number of tasks executed
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### tasks_by_name
 
 Dictionary mapping function names to call records
 
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`TaskCallRecord`](au.testing.html.md#au.testing.TaskCallRecord)]]
+
 #### all_tasks
 
 List of all task call records
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`TaskCallRecord`](au.testing.html.md#au.testing.TaskCallRecord)]
 
 #### call_count(func_name)
 
@@ -589,7 +600,7 @@ Attempt to terminate the computation. Default: do nothing.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.RetryPolicy(max_attempts=3, backoff=BackoffStrategy.EXPONENTIAL, initial_delay=1.0, max_delay=60.0, retry_on=<factory>, dont_retry_on=<factory>, on_retry=None)
+### *class* au.RetryPolicy(max_attempts=3, backoff=BackoffStrategy.EXPONENTIAL, initial_delay=1.0, max_delay=60.0, retry_on=list(), dont_retry_on=list(), on_retry=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -599,29 +610,50 @@ Configuration for retry behavior.
 
 Maximum number of retry attempts (including initial try)
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### backoff
 
 Backoff strategy (exponential, linear, constant)
+
+* **Type:**
+  [`BackoffStrategy`](au.retry.html.md#au.retry.BackoffStrategy)
 
 #### initial_delay
 
 Initial delay in seconds before first retry
 
+* **Type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
 #### max_delay
 
 Maximum delay between retries
+
+* **Type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 #### retry_on
 
 List of exception types to retry on (empty means retry all)
 
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Type`](https://docs.python.org/3/library/typing.html#typing.Type)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]]
+
 #### dont_retry_on
 
 List of exception types to never retry
 
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Type`](https://docs.python.org/3/library/typing.html#typing.Type)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]]
+
 #### on_retry
 
 Optional callback called before each retry
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)], [`None`](https://docs.python.org/3/builtins/constants.html#None)]]
 
 #### get_delay(attempt)
 
@@ -646,7 +678,7 @@ Determine if we should retry given an attempt number and error.
 * **Returns:**
   True if should retry, False otherwise
 
-### *class* au.RetryState(attempt_count=0, last_error=None, will_retry=False, next_retry_at=None, retry_history=<factory>)
+### *class* au.RetryState(attempt_count=0, last_error=None, will_retry=False, next_retry_at=None, retry_history=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -656,21 +688,36 @@ State tracking for retries.
 
 Number of attempts made
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### last_error
 
 Last exception encountered
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]
 
 #### will_retry
 
 Whether another retry will be attempted
 
+* **Type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 #### next_retry_at
 
 Timestamp of next retry attempt
 
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 #### retry_history
 
 List of (timestamp, exception) tuples
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
 #### add_attempt(error, will_retry, next_retry_at=None)
 
@@ -765,7 +812,7 @@ No-op for synchronous backend (already completed).
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.TaskEvent(task_id, event_type, timestamp=<factory>, data=<factory>)
+### *class* au.TaskEvent(task_id, event_type, timestamp=datetime.now(), data=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -775,17 +822,29 @@ Event fired during task lifecycle.
 
 Task identifier
 
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
 #### event_type
 
 Type of event (start, complete, error, retry)
+
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 #### timestamp
 
 When event occurred
 
+* **Type:**
+  [`datetime`](https://docs.python.org/3/library/datetime.html#datetime.datetime)
+
 #### data
 
 Event-specific data
+
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### *class* au.TaskGraph(backend=None, store=None)
 
@@ -985,7 +1044,7 @@ Build and return the task graph.
 * **Returns:**
   TaskGraph instance
 
-### *class* au.WorkflowTask(func, args=<factory>, kwargs=<factory>, depends_on=<factory>, task_id=None, state=TaskState.PENDING, result=None, error=None)
+### *class* au.WorkflowTask(func, args=tuple(), kwargs=dict(), depends_on=list(), task_id=None, state=TaskState.PENDING, result=None, error=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -995,33 +1054,57 @@ A task in a workflow with dependencies.
 
 Function to execute
 
+* **Type:**
+  [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)
+
 #### args
 
 Positional arguments
+
+* **Type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)
 
 #### kwargs
 
 Keyword arguments
 
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 #### depends_on
 
 List of task IDs this task depends on
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 #### task_id
 
 Unique task ID
 
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 #### state
 
 Current state
+
+* **Type:**
+  [`TaskState`](au.workflow.html.md#au.workflow.TaskState)
 
 #### result
 
 Result value (when completed)
 
+* **Type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
 #### error
 
 Error message (when failed)
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 #### is_ready_to_run(completed_tasks)
 

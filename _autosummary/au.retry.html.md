@@ -34,7 +34,7 @@ Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exceptio
 
 Base class for errors that should not be retried.
 
-### *class* au.retry.RetryPolicy(max_attempts=3, backoff=BackoffStrategy.EXPONENTIAL, initial_delay=1.0, max_delay=60.0, retry_on=<factory>, dont_retry_on=<factory>, on_retry=None)
+### *class* au.retry.RetryPolicy(max_attempts=3, backoff=BackoffStrategy.EXPONENTIAL, initial_delay=1.0, max_delay=60.0, retry_on=list(), dont_retry_on=list(), on_retry=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -44,29 +44,50 @@ Configuration for retry behavior.
 
 Maximum number of retry attempts (including initial try)
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### backoff
 
 Backoff strategy (exponential, linear, constant)
+
+* **Type:**
+  [`BackoffStrategy`](#au.retry.BackoffStrategy)
 
 #### initial_delay
 
 Initial delay in seconds before first retry
 
+* **Type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
+
 #### max_delay
 
 Maximum delay between retries
+
+* **Type:**
+  [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
 #### retry_on
 
 List of exception types to retry on (empty means retry all)
 
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Type`](https://docs.python.org/3/library/typing.html#typing.Type)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]]
+
 #### dont_retry_on
 
 List of exception types to never retry
 
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Type`](https://docs.python.org/3/library/typing.html#typing.Type)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]]
+
 #### on_retry
 
 Optional callback called before each retry
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)[[[`int`](https://docs.python.org/3/builtins/functions.html#int), [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)], [`None`](https://docs.python.org/3/builtins/constants.html#None)]]
 
 #### get_delay(attempt)
 
@@ -91,7 +112,7 @@ Determine if we should retry given an attempt number and error.
 * **Returns:**
   True if should retry, False otherwise
 
-### *class* au.retry.RetryState(attempt_count=0, last_error=None, will_retry=False, next_retry_at=None, retry_history=<factory>)
+### *class* au.retry.RetryState(attempt_count=0, last_error=None, will_retry=False, next_retry_at=None, retry_history=list())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -101,21 +122,36 @@ State tracking for retries.
 
 Number of attempts made
 
+* **Type:**
+  [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
 #### last_error
 
 Last exception encountered
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)]
 
 #### will_retry
 
 Whether another retry will be attempted
 
+* **Type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
 #### next_retry_at
 
 Timestamp of next retry attempt
 
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
 #### retry_history
 
 List of (timestamp, exception) tuples
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`float`](https://docs.python.org/3/builtins/functions.html#float), [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]]
 
 #### add_attempt(error, will_retry, next_retry_at=None)
 

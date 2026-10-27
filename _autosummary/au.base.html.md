@@ -153,9 +153,11 @@ a genuine failure via [`get_status()`](#au.base.ComputationHandle.get_status) wi
   True if cancelled, False if already in a terminal state.
 
 #### NOTE
-Only a backend that can stop the work (`ProcessBackend`) makes
-CANCELLED final. A thread, or a pool task that is already running,
-cannot be stopped and may still write its own result afterwards.
+A thread, or a pool task that is already running, cannot be
+stopped; the au workers keep CANCELLED final anyway by not writing
+their outcome over it. `after_compute` then receives the CANCELLED
+result. A worker finishing in the instant between its check and its
+write can still overwrite it (no compare-and-set).
 
 #### get_result(, timeout=None)
 
@@ -167,7 +169,7 @@ Get the computation result, optionally waiting for completion.
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If timeout expires before completion.
   * [**Exception**](https://docs.python.org/3/builtins/exceptions.html#Exception) – If the computation failed.
 * **Return type:**
-  [`TypeVar`](https://docs.python.org/3/library/typing.html#typing.TypeVar)(`T`)
+  `T`
 
 #### get_status()
 
@@ -187,7 +189,7 @@ Check if the computation is complete.
 
 Get computation metadata.
 
-### *class* au.base.ComputationResult(value, status, error=None, created_at=<factory>, completed_at=None, metadata=<factory>, terminal_reason=None)
+### *class* au.base.ComputationResult(value, status, error=None, created_at=datetime.now(), completed_at=None, metadata=dict(), terminal_reason=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 

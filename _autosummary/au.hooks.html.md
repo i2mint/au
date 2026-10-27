@@ -124,7 +124,7 @@ Record error metrics (base.Middleware protocol).
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.hooks.TaskEvent(task_id, event_type, timestamp=<factory>, data=<factory>)
+### *class* au.hooks.TaskEvent(task_id, event_type, timestamp=datetime.now(), data=dict())
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -134,17 +134,29 @@ Event fired during task lifecycle.
 
 Task identifier
 
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
 #### event_type
 
 Type of event (start, complete, error, retry)
+
+* **Type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 #### timestamp
 
 When event occurred
 
+* **Type:**
+  [`datetime`](https://docs.python.org/3/library/datetime.html#datetime.datetime)
+
 #### data
 
 Event-specific data
+
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
 
 ### *class* au.hooks.TaskEventHandler(\*args, \*\*kwargs)
 

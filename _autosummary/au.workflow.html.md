@@ -146,7 +146,7 @@ Build and return the task graph.
 * **Returns:**
   TaskGraph instance
 
-### *class* au.workflow.WorkflowTask(func, args=<factory>, kwargs=<factory>, depends_on=<factory>, task_id=None, state=TaskState.PENDING, result=None, error=None)
+### *class* au.workflow.WorkflowTask(func, args=tuple(), kwargs=dict(), depends_on=list(), task_id=None, state=TaskState.PENDING, result=None, error=None)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -156,33 +156,57 @@ A task in a workflow with dependencies.
 
 Function to execute
 
+* **Type:**
+  [`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)
+
 #### args
 
 Positional arguments
+
+* **Type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)
 
 #### kwargs
 
 Keyword arguments
 
+* **Type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
 #### depends_on
 
 List of task IDs this task depends on
+
+* **Type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 #### task_id
 
 Unique task ID
 
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
 #### state
 
 Current state
+
+* **Type:**
+  [`TaskState`](#au.workflow.TaskState)
 
 #### result
 
 Result value (when completed)
 
+* **Type:**
+  [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)
+
 #### error
 
 Error message (when failed)
+
+* **Type:**
+  [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 #### is_ready_to_run(completed_tasks)
 

@@ -7,6 +7,7 @@
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
     <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -216,7 +217,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BackoffStrategy.EXPONENTIAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryPolicy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BackoffStrategy.EXPONENTIAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dont_retry_on</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryPolicy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryPolicy" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Configuration for retry behavior.</p>
 <dl class="field-list simple">
@@ -225,42 +226,77 @@ data-aria-dark="Switch to auto color mode">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.max_attempts">
 <span class="sig-name descname"><span class="pre">max_attempts</span></span><a class="headerlink" href="#au.retry.RetryPolicy.max_attempts" title="Link to this definition">#</a></dt>
 <dd><p>Maximum number of retry attempts (including initial try)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.backoff">
 <span class="sig-name descname"><span class="pre">backoff</span></span><a class="headerlink" href="#au.retry.RetryPolicy.backoff" title="Link to this definition">#</a></dt>
 <dd><p>Backoff strategy (exponential, linear, constant)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.retry.BackoffStrategy" title="au.retry.BackoffStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.initial_delay">
 <span class="sig-name descname"><span class="pre">initial_delay</span></span><a class="headerlink" href="#au.retry.RetryPolicy.initial_delay" title="Link to this definition">#</a></dt>
 <dd><p>Initial delay in seconds before first retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.max_delay">
 <span class="sig-name descname"><span class="pre">max_delay</span></span><a class="headerlink" href="#au.retry.RetryPolicy.max_delay" title="Link to this definition">#</a></dt>
 <dd><p>Maximum delay between retries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.retry_on">
 <span class="sig-name descname"><span class="pre">retry_on</span></span><a class="headerlink" href="#au.retry.RetryPolicy.retry_on" title="Link to this definition">#</a></dt>
 <dd><p>List of exception types to retry on (empty means retry all)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.dont_retry_on">
 <span class="sig-name descname"><span class="pre">dont_retry_on</span></span><a class="headerlink" href="#au.retry.RetryPolicy.dont_retry_on" title="Link to this definition">#</a></dt>
 <dd><p>List of exception types to never retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryPolicy.on_retry">
 <span class="sig-name descname"><span class="pre">on_retry</span></span><a class="headerlink" href="#au.retry.RetryPolicy.on_retry" title="Link to this definition">#</a></dt>
 <dd><p>Optional callback called before each retry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>], <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -304,7 +340,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.retry.RetryState">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryState" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.retry.</span></span><span class="sig-name descname"><span class="pre">RetryState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attempt_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">will_retry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_retry_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_history</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/retry.html#RetryState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.retry.RetryState" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>State tracking for retries.</p>
 <dl class="field-list simple">
@@ -313,30 +349,55 @@ data-aria-dark="Switch to auto color mode">
 <dt class="sig sig-object py" id="au.retry.RetryState.attempt_count">
 <span class="sig-name descname"><span class="pre">attempt_count</span></span><a class="headerlink" href="#au.retry.RetryState.attempt_count" title="Link to this definition">#</a></dt>
 <dd><p>Number of attempts made</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryState.last_error">
 <span class="sig-name descname"><span class="pre">last_error</span></span><a class="headerlink" href="#au.retry.RetryState.last_error" title="Link to this definition">#</a></dt>
 <dd><p>Last exception encountered</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryState.will_retry">
 <span class="sig-name descname"><span class="pre">will_retry</span></span><a class="headerlink" href="#au.retry.RetryState.will_retry" title="Link to this definition">#</a></dt>
 <dd><p>Whether another retry will be attempted</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryState.next_retry_at">
 <span class="sig-name descname"><span class="pre">next_retry_at</span></span><a class="headerlink" href="#au.retry.RetryState.next_retry_at" title="Link to this definition">#</a></dt>
 <dd><p>Timestamp of next retry attempt</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="au.retry.RetryState.retry_history">
 <span class="sig-name descname"><span class="pre">retry_history</span></span><a class="headerlink" href="#au.retry.RetryState.retry_history" title="Link to this definition">#</a></dt>
 <dd><p>List of (timestamp, exception) tuples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -430,7 +491,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=360bc84d"></script>
+      <script src="../_static/documentation_options.js?v=fd825880"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
