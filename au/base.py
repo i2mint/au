@@ -63,6 +63,7 @@ import multiprocessing
 import pickle
 import time
 import uuid
+import warnings
 import concurrent.futures
 import threading
 import random
@@ -108,7 +109,7 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
             logger.error(
                 f"Failed to write failed result in worker entrypoint: {inner_e}"
             )
-        return
+        raise  # so the queue records the job as failed, not done
 
     # Outside the handler above: what compute_and_record raises (a BaseException,
     # or a failure the store would not record) reaches the queue's own record.
@@ -1219,9 +1220,10 @@ def async_compute(
         if backend_given or _default_backend is None:
             return backend
         if middleware:
-            logger.warning(
+            warnings.warn(  # once per call site, not once per call
                 f"{type(_default_backend).__name__} replaces the default backend: "
-                "the middleware given to async_compute does not run"
+                "the middleware given to async_compute does not run",
+                stacklevel=3,
             )
         return _default_backend
 
@@ -1236,7 +1238,7 @@ def async_compute(
         # Attach utility methods
         wrapper.cleanup_expired = lambda: store.cleanup_expired()
         wrapper.store = store
-        wrapper.backend = backend
+        wrapper.backend = backend  # as decorated; a call may use _default_backend
 
         return wrapper
 

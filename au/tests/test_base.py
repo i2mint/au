@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from datetime import timedelta
 import pytest
+from au.testing import InMemoryStore
 from au.base import (
     async_compute,
     FileSystemStore,
@@ -930,7 +931,7 @@ def test_get_result_chains_the_original_error():
     assert isinstance(raised.value.__cause__, KeyError)
 
 
-@async_compute
+@async_compute(store=InMemoryStore())
 def _decorated_at_import(x):
     return x + 100
 
@@ -986,3 +987,15 @@ def test_a_queue_job_whose_failure_cannot_be_recorded_fails_its_queue_job(
     with pytest.raises(OSError) as raised:
         base._au_worker_entrypoint(payload)
     assert isinstance(raised.value.__cause__, KeyError)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [b"not a pickle", pickle.dumps({"key": "k", "store_reconstruction_info": {}})],
+)
+def test_a_queue_job_that_cannot_be_set_up_fails_its_queue_job(payload):
+    """It used to return normally: the queue recorded it as done."""
+    from au.base import _au_worker_entrypoint
+
+    with pytest.raises(Exception):
+        _au_worker_entrypoint(payload)
