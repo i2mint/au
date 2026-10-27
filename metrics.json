@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 6.060168981552124,
+  "collection_duration_seconds": 7.66428542137146,
   "commit_message": "mock_async works; results keep the run's duration; failures report their cause (#23)\n\n* mock_async works; results keep the run's duration; failures report their cause (#20)\n\n- mock_async swaps a default-backend seam that async_compute and the simple\n  API both read (it set an attribute nothing read, so tasks ran on a\n  ProcessBackend); @async_compute may be used bare, as the README shows.\n- ComputationResult.started_at: a worker records when the run began, so\n  duration is the run's (it was ~0); TTL still counts from created_at.\n- get_result chains the original error as __cause__.\n- A failure the store will not record is raised after on_error, instead of\n  only logged with RUNNING left behind for good.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Review fixes: mock reaches import-time tasks; queue jobs fail with their cause (#20)\n\n- async_compute looks up the default backend per call, so mock_async also\n  reaches functions decorated at import time; it warns when the swapped\n  backend drops middleware given to async_compute.\n- @async_compute bare detection checks for .launch, not the class, so a\n  callable backend (a mock) is not wrapped as the function.\n- _au_worker_entrypoint's fallback covers only the task's setup: a failure\n  compute_and_record raises now reaches the queue (future, RQ job, Supabase\n  status) with its cause, instead of being swallowed and its cause\n  overwritten by the write error.\n- The unrecordable failure is logged as well as raised; started_at is taken\n  right before the call.\n- Tests: import-time decoration, a callable backend, the entrypoint; faster\n  TTL guard; the mock test writes nowhere outside memory.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Re-review fixes: a queue job that cannot be set up fails too (#20)\n\n- _au_worker_entrypoint re-raises after recording a setup failure (a bad\n  pickle, a store it cannot rebuild), so the queue does not mark it done.\n- The dropped-middleware warning is a warnings.warn, shown once per call\n  site; wrapper.backend is documented as the backend it was decorated with.\n- The import-time task in the mock test uses an in-memory store.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
   "commit_sha": "27a77753f3314712f4e8ad4329cc72d5654937d4",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35212,
-      "comment_lines_ratio": 0.06521078870756261,
-      "docs_lines": 42383,
-      "empty_lines": 70705,
-      "empty_lines_ratio": 0.1309419747690621,
-      "files_analyzed": 1332,
-      "function_lines": 323535,
-      "function_lines_ratio": 0.5991699569607313,
-      "mean_lines_per_function": 15.955762686787986,
-      "num_classes": 3021,
-      "num_functions": 20277,
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.0651836504466376,
+      "docs_lines": 42477,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.1310714509546579,
+      "files_analyzed": 1347,
+      "function_lines": 325307,
+      "function_lines_ratio": 0.5996464503094943,
+      "mean_lines_per_function": 15.958155506499878,
+      "num_classes": 3036,
+      "num_functions": 20385,
       "pypi_version": "0.1.7",
-      "total_lines": 539972
+      "total_lines": 542498
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:07:38.325884Z",
+  "timestamp": "2026-10-27T14:07:45.284366Z",
   "workflow_status": {}
 }
