@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 4.560141563415527,
-  "commit_message": "Review fixes: zero durations, one read, started_at in responses, no made-up times (part of #24)\n\n- _timing reports a zero duration as 0.0 (a timedelta(0) reached the\n  response model: HTTP 500), sends started_at (when the run began; created_at\n  is when the record was written), and nothing for a PENDING record, which\n  FileSystemStore makes up, stamped now, for any unknown id.\n- /status reads the store once, so status and timing agree; the Flask status\n  route reports timing too.\n- mock_async(store=...) keeps the simple API's results where the caller can\n  read them after the block.\n- ComputationHandle treats a key nothing has written yet as PENDING:\n  get_result right after submit_task on an InMemoryStore raised KeyError.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "f7663f16987ced7c0d1de9d76a81ea036d1db810",
+  "collection_duration_seconds": 6.008959054946899,
+  "commit_message": "Merge f7663f16987ced7c0d1de9d76a81ea036d1db810 into 3b2a88861ca1c1964620cd080b2fd8043857cb09",
+  "commit_sha": "1914bf52a08269b32480303644d125986e35d22d",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35360,
-      "comment_lines_ratio": 0.06517395695864697,
-      "docs_lines": 42490,
-      "empty_lines": 71107,
-      "empty_lines_ratio": 0.131061214860252,
-      "files_analyzed": 1347,
-      "function_lines": 325316,
-      "function_lines_ratio": 0.5996077766391177,
-      "mean_lines_per_function": 15.956248773788504,
-      "num_classes": 3036,
-      "num_functions": 20388,
-      "pypi_version": "0.1.8",
-      "total_lines": 542548
+      "comment_lines": 35210,
+      "comment_lines_ratio": 0.06520104736473699,
+      "docs_lines": 42396,
+      "empty_lines": 70706,
+      "empty_lines_ratio": 0.13093170278247923,
+      "files_analyzed": 1332,
+      "function_lines": 323544,
+      "function_lines_ratio": 0.5991311465088459,
+      "mean_lines_per_function": 15.953846153846154,
+      "num_classes": 3021,
+      "num_functions": 20280,
+      "pypi_version": "0.1.9",
+      "total_lines": 540022
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:28:11.986442Z",
+  "timestamp": "2026-10-27T14:28:17.071429Z",
   "workflow_status": {}
 }
