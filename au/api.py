@@ -35,7 +35,14 @@ def _get_default_backend() -> ComputationBackend:
     global _default_backend
 
     if _default_backend is None:
+        from au.base import LoggingMiddleware
+
         config = get_global_config()
+        middleware = (
+            [LoggingMiddleware(level=config.logging_level)]
+            if config.logging_enabled
+            else []
+        )
 
         # Create backend based on config. Backends take the result store
         # per-launch (submit_task passes it), so no store is bound here.
@@ -46,7 +53,9 @@ def _get_default_backend() -> ComputationBackend:
 
             redis_url = config.redis_url or "redis://localhost:6379"
             connection = redis.Redis.from_url(redis_url)
-            _default_backend = RQBackend(rq_queue=Queue(connection=connection))
+            _default_backend = RQBackend(
+                rq_queue=Queue(connection=connection), middleware=middleware
+            )
 
         elif config.backend == "supabase":
             from au.backends.supabase_backend import SupabaseQueueBackend
@@ -58,12 +67,14 @@ def _get_default_backend() -> ComputationBackend:
             from supabase import create_client
 
             client = create_client(config.supabase_url, config.supabase_key)
-            _default_backend = SupabaseQueueBackend(supabase_client=client)
+            _default_backend = SupabaseQueueBackend(
+                supabase_client=client, middleware=middleware
+            )
 
         elif config.backend == "process":
             from au.base import ProcessBackend
 
-            _default_backend = ProcessBackend()
+            _default_backend = ProcessBackend(middleware=middleware)
 
         elif config.backend == "stdlib":
             from au.base import StdLibQueueBackend
@@ -71,12 +82,13 @@ def _get_default_backend() -> ComputationBackend:
             _default_backend = StdLibQueueBackend(
                 max_workers=config.max_workers,
                 use_processes=False,
+                middleware=middleware,
             )
 
         else:  # Default to thread
             from au.base import ThreadBackend
 
-            _default_backend = ThreadBackend()
+            _default_backend = ThreadBackend(middleware=middleware)
 
     return _default_backend
 

@@ -120,3 +120,28 @@ def test_global_config():
 
     # Reset
     reset_global_config()
+
+
+# --- i2mint/au#22: the observability settings reach the simple API ------------
+
+
+@pytest.mark.parametrize(
+    "env, levels",
+    [({"AU_LOGGING_LEVEL": "DEBUG"}, [10]), ({"AU_LOGGING_ENABLED": "false"}, [])],
+)
+def test_logging_settings_reach_the_simple_apis_default_backend(
+    monkeypatch, env, levels
+):
+    import au.api
+    from au.base import LoggingMiddleware
+
+    for name, value in env.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(au.api, "_default_backend", None)
+    reset_global_config()
+    try:
+        backend = au.api._get_default_backend()
+    finally:
+        reset_global_config()
+    found = [mw.level for mw in backend.middleware if isinstance(mw, LoggingMiddleware)]
+    assert found == levels
