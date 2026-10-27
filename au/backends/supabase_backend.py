@@ -32,7 +32,7 @@ try:
     from au.base import (
         ComputationBackend,
         _au_worker_entrypoint,
-        _middleware_configs,
+        _picklable_middleware,
     )
 except ImportError:
     # Handle case where we're importing this before base is fully loaded
@@ -131,7 +131,7 @@ class SupabaseQueueBackend(ComputationBackend):
             "kwargs": kwargs,
             "key": key,
             "store_reconstruction_info": store.get_reconstruction_info(),
-            "middleware_configs": _middleware_configs(self.middleware),
+            "middleware": _picklable_middleware(self.middleware),
         }
         serialized_data = pickle.dumps(task_data)
 
