@@ -81,6 +81,7 @@ class TaskStatusResponse(BaseModel):
     task_id: str
     status: str
     created_at: Optional[str] = None
+    started_at: Optional[str] = None
     completed_at: Optional[str] = None
     duration: Optional[float] = None
 
@@ -93,6 +94,7 @@ class TaskResultResponse(BaseModel):
     result: Optional[Any] = None
     error: Optional[str] = None
     created_at: Optional[str] = None
+    started_at: Optional[str] = None
     completed_at: Optional[str] = None
     duration: Optional[float] = None
 
@@ -115,13 +117,18 @@ class TaskCancelResponse(BaseModel):
 def _timing(result: ComputationResult) -> dict[str, Any]:
     """The timing fields of a task's response, from its stored result.
 
-    (They used to be read off ``handle.metadata``, a plain dict: never sent.)
+    ``created_at`` is when this record was written, ``started_at`` when the run
+    began. A PENDING record gets none: FileSystemStore reports any unknown id as
+    PENDING, stamped with the time of the read.
     """
+    if result.status == ComputationStatus.PENDING:
+        return {}
     duration = result.duration
     return {
         "created_at": result.created_at.isoformat(),
+        "started_at": result.started_at and result.started_at.isoformat(),
         "completed_at": result.completed_at and result.completed_at.isoformat(),
-        "duration": duration and duration.total_seconds(),
+        "duration": None if duration is None else duration.total_seconds(),
     }
 
 
@@ -229,9 +236,9 @@ def mk_http_interface(
     def get_task_status(task_id: str):
         """Get the status of a task."""
         try:
-            status = get_status(task_id, store=_store)
+            record = _store[task_id]  # one read: status and timing agree
             return TaskStatusResponse(
-                task_id=task_id, status=status.value, **_timing(_store[task_id])
+                task_id=task_id, status=record.status.value, **_timing(record)
             )
 
         except KeyError:
@@ -452,8 +459,10 @@ def mk_flask_interface(
     @app.route("/tasks/<task_id>/status")
     def status(task_id):
         try:
-            status = get_status(task_id, store=_store)
-            return jsonify({"task_id": task_id, "status": status.value})
+            record = _store[task_id]
+            return jsonify(
+                {"task_id": task_id, "status": record.status.value, **_timing(record)}
+            )
         except KeyError:
             return jsonify({"error": "Task not found"}), 404
 

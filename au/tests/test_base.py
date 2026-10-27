@@ -1010,6 +1010,28 @@ def test_a_running_record_says_when_the_run_began(tmp_path):
     assert store["k"].started_at == began
 
 
+def test_a_worker_writes_when_the_run_began_on_the_running_record():
+    from au.base import compute_and_record
+
+    store, seen = {}, []
+
+    def peek():
+        seen.append(store["k"].started_at)
+
+    compute_and_record(peek, (), {}, key="k", store=store, middleware=[])
+    assert seen[0] is not None and seen[0] == store["k"].started_at
+
+
+def test_mock_async_puts_the_simple_apis_results_in_the_store_given():
+    import au.api
+    from au.testing import mock_async
+
+    kept = InMemoryStore()
+    with mock_async(store=kept):
+        key = au.api.submit_task(_double, 4)
+    assert kept[key].value == 8
+
+
 def test_mock_async_keeps_the_simple_apis_results_in_memory():
     import au.api
     from au.testing import mock_async
@@ -1020,3 +1042,11 @@ def test_mock_async_keeps_the_simple_apis_results_in_memory():
         assert isinstance(au.api._default_store, InMemoryStore)
         assert au.api.get_result(key, timeout=1) == 8
     assert au.api._default_store is before
+
+
+def test_a_handle_on_an_unwritten_key_waits_instead_of_raising():
+    """InMemoryStore raises KeyError until the worker's first write."""
+    handle = ComputationHandle("not-yet", InMemoryStore())
+    assert handle.get_status() == ComputationStatus.PENDING and not handle.is_ready()
+    with pytest.raises(TimeoutError):
+        handle.get_result(timeout=0.05)

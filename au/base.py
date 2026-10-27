@@ -1046,13 +1046,21 @@ class ComputationHandle(Generic[T]):
     store: ComputationStore
     backend: ComputationBackend | None = None  # Add this
 
+    def _current(self) -> ComputationResult:
+        """The stored result; PENDING while the worker has written nothing yet
+        (a store such as InMemoryStore raises KeyError for an unwritten key)."""
+        try:
+            return self.store[self.key]
+        except KeyError:
+            return ComputationResult(None, ComputationStatus.PENDING)
+
     def is_ready(self) -> bool:
         """Check if the computation is complete."""
-        return self.store[self.key].is_ready
+        return self._current().is_ready
 
     def get_status(self) -> ComputationStatus:
         """Get the current status of the computation."""
-        return self.store[self.key].status
+        return self._current().status
 
     def get_result(self, *, timeout: float | None = None) -> T:
         """
@@ -1078,7 +1086,7 @@ class ComputationHandle(Generic[T]):
         start_time = time.time()
 
         while True:
-            result = self.store[self.key]
+            result = self._current()
 
             if result.status == ComputationStatus.COMPLETED:
                 return result.value
@@ -1126,7 +1134,7 @@ class ComputationHandle(Generic[T]):
             result. A worker finishing in the instant between its check and its
             write can still overwrite it (no compare-and-set).
         """
-        result = self.store[self.key]
+        result = self._current()
         if not result.is_ready:
             self.store[self.key] = ComputationResult(
                 None,

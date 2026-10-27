@@ -270,12 +270,17 @@ class TrackingTestBackend(SyncTestBackend):
 
 
 @contextmanager
-def mock_async(backend: Optional[ComputationBackend] = None):
+def mock_async(
+    backend: Optional[ComputationBackend] = None,
+    *,
+    store: Optional[ComputationStore] = None,
+):
     """Run every task launched inside the block on a synchronous test backend.
 
     It becomes the default backend of :func:`au.async_compute` and of the
-    simple API (``au.submit_task``, ...), whose results then also stay in
-    memory.
+    simple API (``au.submit_task``, ...). The simple API's results go to
+    ``store`` (a fresh InMemoryStore by default), which is restored on exit:
+    read them inside the block, or pass a store you keep.
 
     Usage:
         with mock_async() as mock:
@@ -289,6 +294,7 @@ def mock_async(backend: Optional[ComputationBackend] = None):
 
     Args:
         backend: Optional custom backend (defaults to TrackingTestBackend)
+        store: The simple API's store inside the block (default: in memory)
 
     Yields:
         MockTaskTracker instance
@@ -304,7 +310,7 @@ def mock_async(backend: Optional[ComputationBackend] = None):
         au.api._default_store,
     )
     au.base._default_backend = au.api._default_backend = backend
-    au.api._default_store = InMemoryStore()  # the simple API's results, too
+    au.api._default_store = store if store is not None else InMemoryStore()
     try:
         if isinstance(backend, TrackingTestBackend):
             yield backend.tracker
