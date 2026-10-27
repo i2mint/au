@@ -1,8 +1,17 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:44:32.249895Z
-commit_sha,0b06e64f8ac2a1fc2d447ded3659fd381d7d3aed
-commit_message,Merge 8fd8074171c76e601e39a1465cd18506c31b8c97 into aab88233c2ae276beff656b7b2d95cd0691c85e6
+timestamp,2026-10-27T13:44:34.816310Z
+commit_sha,8fd8074171c76e601e39a1465cd18506c31b8c97
+commit_message,"LoggingMiddleware takes a level name; export SharedMetricsMiddleware (#17)
+
+- LoggingMiddleware(level=""INFO"") works (the README example passed a string
+  that logger.log rejected on every hook); an unknown name is refused at
+  construction. create_observability_middleware no longer converts the level
+  itself, nor silently falls back to INFO for an unknown name.
+- SharedMetricsMiddleware, the one to count across processes with the
+  default backend, is exported from au.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
 metrics.umpyre_stats.num_functions,20384
 metrics.umpyre_stats.num_classes,3036
@@ -36,4 +45,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.071789026260376
+collection_duration_seconds,7.157349586486816
