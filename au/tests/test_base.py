@@ -571,8 +571,75 @@ def test_a_thread_backend_job_raising_a_base_exception_ends_failed(monkeypatch):
     handle = async_compute(backend=ThreadBackend(store, middleware=[mw]), store=store)(
         _interrupted
     )()
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError, match="stop"):
         handle.get_result(timeout=5)
     assert handle.get_status() == ComputationStatus.FAILED
     assert escaped.wait(5), "the BaseException was swallowed, not re-raised"
     assert mw.calls == [("error", handle.key, _Interrupt)] and not mw.in_flight
+
+
+def test_a_cancellation_is_final_whatever_the_cancelled_job_then_does():
+    from au.base import _compute_and_record
+
+    def cancelled_then(outcome):
+        def job():
+            store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+            return outcome()
+
+        return job
+
+    for outcome, raised in [(lambda: 1, None), (_interrupted, _Interrupt)]:
+        store, mw = {}, _Recorder()
+        try:
+            _compute_and_record(
+                cancelled_then(outcome), (), {}, key="k", store=store, middleware=[mw]
+            )
+        except _Interrupt:
+            pass
+        assert store["k"].status == ComputationStatus.CANCELLED
+        assert not mw.in_flight and len(mw.calls) == 1
+
+
+def _interrupted_hook(*args):
+    raise _Interrupt("hook")
+
+
+@pytest.mark.parametrize("hook", ["before_compute", "after_compute"])
+def test_a_hook_raising_a_base_exception_does_not_strand_the_others(hook):
+    from au.base import _compute_and_record
+
+    store, mw, interrupting = {}, _Recorder(), MetricsMiddleware()
+    setattr(interrupting, hook, _interrupted_hook)
+    with pytest.raises(_Interrupt):
+        _compute_and_record(
+            _double,
+            (2,),
+            {},
+            key="k",
+            store=store,
+            middleware=[interrupting, mw],
+        )
+    assert not mw.in_flight and len(mw.calls) == 1
+    expected = {"before_compute": ComputationStatus.FAILED}
+    assert store["k"].status == expected.get(hook, ComputationStatus.COMPLETED)
+
+
+def _interrupted_without_a_message():
+    raise _Interrupt()
+
+
+def test_a_queue_job_raising_a_base_exception_ends_failed_and_says_what(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    with StdLibQueueBackend(store, use_processes=False) as backend:
+        handle = async_compute(backend=backend, store=store)(
+            _interrupted_without_a_message
+        )()
+        with pytest.raises(RuntimeError, match="_Interrupt"):
+            handle.get_result(timeout=5)
+        assert handle.get_status() == ComputationStatus.FAILED
+        assert (
+            async_compute(backend=backend, store=store)(_double)(4).get_result(
+                timeout=5
+            )
+            == 8
+        ), "the queue worker did not survive"

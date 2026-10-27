@@ -352,7 +352,12 @@ class FileSystemStore(ComputationStore):
         data = {
             "value": result.value,
             "status": result.status.value,
-            "error": str(result.error) if result.error else None,
+            # ``str()`` of a bare KeyboardInterrupt or CancelledError is empty.
+            "error": (
+                (str(result.error) or type(result.error).__name__)
+                if result.error
+                else None
+            ),
             "created_at": result.created_at.isoformat(),
             "completed_at": (
                 result.completed_at.isoformat() if result.completed_at else None
@@ -703,12 +708,21 @@ class ComputationBackend(ABC):
 
 
 def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
-    """Call ``hook`` on each middleware; one failing hook does not stop the rest."""
+    """Call ``hook`` on every middleware, whatever the others raise.
+
+    A failing hook is logged. A ``BaseException`` from one is re-raised once all
+    have run, so one hook cannot leave another middleware's key registered.
+    """
+    interrupt = None
     for mw in middleware:
         try:
             getattr(mw, hook)(*args)
-        except Exception as e:
-            logger.error(f"Middleware {mw.__class__.__name__} {hook} failed: {e}")
+        except Exception:
+            logger.exception(f"Middleware {mw.__class__.__name__} {hook} failed")
+        except BaseException as e:
+            interrupt = interrupt or e
+    if interrupt is not None:
+        raise interrupt
 
 
 def _compute_and_record(
@@ -722,28 +736,43 @@ def _compute_and_record(
 ) -> None:
     """Run ``func``, record its outcome under ``key``, and drive the middleware.
 
-    The body every worker runs (thread, process, queue). Once ``before_compute``
-    has run, exactly one of ``after_compute`` / ``on_error`` runs too, whatever
-    fails (the RUNNING write, the COMPLETED write, the FAILED write), so
-    middleware that registers a key in one can always release it in the other.
-    A ``BaseException`` (``asyncio.CancelledError``, ``SystemExit``, ...) is
-    recorded as FAILED like any error, then re-raised (i2mint/au#12).
+    The body the thread and queue workers run, and ProcessBackend's child. Once
+    ``before_compute`` has run, exactly one of ``after_compute`` / ``on_error``
+    runs too, whatever fails (a hook, the RUNNING write, the COMPLETED write, the
+    FAILED write), so middleware that registers a key in one can always release
+    it in the other. A ``BaseException`` (``asyncio.CancelledError``,
+    ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
+    then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
-    _call_hooks(middleware, "before_compute", func, args, kwargs, key)
     try:
+        _call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
         result = ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED)
-        store[key] = result
+        _record_unless_cancelled(store, key, result)
     except BaseException as error:
+        failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
         try:
-            store[key] = ComputationResult(None, ComputationStatus.FAILED, error=error)
-        except Exception as e:
-            logger.error(f"Could not record the failure of {key}: {e}")
+            _record_unless_cancelled(store, key, failure)
+        except Exception:
+            logger.exception(f"Could not record the failure of {key}")
         _call_hooks(middleware, "on_error", key, error)
         if not isinstance(error, Exception):
             raise
     else:
         _call_hooks(middleware, "after_compute", key, result)
+
+
+def _record_unless_cancelled(
+    store: "ComputationStore", key: str, result: ComputationResult
+) -> None:
+    """Record a worker's outcome, unless the caller cancelled meanwhile.
+
+    A thread cannot be killed, so a cancelled one runs on; its outcome must not
+    turn the cancellation back into COMPLETED or FAILED.
+    """
+    current = store.get(key)
+    if current is None or current.status != ComputationStatus.CANCELLED:
+        store[key] = result
 
 
 def _mark_running(store: "ComputationStore", key: str) -> None:
