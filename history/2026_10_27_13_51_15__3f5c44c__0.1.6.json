@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 6.726547718048096,
+  "commit_message": "mock_async works; results keep the run's duration; failures report their cause (#20)\n\n- mock_async swaps a default-backend seam that async_compute and the simple\n  API both read (it set an attribute nothing read, so tasks ran on a\n  ProcessBackend); @async_compute may be used bare, as the README shows.\n- ComputationResult.started_at: a worker records when the run began, so\n  duration is the run's (it was ~0); TTL still counts from created_at.\n- get_result chains the original error as __cause__.\n- A failure the store will not record is raised after on_error, instead of\n  only logged with RUNNING left behind for good.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "3f5c44c99a41b38df801fcc658feda87f06f6d2c",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.06518461169791148,
+      "docs_lines": 42474,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.13107338384117678,
+      "files_analyzed": 1347,
+      "function_lines": 325285,
+      "function_lines_ratio": 0.5996147394422017,
+      "mean_lines_per_function": 15.957859105180534,
+      "num_classes": 3036,
+      "num_functions": 20384,
+      "pypi_version": "0.1.6",
+      "total_lines": 542490
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T13:49:54Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40515409016",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T13:51:14.766118Z",
+  "workflow_status": {}
+}

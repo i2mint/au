@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 4.310508966445923,
-  "commit_message": "Merge 3f5c44c99a41b38df801fcc658feda87f06f6d2c into 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
-  "commit_sha": "9556a909c392a9316ad597b60dab660d8c7a9983",
+  "collection_duration_seconds": 6.726547718048096,
+  "commit_message": "mock_async works; results keep the run's duration; failures report their cause (#20)\n\n- mock_async swaps a default-backend seam that async_compute and the simple\n  API both read (it set an attribute nothing read, so tasks ran on a\n  ProcessBackend); @async_compute may be used bare, as the README shows.\n- ComputationResult.started_at: a worker records when the run began, so\n  duration is the run's (it was ~0); TTL still counts from created_at.\n- get_result chains the original error as __cause__.\n- A failure the store will not record is raised after on_error, instead of\n  only logged with RUNNING left behind for good.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "3f5c44c99a41b38df801fcc658feda87f06f6d2c",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.957859105180534,
       "num_classes": 3036,
       "num_functions": 20384,
-      "pypi_version": "0.1.7",
+      "pypi_version": "0.1.6",
       "total_lines": 542490
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:51:09.794763Z",
+  "timestamp": "2026-10-27T13:51:14.766118Z",
   "workflow_status": {}
 }
