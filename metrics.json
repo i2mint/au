@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 4.396294593811035,
-  "commit_message": "Merge 0f537ac6f42cb4514223d861a58d77f5078deff8 into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14",
-  "commit_sha": "aaaa842c1170be236cd71d8e944ddc8087afce5e",
+  "collection_duration_seconds": 8.152384996414185,
+  "commit_message": "ProcessBackend runs middleware in the child only; one rebuild rule for queues (#14)\n\n- ProcessBackend hands its middleware to the child, which runs\n  _compute_and_record: the parent no longer calls before_compute without a\n  matching release, and LoggingMiddleware no longer logs the start twice.\n  _worker_function and ProcessBackend._serialize_middleware are gone.\n- Queue workers (StdLibQueue, RQ, Supabase) rebuild middleware by one rule:\n  its class plus Middleware.worker_kwargs() (new, default {}; Logging and\n  SharedMetrics override it). Four serialisers with two rules become one\n  _middleware_configs. A class that rule cannot rebuild is refused at launch\n  instead of being silently dropped.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "0f537ac6f42cb4514223d861a58d77f5078deff8",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35372,
-      "comment_lines_ratio": 0.06520508854818581,
-      "docs_lines": 42452,
-      "empty_lines": 71113,
-      "empty_lines_ratio": 0.13109039528234584,
-      "files_analyzed": 1347,
-      "function_lines": 325282,
-      "function_lines_ratio": 0.5996279999188899,
-      "mean_lines_per_function": 15.95536371216952,
-      "num_classes": 3036,
-      "num_functions": 20387,
+      "comment_lines": 35222,
+      "comment_lines_ratio": 0.06523232835815367,
+      "docs_lines": 42358,
+      "empty_lines": 70712,
+      "empty_lines_ratio": 0.13096100172794736,
+      "files_analyzed": 1332,
+      "function_lines": 323510,
+      "function_lines_ratio": 0.5991513981927856,
+      "mean_lines_per_function": 15.95295626017062,
+      "num_classes": 3021,
+      "num_functions": 20279,
       "pypi_version": "0.1.4",
-      "total_lines": 542473
+      "total_lines": 539947
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:12:40.658338Z",
+  "timestamp": "2026-10-27T13:12:46.087583Z",
   "workflow_status": {}
 }
