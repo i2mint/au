@@ -470,3 +470,109 @@ def test_a_busy_file_is_retried_on_windows_and_not_elsewhere(tmp_path, monkeypat
     monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", False)
     store[other] = ComputationResult(2, ComputationStatus.COMPLETED)
     assert len(refusals) == 1 and store[other].status == ComputationStatus.PENDING
+
+
+# --- i2mint/au#12: every failure is recorded and the release hook always runs --
+
+
+class _Recorder(MetricsMiddleware):
+    """Middleware that tracks in-flight keys, as nw's job manager does."""
+
+    def __init__(self):
+        super().__init__()
+        self.in_flight, self.calls = set(), []
+
+    def before_compute(self, func, args, kwargs, key):
+        self.in_flight.add(key)
+
+    def after_compute(self, key, result):
+        self.calls.append(("after", key))
+        self.in_flight.discard(key)
+
+    def on_error(self, key, error):
+        self.calls.append(("error", key, type(error)))
+        self.in_flight.discard(key)
+
+
+class _Refusing(dict):
+    """A store that raises when asked to write any of the ``refused`` statuses."""
+
+    def __init__(self, *refused):
+        super().__init__()
+        self.refused = refused
+
+    def __setitem__(self, key, result):
+        if result.status in self.refused:
+            raise OSError(f"cannot write {result.status}")
+        super().__setitem__(key, result)
+
+
+class _Interrupt(BaseException):
+    pass
+
+
+def _interrupted():
+    raise _Interrupt("stop")
+
+
+def test_a_base_exception_is_recorded_as_failed_then_re_raised():
+    from au.base import _compute_and_record
+
+    store, mw = {}, _Recorder()
+    with pytest.raises(_Interrupt):
+        _compute_and_record(_interrupted, (), {}, key="k", store=store, middleware=[mw])
+    assert store["k"].status == ComputationStatus.FAILED
+    assert isinstance(store["k"].error, _Interrupt)
+    assert mw.calls == [("error", "k", _Interrupt)] and not mw.in_flight
+
+
+@pytest.mark.parametrize(
+    "refused, recorded",
+    [
+        ((ComputationStatus.RUNNING,), ComputationStatus.FAILED),
+        ((ComputationStatus.COMPLETED,), ComputationStatus.FAILED),
+        # Nothing more can be written: RUNNING stays, but the hook still runs.
+        (
+            (ComputationStatus.COMPLETED, ComputationStatus.FAILED),
+            ComputationStatus.RUNNING,
+        ),
+        (
+            (
+                ComputationStatus.RUNNING,
+                ComputationStatus.COMPLETED,
+                ComputationStatus.FAILED,
+            ),
+            None,
+        ),
+    ],
+)
+def test_a_store_that_fails_to_write_still_gets_the_release_hook(refused, recorded):
+    from au.base import _compute_and_record
+
+    store, mw = _Refusing(*refused), _Recorder()
+    _compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
+    assert mw.calls == [("error", "k", OSError)] and not mw.in_flight
+    assert (store["k"].status if "k" in store else None) == recorded
+
+
+def test_a_thread_backend_job_raising_a_base_exception_ends_failed(monkeypatch):
+    import threading
+
+    from au.base import ThreadBackend
+    from au.testing import InMemoryStore
+
+    escaped = threading.Event()
+    monkeypatch.setattr(
+        threading,
+        "excepthook",
+        lambda a: escaped.set() if a.exc_type is _Interrupt else None,
+    )
+    store, mw = InMemoryStore(), _Recorder()
+    handle = async_compute(backend=ThreadBackend(store, middleware=[mw]), store=store)(
+        _interrupted
+    )()
+    with pytest.raises(Exception):
+        handle.get_result(timeout=5)
+    assert handle.get_status() == ComputationStatus.FAILED
+    assert escaped.wait(5), "the BaseException was swallowed, not re-raised"
+    assert mw.calls == [("error", handle.key, _Interrupt)] and not mw.in_flight
