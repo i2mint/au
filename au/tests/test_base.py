@@ -1,3 +1,4 @@
+import contextlib
 import time
 from pathlib import Path
 from datetime import timedelta
@@ -480,13 +481,14 @@ class _Recorder(MetricsMiddleware):
 
     def __init__(self):
         super().__init__()
-        self.in_flight, self.calls = set(), []
+        self.in_flight, self.calls, self.results = set(), [], []
 
     def before_compute(self, func, args, kwargs, key):
         self.in_flight.add(key)
 
     def after_compute(self, key, result):
         self.calls.append(("after", key))
+        self.results.append(result.status)
         self.in_flight.discard(key)
 
     def on_error(self, key, error):
@@ -588,16 +590,37 @@ def test_a_cancellation_is_final_whatever_the_cancelled_job_then_does():
 
         return job
 
-    for outcome, raised in [(lambda: 1, None), (_interrupted, _Interrupt)]:
+    for outcome, raised, hook in [
+        (lambda: 1, None, "after"),
+        (_interrupted, _Interrupt, "error"),
+    ]:
         store, mw = {}, _Recorder()
-        try:
+        with pytest.raises(raised) if raised else contextlib.nullcontext():
             _compute_and_record(
                 cancelled_then(outcome), (), {}, key="k", store=store, middleware=[mw]
             )
-        except _Interrupt:
-            pass
         assert store["k"].status == ComputationStatus.CANCELLED
-        assert not mw.in_flight and len(mw.calls) == 1
+        assert not mw.in_flight and [c[0] for c in mw.calls] == [hook]
+        if hook == "after":
+            assert mw.results == [ComputationStatus.CANCELLED]
+
+
+class _ForgetfulStore(dict):
+    """A store whose reads fail once the job has started (a dropped connection)."""
+
+    def get(self, key, default=None):
+        if key in self:
+            raise ConnectionError("store unreachable")
+        return default
+
+
+def test_a_store_read_that_fails_does_not_lose_a_finished_job():
+    from au.base import _compute_and_record
+
+    store, mw = _ForgetfulStore(), _Recorder()
+    _compute_and_record(_double, (21,), {}, key="k", store=store, middleware=[mw])
+    assert dict.get(store, "k").value == 42
+    assert [c[0] for c in mw.calls] == ["after"]
 
 
 def _interrupted_hook(*args):

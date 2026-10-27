@@ -720,7 +720,10 @@ def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
         except Exception:
             logger.exception(f"Middleware {mw.__class__.__name__} {hook} failed")
         except BaseException as e:
-            interrupt = interrupt or e
+            if interrupt is None:
+                interrupt = e
+            else:
+                logger.exception(f"Middleware {mw.__class__.__name__} {hook} failed")
     if interrupt is not None:
         raise interrupt
 
@@ -747,8 +750,11 @@ def _compute_and_record(
     try:
         _call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
-        result = ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED)
-        _record_unless_cancelled(store, key, result)
+        result = _record_unless_cancelled(
+            store,
+            key,
+            ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED),
+        )
     except BaseException as error:
         failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
         try:
@@ -764,15 +770,22 @@ def _compute_and_record(
 
 def _record_unless_cancelled(
     store: "ComputationStore", key: str, result: ComputationResult
-) -> None:
-    """Record a worker's outcome, unless the caller cancelled meanwhile.
+) -> ComputationResult:
+    """Record a worker's outcome unless the caller cancelled meanwhile, and
+    return what the store now holds.
 
     A thread cannot be killed, so a cancelled one runs on; its outcome must not
-    turn the cancellation back into COMPLETED or FAILED.
+    turn the cancellation back into COMPLETED or FAILED. A read that fails means
+    "not known to be cancelled": the outcome is written rather than lost.
     """
-    current = store.get(key)
-    if current is None or current.status != ComputationStatus.CANCELLED:
-        store[key] = result
+    try:
+        current = store.get(key)
+    except Exception:
+        current = None
+    if current is not None and current.status == ComputationStatus.CANCELLED:
+        return current
+    store[key] = result
+    return result
 
 
 def _mark_running(store: "ComputationStore", key: str) -> None:
@@ -1103,9 +1116,11 @@ class ComputationHandle(Generic[T]):
             True if cancelled, False if already in a terminal state.
 
         Note:
-            Only a backend that can stop the work (``ProcessBackend``) makes
-            CANCELLED final. A thread, or a pool task that is already running,
-            cannot be stopped and may still write its own result afterwards.
+            A thread, or a pool task that is already running, cannot be
+            stopped; the au workers keep CANCELLED final anyway by not writing
+            their outcome over it. ``after_compute`` then receives the CANCELLED
+            result. A worker finishing in the instant between its check and its
+            write can still overwrite it (no compare-and-set).
         """
         result = self.store[self.key]
         if not result.is_ready:
