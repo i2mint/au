@@ -1028,8 +1028,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="797">    <span class="n">started</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span data-line="798">    <span class="k">try</span><span class="p">:</span>
 </span><span data-line="799">        <span class="n">call_hooks</span><span class="p">(</span><span class="n">middleware</span><span class="p">,</span> <span class="s2">"before_compute"</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-</span><span data-line="800">        <span class="n">_mark_running</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-</span><span data-line="801">        <span class="n">started</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+</span><span data-line="800">        <span class="n">started</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>  <span class="c1"># on RUNNING too, so a running job shows it</span>
+</span><span data-line="801">        <span class="n">_mark_running</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">started_at</span><span class="o">=</span><span class="n">started</span><span class="p">)</span>
 </span><span data-line="802">        <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span><span data-line="803">        <span class="n">result</span> <span class="o">=</span> <span class="n">_record_unless_cancelled</span><span class="p">(</span>
 </span><span data-line="804">            <span class="n">store</span><span class="p">,</span>
@@ -1079,623 +1079,642 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="847">    <span class="k">return</span> <span class="n">result</span>
 </span><span data-line="848">
 </span><span data-line="849">
-</span><span data-line="850"><span class="k">def</span><span class="w"> </span><span class="nf">_mark_running</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="s2">"ComputationStore"</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="851"><span class="w">    </span><span class="sd">"""Record RUNNING, unless the computation was already cancelled or finished.</span>
-</span><span data-line="852">
-</span><span data-line="853"><span class="sd">    A worker starts after the caller may have cancelled it; writing RUNNING over</span>
-</span><span data-line="854"><span class="sd">    that CANCELLED makes the cancellation disappear (i2mint/au#6).</span>
-</span><span data-line="855"><span class="sd">    """</span>
-</span><span data-line="856">    <span class="n">current</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>  <span class="c1"># a store may raise KeyError for a key not yet written</span>
-</span><span data-line="857">    <span class="k">if</span> <span class="n">current</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">current</span><span class="o">.</span><span class="n">is_ready</span><span class="p">:</span>
-</span><span data-line="858">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">)</span>
-</span><span data-line="859">
-</span><span data-line="860">
-</span><span data-line="861"><span class="k">def</span><span class="w"> </span><span class="nf">_explained_start_failure</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span data-line="862"><span class="w">    </span><span class="sd">"""The error to raise when a process could not be started.</span>
+</span><span data-line="850"><span class="k">def</span><span class="w"> </span><span class="nf">_mark_running</span><span class="p">(</span>
+</span><span data-line="851">    <span class="n">store</span><span class="p">:</span> <span class="s2">"ComputationStore"</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">started_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="852"><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="853"><span class="w">    </span><span class="sd">"""Record RUNNING, unless the computation was already cancelled or finished.</span>
+</span><span data-line="854">
+</span><span data-line="855"><span class="sd">    A worker starts after the caller may have cancelled it; writing RUNNING over</span>
+</span><span data-line="856"><span class="sd">    that CANCELLED makes the cancellation disappear (i2mint/au#6).</span>
+</span><span data-line="857"><span class="sd">    """</span>
+</span><span data-line="858">    <span class="n">current</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>  <span class="c1"># a store may raise KeyError for a key not yet written</span>
+</span><span data-line="859">    <span class="k">if</span> <span class="n">current</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">current</span><span class="o">.</span><span class="n">is_ready</span><span class="p">:</span>
+</span><span data-line="860">        <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
+</span><span data-line="861">            <span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">started_at</span><span class="o">=</span><span class="n">started_at</span>
+</span><span data-line="862">        <span class="p">)</span>
 </span><span data-line="863">
-</span><span data-line="864"><span class="sd">    Where processes are spawned (Windows; macOS and Python 3.14 by default if</span>
-</span><span data-line="865"><span class="sd">    the start method is changed) the work crosses by pickle at ``start()``: a</span>
-</span><span data-line="866"><span class="sd">    lambda, a local function, or a name rebound by a decorator fails there with</span>
-</span><span data-line="867"><span class="sd">    an error that does not say so, and so does middleware holding a lock or a</span>
-</span><span data-line="868"><span class="sd">    handle. Starting is the only honest test of what a spawned process accepts</span>
-</span><span data-line="869"><span class="sd">    (a ``multiprocessing.Queue`` pickles only then).</span>
-</span><span data-line="870"><span class="sd">    """</span>
-</span><span data-line="871">    <span class="c1"># Pickling failures surface as PicklingError, TypeError ("cannot pickle ...")</span>
-</span><span data-line="872">    <span class="c1"># or AttributeError ("Can't get local object ...").</span>
-</span><span data-line="873">    <span class="n">pickling</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">))</span>
-</span><span data-line="874">    <span class="k">if</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"fork"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">pickling</span><span class="p">:</span>
-</span><span data-line="875">        <span class="k">return</span> <span class="n">error</span>
-</span><span data-line="876">    <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span data-line="877">        <span class="sa">f</span><span class="s2">"The work cannot be sent to a spawned process (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: "</span>
-</span><span data-line="878">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">). The start method is </span><span class="si">{</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span><span class="si">!r}</span><span class="s2">, "</span>
-</span><span data-line="879">        <span class="s2">"which pickles the function, its arguments and the middleware: use a "</span>
-</span><span data-line="880">        <span class="s2">"module-level function and middleware that pickles (e.g. give it a "</span>
-</span><span data-line="881">        <span class="s2">"__getstate__ that drops a lock or a handle), or ThreadBackend."</span>
-</span><span data-line="882">    <span class="p">)</span>
-</span><span data-line="883">
-</span><span data-line="884">
+</span><span data-line="864">
+</span><span data-line="865"><span class="k">def</span><span class="w"> </span><span class="nf">_explained_start_failure</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">Exception</span><span class="p">:</span>
+</span><span data-line="866"><span class="w">    </span><span class="sd">"""The error to raise when a process could not be started.</span>
+</span><span data-line="867">
+</span><span data-line="868"><span class="sd">    Where processes are spawned (Windows; macOS and Python 3.14 by default if</span>
+</span><span data-line="869"><span class="sd">    the start method is changed) the work crosses by pickle at ``start()``: a</span>
+</span><span data-line="870"><span class="sd">    lambda, a local function, or a name rebound by a decorator fails there with</span>
+</span><span data-line="871"><span class="sd">    an error that does not say so, and so does middleware holding a lock or a</span>
+</span><span data-line="872"><span class="sd">    handle. Starting is the only honest test of what a spawned process accepts</span>
+</span><span data-line="873"><span class="sd">    (a ``multiprocessing.Queue`` pickles only then).</span>
+</span><span data-line="874"><span class="sd">    """</span>
+</span><span data-line="875">    <span class="c1"># Pickling failures surface as PicklingError, TypeError ("cannot pickle ...")</span>
+</span><span data-line="876">    <span class="c1"># or AttributeError ("Can't get local object ...").</span>
+</span><span data-line="877">    <span class="n">pickling</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">))</span>
+</span><span data-line="878">    <span class="k">if</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"fork"</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">pickling</span><span class="p">:</span>
+</span><span data-line="879">        <span class="k">return</span> <span class="n">error</span>
+</span><span data-line="880">    <span class="k">return</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="881">        <span class="sa">f</span><span class="s2">"The work cannot be sent to a spawned process (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: "</span>
+</span><span data-line="882">        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">). The start method is </span><span class="si">{</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span><span class="si">!r}</span><span class="s2">, "</span>
+</span><span data-line="883">        <span class="s2">"which pickles the function, its arguments and the middleware: use a "</span>
+</span><span data-line="884">        <span class="s2">"module-level function and middleware that pickles (e.g. give it a "</span>
+</span><span data-line="885">        <span class="s2">"__getstate__ that drops a lock or a handle), or ThreadBackend."</span>
+</span><span data-line="886">    <span class="p">)</span>
+</span><span data-line="887">
+</span><span data-line="888">
 <div class="viewcode-block" id="ProcessBackend">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ProcessBackend">[docs]</a>
-</span><span data-line="885"><span class="k">class</span><span class="w"> </span><span class="nc">ProcessBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
-</span><span data-line="886"><span class="w">    </span><span class="sd">"""Execute computations in separate processes with middleware support."""</span>
-</span><span data-line="887">
-</span><span data-line="888">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span data-line="889">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="890">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="891">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="892">    <span class="p">):</span>
-</span><span data-line="893">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="894">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="895">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_fork_method</span><span class="p">()</span>
-</span><span data-line="896">        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span data-line="897">
-</span><span data-line="898">    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_fork_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="899"><span class="w">        </span><span class="sd">"""Prefer ``fork`` for better pickling compatibility, where it exists.</span>
-</span><span data-line="900">
-</span><span data-line="901"><span class="sd">        ``fork`` does not exist on Windows, where asking for it raises</span>
-</span><span data-line="902"><span class="sd">        ``ValueError`` (i2mint/au#7): there the platform default (``spawn``) is</span>
-</span><span data-line="903"><span class="sd">        kept, and ``launch`` checks that the function can be pickled.</span>
-</span><span data-line="904"><span class="sd">        """</span>
-</span><span data-line="905">        <span class="k">if</span> <span class="s2">"fork"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_all_start_methods</span><span class="p">():</span>
-</span><span data-line="906">            <span class="k">return</span>
-</span><span data-line="907">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="908">            <span class="n">current_method</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
-</span><span data-line="909">            <span class="k">if</span> <span class="n">current_method</span> <span class="o">!=</span> <span class="s2">"fork"</span><span class="p">:</span>
-</span><span data-line="910">                <span class="n">multiprocessing</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s2">"fork"</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span data-line="911">        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-</span><span data-line="912">            <span class="c1"># Start method already set, which is fine</span>
-</span><span data-line="913">            <span class="k">pass</span>
-</span><span data-line="914">
+</span><span data-line="889"><span class="k">class</span><span class="w"> </span><span class="nc">ProcessBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+</span><span data-line="890"><span class="w">    </span><span class="sd">"""Execute computations in separate processes with middleware support."""</span>
+</span><span data-line="891">
+</span><span data-line="892">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="893">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="894">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="895">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="896">    <span class="p">):</span>
+</span><span data-line="897">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="898">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="899">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_fork_method</span><span class="p">()</span>
+</span><span data-line="900">        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="901">
+</span><span data-line="902">    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_fork_method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="903"><span class="w">        </span><span class="sd">"""Prefer ``fork`` for better pickling compatibility, where it exists.</span>
+</span><span data-line="904">
+</span><span data-line="905"><span class="sd">        ``fork`` does not exist on Windows, where asking for it raises</span>
+</span><span data-line="906"><span class="sd">        ``ValueError`` (i2mint/au#7): there the platform default (``spawn``) is</span>
+</span><span data-line="907"><span class="sd">        kept, and ``launch`` checks that the function can be pickled.</span>
+</span><span data-line="908"><span class="sd">        """</span>
+</span><span data-line="909">        <span class="k">if</span> <span class="s2">"fork"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_all_start_methods</span><span class="p">():</span>
+</span><span data-line="910">            <span class="k">return</span>
+</span><span data-line="911">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="912">            <span class="n">current_method</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
+</span><span data-line="913">            <span class="k">if</span> <span class="n">current_method</span> <span class="o">!=</span> <span class="s2">"fork"</span><span class="p">:</span>
+</span><span data-line="914">                <span class="n">multiprocessing</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s2">"fork"</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="915">        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+</span><span data-line="916">            <span class="c1"># Start method already set, which is fine</span>
+</span><span data-line="917">            <span class="k">pass</span>
+</span><span data-line="918">
 <div class="viewcode-block" id="ProcessBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ProcessBackend.launch">[docs]</a>
-</span><span data-line="915">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="916">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="917">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="918">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="919">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="920">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="921">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="922">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="923"><span class="w">        </span><span class="sd">"""Launch computation in a new process.</span>
-</span><span data-line="924">
-</span><span data-line="925"><span class="sd">        The middleware goes to the child with the work and runs there only, so</span>
-</span><span data-line="926"><span class="sd">        each ``before_compute`` is released by an ``after_compute`` or</span>
-</span><span data-line="927"><span class="sd">        ``on_error`` in the same process (i2mint/au#14). Count across processes</span>
-</span><span data-line="928"><span class="sd">        with :class:`SharedMetricsMiddleware`; a plain one counts in the child.</span>
-</span><span data-line="929"><span class="sd">        """</span>
-</span><span data-line="930">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="931">        <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
-</span><span data-line="932">            <span class="n">target</span><span class="o">=</span><span class="n">compute_and_record</span><span class="p">,</span>
-</span><span data-line="933">            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">),</span>
-</span><span data-line="934">            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">),</span>
-</span><span data-line="935">        <span class="p">)</span>
-</span><span data-line="936">        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">process</span>
-</span><span data-line="937">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="938">            <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span data-line="939">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span data-line="940">            <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span data-line="941">            <span class="k">raise</span> <span class="n">_explained_start_failure</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+</span><span data-line="919">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="920">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="921">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="922">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="923">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="924">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="925">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="926">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="927"><span class="w">        </span><span class="sd">"""Launch computation in a new process.</span>
+</span><span data-line="928">
+</span><span data-line="929"><span class="sd">        The middleware goes to the child with the work and runs there only, so</span>
+</span><span data-line="930"><span class="sd">        each ``before_compute`` is released by an ``after_compute`` or</span>
+</span><span data-line="931"><span class="sd">        ``on_error`` in the same process (i2mint/au#14). Count across processes</span>
+</span><span data-line="932"><span class="sd">        with :class:`SharedMetricsMiddleware`; a plain one counts in the child.</span>
+</span><span data-line="933"><span class="sd">        """</span>
+</span><span data-line="934">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="935">        <span class="n">process</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span>
+</span><span data-line="936">            <span class="n">target</span><span class="o">=</span><span class="n">compute_and_record</span><span class="p">,</span>
+</span><span data-line="937">            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">),</span>
+</span><span data-line="938">            <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span><span class="p">),</span>
+</span><span data-line="939">        <span class="p">)</span>
+</span><span data-line="940">        <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">process</span>
+</span><span data-line="941">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="942">            <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span data-line="943">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="944">            <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span data-line="945">            <span class="k">raise</span> <span class="n">_explained_start_failure</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
 
-</span><span data-line="942">
+</span><span data-line="946">
 <div class="viewcode-block" id="ProcessBackend.terminate">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ProcessBackend.terminate">[docs]</a>
-</span><span data-line="943">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="944">        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span data-line="945">        <span class="k">if</span> <span class="n">proc</span> <span class="ow">and</span> <span class="n">proc</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-</span><span data-line="946">            <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-</span><span data-line="947">            <span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+</span><span data-line="947">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="948">        <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span data-line="949">        <span class="k">if</span> <span class="n">proc</span> <span class="ow">and</span> <span class="n">proc</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+</span><span data-line="950">            <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+</span><span data-line="951">            <span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 </div>
 
-</span><span data-line="948">
-</span><span data-line="949">
+</span><span data-line="952">
+</span><span data-line="953">
 <div class="viewcode-block" id="StdLibQueueBackend">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.StdLibQueueBackend">[docs]</a>
-</span><span data-line="950"><span class="k">class</span><span class="w"> </span><span class="nc">StdLibQueueBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
-</span><span data-line="951"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="952"><span class="sd">    Execute computations using Python's standard library concurrent.futures.</span>
-</span><span data-line="953">
-</span><span data-line="954"><span class="sd">    This backend uses ThreadPoolExecutor or ProcessPoolExecutor for in-memory</span>
-</span><span data-line="955"><span class="sd">    task queuing. Not persistent across application restarts.</span>
-</span><span data-line="956"><span class="sd">    """</span>
+</span><span data-line="954"><span class="k">class</span><span class="w"> </span><span class="nc">StdLibQueueBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+</span><span data-line="955"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="956"><span class="sd">    Execute computations using Python's standard library concurrent.futures.</span>
 </span><span data-line="957">
-</span><span data-line="958">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span data-line="959">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="960">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="961">        <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-</span><span data-line="962">        <span class="n">use_processes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span data-line="963">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="964">    <span class="p">):</span>
-</span><span data-line="965">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="966">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="967">        <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
-</span><span data-line="968">        <span class="bp">self</span><span class="o">.</span><span class="n">use_processes</span> <span class="o">=</span> <span class="n">use_processes</span>
-</span><span data-line="969">        <span class="bp">self</span><span class="o">.</span><span class="n">executor_cls</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="970">            <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span>
-</span><span data-line="971">            <span class="k">if</span> <span class="n">use_processes</span>
-</span><span data-line="972">            <span class="k">else</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span>
-</span><span data-line="973">        <span class="p">)</span>
-</span><span data-line="974">        <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="p">(</span>
-</span><span data-line="975">            <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span>
-</span><span data-line="976">            <span class="o">|</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span>
-</span><span data-line="977">        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="978">        <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">Future</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span data-line="979">        <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span data-line="980">
-</span><span data-line="981">    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_started</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="982"><span class="w">        </span><span class="sd">"""Lazy initialization of the executor."""</span>
-</span><span data-line="983">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
-</span><span data-line="984">            <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_cls</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span><span class="p">)</span>
-</span><span data-line="985">            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span data-line="986">
+</span><span data-line="958"><span class="sd">    This backend uses ThreadPoolExecutor or ProcessPoolExecutor for in-memory</span>
+</span><span data-line="959"><span class="sd">    task queuing. Not persistent across application restarts.</span>
+</span><span data-line="960"><span class="sd">    """</span>
+</span><span data-line="961">
+</span><span data-line="962">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="963">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="964">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="965">        <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+</span><span data-line="966">        <span class="n">use_processes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span data-line="967">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="968">    <span class="p">):</span>
+</span><span data-line="969">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="970">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="971">        <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
+</span><span data-line="972">        <span class="bp">self</span><span class="o">.</span><span class="n">use_processes</span> <span class="o">=</span> <span class="n">use_processes</span>
+</span><span data-line="973">        <span class="bp">self</span><span class="o">.</span><span class="n">executor_cls</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="974">            <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span>
+</span><span data-line="975">            <span class="k">if</span> <span class="n">use_processes</span>
+</span><span data-line="976">            <span class="k">else</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span>
+</span><span data-line="977">        <span class="p">)</span>
+</span><span data-line="978">        <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="p">(</span>
+</span><span data-line="979">            <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span>
+</span><span data-line="980">            <span class="o">|</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ProcessPoolExecutor</span>
+</span><span data-line="981">        <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="982">        <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">Future</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="983">        <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span data-line="984">
+</span><span data-line="985">    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_started</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="986"><span class="w">        </span><span class="sd">"""Lazy initialization of the executor."""</span>
+</span><span data-line="987">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
+</span><span data-line="988">            <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executor_cls</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span><span class="p">)</span>
+</span><span data-line="989">            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="990">
 <div class="viewcode-block" id="StdLibQueueBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.StdLibQueueBackend.launch">[docs]</a>
-</span><span data-line="987">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="988">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="989">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="990">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="991">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="992">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="993">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="994">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="995"><span class="w">        </span><span class="sd">"""Launch computation using executor."""</span>
-</span><span data-line="996">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="997">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_started</span><span class="p">()</span>
-</span><span data-line="998">
-</span><span data-line="999">        <span class="c1"># Serialize task data</span>
-</span><span data-line="1000">        <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">_queue_payload</span><span class="p">(</span>
-</span><span data-line="1001">            <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
-</span><span data-line="1002">        <span class="p">)</span>
-</span><span data-line="1003">
-</span><span data-line="1004">        <span class="c1"># Submit to executor</span>
-</span><span data-line="1005">        <span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_au_worker_entrypoint</span><span class="p">,</span> <span class="n">serialized_data</span><span class="p">)</span>
-</span><span data-line="1006">        <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">future</span></div>
-
+</span><span data-line="991">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="992">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="993">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="994">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="995">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="996">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="997">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="998">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="999"><span class="w">        </span><span class="sd">"""Launch computation using executor."""</span>
+</span><span data-line="1000">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="1001">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_started</span><span class="p">()</span>
+</span><span data-line="1002">
+</span><span data-line="1003">        <span class="c1"># Serialize task data</span>
+</span><span data-line="1004">        <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">_queue_payload</span><span class="p">(</span>
+</span><span data-line="1005">            <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
+</span><span data-line="1006">        <span class="p">)</span>
 </span><span data-line="1007">
+</span><span data-line="1008">        <span class="c1"># Submit to executor</span>
+</span><span data-line="1009">        <span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_au_worker_entrypoint</span><span class="p">,</span> <span class="n">serialized_data</span><span class="p">)</span>
+</span><span data-line="1010">        <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">future</span></div>
+
+</span><span data-line="1011">
 <div class="viewcode-block" id="StdLibQueueBackend.terminate">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.StdLibQueueBackend.terminate">[docs]</a>
-</span><span data-line="1008">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1009"><span class="w">        </span><span class="sd">"""Attempt to cancel a running task."""</span>
-</span><span data-line="1010">        <span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-</span><span data-line="1011">        <span class="k">if</span> <span class="n">future</span><span class="p">:</span>
-</span><span data-line="1012">            <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span data-line="1013">            <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+</span><span data-line="1012">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1013"><span class="w">        </span><span class="sd">"""Attempt to cancel a running task."""</span>
+</span><span data-line="1014">        <span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span data-line="1015">        <span class="k">if</span> <span class="n">future</span><span class="p">:</span>
+</span><span data-line="1016">            <span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span data-line="1017">            <span class="bp">self</span><span class="o">.</span><span class="n">_futures</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
-</span><span data-line="1014">
+</span><span data-line="1018">
 <div class="viewcode-block" id="StdLibQueueBackend.shutdown">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.StdLibQueueBackend.shutdown">[docs]</a>
-</span><span data-line="1015">    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1016"><span class="w">        </span><span class="sd">"""Shutdown the executor."""</span>
-</span><span data-line="1017">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="p">:</span>
-</span><span data-line="1018">            <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span data-line="1019">            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span></div>
+</span><span data-line="1019">    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1020"><span class="w">        </span><span class="sd">"""Shutdown the executor."""</span>
+</span><span data-line="1021">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="p">:</span>
+</span><span data-line="1022">            <span class="bp">self</span><span class="o">.</span><span class="n">_executor</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="1023">            <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-</span><span data-line="1020">
-</span><span data-line="1021">    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span data-line="1022"><span class="w">        </span><span class="sd">"""Context manager entry."""</span>
-</span><span data-line="1023">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_started</span><span class="p">()</span>
-</span><span data-line="1024">        <span class="k">return</span> <span class="bp">self</span>
-</span><span data-line="1025">
-</span><span data-line="1026">    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-</span><span data-line="1027"><span class="w">        </span><span class="sd">"""Context manager exit."""</span>
-</span><span data-line="1028">        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span></div>
-
+</span><span data-line="1024">
+</span><span data-line="1025">    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span data-line="1026"><span class="w">        </span><span class="sd">"""Context manager entry."""</span>
+</span><span data-line="1027">        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_started</span><span class="p">()</span>
+</span><span data-line="1028">        <span class="k">return</span> <span class="bp">self</span>
 </span><span data-line="1029">
-</span><span data-line="1030">
+</span><span data-line="1030">    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+</span><span data-line="1031"><span class="w">        </span><span class="sd">"""Context manager exit."""</span>
+</span><span data-line="1032">        <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span></div>
+
+</span><span data-line="1033">
+</span><span data-line="1034">
 <div class="viewcode-block" id="ComputationHandle">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ComputationHandle">[docs]</a>
-</span><span data-line="1031"><span class="nd">@dataclass</span>
-</span><span data-line="1032"><span class="k">class</span><span class="w"> </span><span class="nc">ComputationHandle</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
-</span><span data-line="1033"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="1034"><span class="sd">    Handle to check status and retrieve results of async computation.</span>
-</span><span data-line="1035">
-</span><span data-line="1036"><span class="sd">    &gt;&gt;&gt; handle = ComputationHandle("test-key", FileSystemStore("/tmp"))</span>
-</span><span data-line="1037"><span class="sd">    &gt;&gt;&gt; handle.is_ready()</span>
-</span><span data-line="1038"><span class="sd">    False</span>
-</span><span data-line="1039"><span class="sd">    """</span>
-</span><span data-line="1040">
-</span><span data-line="1041">    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="1042">    <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span>
-</span><span data-line="1043">    <span class="n">backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Add this</span>
+</span><span data-line="1035"><span class="nd">@dataclass</span>
+</span><span data-line="1036"><span class="k">class</span><span class="w"> </span><span class="nc">ComputationHandle</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+</span><span data-line="1037"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="1038"><span class="sd">    Handle to check status and retrieve results of async computation.</span>
+</span><span data-line="1039">
+</span><span data-line="1040"><span class="sd">    &gt;&gt;&gt; handle = ComputationHandle("test-key", FileSystemStore("/tmp"))</span>
+</span><span data-line="1041"><span class="sd">    &gt;&gt;&gt; handle.is_ready()</span>
+</span><span data-line="1042"><span class="sd">    False</span>
+</span><span data-line="1043"><span class="sd">    """</span>
 </span><span data-line="1044">
+</span><span data-line="1045">    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="1046">    <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span>
+</span><span data-line="1047">    <span class="n">backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Add this</span>
+</span><span data-line="1048">
+</span><span data-line="1049">    <span class="k">def</span><span class="w"> </span><span class="nf">_current</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationResult</span><span class="p">:</span>
+</span><span data-line="1050"><span class="w">        </span><span class="sd">"""The stored result; PENDING while the worker has written nothing yet</span>
+</span><span data-line="1051"><span class="sd">        (a store such as InMemoryStore raises KeyError for an unwritten key).</span>
+</span><span data-line="1052">
+</span><span data-line="1053"><span class="sd">        Like FileSystemStore's reads, a key that will never be written (a typo)</span>
+</span><span data-line="1054"><span class="sd">        reads PENDING too: ``get_result`` then waits for its timeout.</span>
+</span><span data-line="1055"><span class="sd">        """</span>
+</span><span data-line="1056">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="1057">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+</span><span data-line="1058">        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+</span><span data-line="1059">            <span class="k">return</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">PENDING</span><span class="p">)</span>
+</span><span data-line="1060">
 <div class="viewcode-block" id="ComputationHandle.is_ready">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ComputationHandle.is_ready">[docs]</a>
-</span><span data-line="1045">    <span class="k">def</span><span class="w"> </span><span class="nf">is_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="1046"><span class="w">        </span><span class="sd">"""Check if the computation is complete."""</span>
-</span><span data-line="1047">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">is_ready</span></div>
+</span><span data-line="1061">    <span class="k">def</span><span class="w"> </span><span class="nf">is_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="1062"><span class="w">        </span><span class="sd">"""Check if the computation is complete."""</span>
+</span><span data-line="1063">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current</span><span class="p">()</span><span class="o">.</span><span class="n">is_ready</span></div>
 
-</span><span data-line="1048">
+</span><span data-line="1064">
 <div class="viewcode-block" id="ComputationHandle.get_status">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ComputationHandle.get_status">[docs]</a>
-</span><span data-line="1049">    <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationStatus</span><span class="p">:</span>
-</span><span data-line="1050"><span class="w">        </span><span class="sd">"""Get the current status of the computation."""</span>
-</span><span data-line="1051">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">status</span></div>
+</span><span data-line="1065">    <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationStatus</span><span class="p">:</span>
+</span><span data-line="1066"><span class="w">        </span><span class="sd">"""Get the current status of the computation."""</span>
+</span><span data-line="1067">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current</span><span class="p">()</span><span class="o">.</span><span class="n">status</span></div>
 
-</span><span data-line="1052">
+</span><span data-line="1068">
 <div class="viewcode-block" id="ComputationHandle.get_result">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ComputationHandle.get_result">[docs]</a>
-</span><span data-line="1053">    <span class="k">def</span><span class="w"> </span><span class="nf">get_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-</span><span data-line="1054"><span class="w">        </span><span class="sd">"""</span>
-</span><span data-line="1055"><span class="sd">        Get the computation result, optionally waiting for completion.</span>
-</span><span data-line="1056">
-</span><span data-line="1057"><span class="sd">        Args:</span>
-</span><span data-line="1058"><span class="sd">            timeout: Maximum seconds to wait. None means no waiting.</span>
-</span><span data-line="1059">
-</span><span data-line="1060"><span class="sd">        Raises:</span>
-</span><span data-line="1061"><span class="sd">            TimeoutError: If timeout expires before completion.</span>
-</span><span data-line="1062"><span class="sd">            Exception: If the computation failed.</span>
-</span><span data-line="1063"><span class="sd">        """</span>
-</span><span data-line="1064">
-</span><span data-line="1065">        <span class="k">def</span><span class="w"> </span><span class="nf">_poll_interval</span><span class="p">(</span><span class="n">elapsed</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span data-line="1066"><span class="w">            </span><span class="sd">"""Adaptive polling interval that increases with time."""</span>
-</span><span data-line="1067">            <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span data-line="1068">                <span class="k">return</span> <span class="mf">0.01</span>
-</span><span data-line="1069">            <span class="k">elif</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
-</span><span data-line="1070">                <span class="k">return</span> <span class="mf">0.1</span>
-</span><span data-line="1071">            <span class="k">else</span><span class="p">:</span>
-</span><span data-line="1072">                <span class="k">return</span> <span class="mf">0.5</span>
-</span><span data-line="1073">
-</span><span data-line="1074">        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span data-line="1069">    <span class="k">def</span><span class="w"> </span><span class="nf">get_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+</span><span data-line="1070"><span class="w">        </span><span class="sd">"""</span>
+</span><span data-line="1071"><span class="sd">        Get the computation result, optionally waiting for completion.</span>
+</span><span data-line="1072">
+</span><span data-line="1073"><span class="sd">        Args:</span>
+</span><span data-line="1074"><span class="sd">            timeout: Maximum seconds to wait. None means no waiting.</span>
 </span><span data-line="1075">
-</span><span data-line="1076">        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-</span><span data-line="1077">            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-</span><span data-line="1078">
-</span><span data-line="1079">            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
-</span><span data-line="1080">                <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">value</span>
-</span><span data-line="1081">            <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
-</span><span data-line="1082">                <span class="n">error_msg</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="ow">or</span> <span class="s2">"Computation failed"</span>
-</span><span data-line="1083">                <span class="n">cause</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="1084">                    <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
-</span><span data-line="1085">                <span class="p">)</span>
-</span><span data-line="1086">                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">cause</span>
-</span><span data-line="1087">            <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">:</span>
-</span><span data-line="1088">                <span class="n">reason</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">terminal_reason</span> <span class="ow">or</span> <span class="s2">"Computation cancelled"</span>
-</span><span data-line="1089">                <span class="k">raise</span> <span class="n">ComputationCancelledError</span><span class="p">(</span><span class="n">reason</span><span class="p">)</span>
-</span><span data-line="1090">
-</span><span data-line="1091">            <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1092">                <span class="k">break</span>
-</span><span data-line="1093">
-</span><span data-line="1094">            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-</span><span data-line="1095">            <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
-</span><span data-line="1096">                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Computation not ready after </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
-</span><span data-line="1097">
-</span><span data-line="1098">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">_poll_interval</span><span class="p">(</span><span class="n">elapsed</span><span class="p">))</span>
-</span><span data-line="1099">
-</span><span data-line="1100">        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Result not ready and no timeout specified"</span><span class="p">)</span></div>
+</span><span data-line="1076"><span class="sd">        Raises:</span>
+</span><span data-line="1077"><span class="sd">            TimeoutError: If timeout expires before completion.</span>
+</span><span data-line="1078"><span class="sd">            Exception: If the computation failed.</span>
+</span><span data-line="1079"><span class="sd">        """</span>
+</span><span data-line="1080">
+</span><span data-line="1081">        <span class="k">def</span><span class="w"> </span><span class="nf">_poll_interval</span><span class="p">(</span><span class="n">elapsed</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span data-line="1082"><span class="w">            </span><span class="sd">"""Adaptive polling interval that increases with time."""</span>
+</span><span data-line="1083">            <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+</span><span data-line="1084">                <span class="k">return</span> <span class="mf">0.01</span>
+</span><span data-line="1085">            <span class="k">elif</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+</span><span data-line="1086">                <span class="k">return</span> <span class="mf">0.1</span>
+</span><span data-line="1087">            <span class="k">else</span><span class="p">:</span>
+</span><span data-line="1088">                <span class="k">return</span> <span class="mf">0.5</span>
+</span><span data-line="1089">
+</span><span data-line="1090">        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span data-line="1091">
+</span><span data-line="1092">        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span data-line="1093">            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current</span><span class="p">()</span>
+</span><span data-line="1094">
+</span><span data-line="1095">            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+</span><span data-line="1096">                <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">value</span>
+</span><span data-line="1097">            <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">:</span>
+</span><span data-line="1098">                <span class="n">error_msg</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="ow">or</span> <span class="s2">"Computation failed"</span>
+</span><span data-line="1099">                <span class="n">cause</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="1100">                    <span class="n">result</span><span class="o">.</span><span class="n">error</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span data-line="1101">                <span class="p">)</span>
+</span><span data-line="1102">                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">cause</span>
+</span><span data-line="1103">            <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">:</span>
+</span><span data-line="1104">                <span class="n">reason</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">terminal_reason</span> <span class="ow">or</span> <span class="s2">"Computation cancelled"</span>
+</span><span data-line="1105">                <span class="k">raise</span> <span class="n">ComputationCancelledError</span><span class="p">(</span><span class="n">reason</span><span class="p">)</span>
+</span><span data-line="1106">
+</span><span data-line="1107">            <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1108">                <span class="k">break</span>
+</span><span data-line="1109">
+</span><span data-line="1110">            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+</span><span data-line="1111">            <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+</span><span data-line="1112">                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Computation not ready after </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+</span><span data-line="1113">
+</span><span data-line="1114">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">_poll_interval</span><span class="p">(</span><span class="n">elapsed</span><span class="p">))</span>
+</span><span data-line="1115">
+</span><span data-line="1116">        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Result not ready and no timeout specified"</span><span class="p">)</span></div>
 
-</span><span data-line="1101">
+</span><span data-line="1117">
 <div class="viewcode-block" id="ComputationHandle.cancel">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ComputationHandle.cancel">[docs]</a>
-</span><span data-line="1102">    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Computation cancelled"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="1103"><span class="w">        </span><span class="sd">"""</span>
-</span><span data-line="1104"><span class="sd">        Attempt to cancel the computation.</span>
-</span><span data-line="1105">
-</span><span data-line="1106"><span class="sd">        Writes a first-class :attr:`ComputationStatus.CANCELLED` result (not a</span>
-</span><span data-line="1107"><span class="sd">        ``FAILED`` one), so callers can tell a deliberate cancellation apart from</span>
-</span><span data-line="1108"><span class="sd">        a genuine failure via :meth:`get_status` without inspecting error text.</span>
-</span><span data-line="1109">
-</span><span data-line="1110"><span class="sd">        Args:</span>
-</span><span data-line="1111"><span class="sd">            reason: Human-readable reason stored on the result's</span>
-</span><span data-line="1112"><span class="sd">                ``terminal_reason`` (surfaced by</span>
-</span><span data-line="1113"><span class="sd">                :class:`ComputationCancelledError` from :meth:`get_result`).</span>
-</span><span data-line="1114">
-</span><span data-line="1115"><span class="sd">        Returns:</span>
-</span><span data-line="1116"><span class="sd">            True if cancelled, False if already in a terminal state.</span>
-</span><span data-line="1117">
-</span><span data-line="1118"><span class="sd">        Note:</span>
-</span><span data-line="1119"><span class="sd">            A thread, or a pool task that is already running, cannot be</span>
-</span><span data-line="1120"><span class="sd">            stopped; the au workers keep CANCELLED final anyway by not writing</span>
-</span><span data-line="1121"><span class="sd">            their outcome over it. ``after_compute`` then receives the CANCELLED</span>
-</span><span data-line="1122"><span class="sd">            result. A worker finishing in the instant between its check and its</span>
-</span><span data-line="1123"><span class="sd">            write can still overwrite it (no compare-and-set).</span>
-</span><span data-line="1124"><span class="sd">        """</span>
-</span><span data-line="1125">        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
-</span><span data-line="1126">        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">is_ready</span><span class="p">:</span>
-</span><span data-line="1127">            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
-</span><span data-line="1128">                <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1129">                <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">,</span>
-</span><span data-line="1130">                <span class="n">terminal_reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-</span><span data-line="1131">            <span class="p">)</span>
-</span><span data-line="1132">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-</span><span data-line="1133">                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-</span><span data-line="1134">                <span class="c1"># A worker that started between the first write and the</span>
-</span><span data-line="1135">                <span class="c1"># terminate may have written RUNNING over it, and nothing writes</span>
-</span><span data-line="1136">                <span class="c1"># after the terminate returns (ProcessBackend waits for the</span>
-</span><span data-line="1137">                <span class="c1"># process to exit): say it again so CANCELLED is what is left.</span>
-</span><span data-line="1138">                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
-</span><span data-line="1139">                    <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1140">                    <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">,</span>
-</span><span data-line="1141">                    <span class="n">terminal_reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-</span><span data-line="1142">                <span class="p">)</span>
-</span><span data-line="1143">            <span class="k">return</span> <span class="kc">True</span>
-</span><span data-line="1144">        <span class="k">return</span> <span class="kc">False</span></div>
+</span><span data-line="1118">    <span class="k">def</span><span class="w"> </span><span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Computation cancelled"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="1119"><span class="w">        </span><span class="sd">"""</span>
+</span><span data-line="1120"><span class="sd">        Attempt to cancel the computation.</span>
+</span><span data-line="1121">
+</span><span data-line="1122"><span class="sd">        A computation nothing has written yet (the worker has not started) is</span>
+</span><span data-line="1123"><span class="sd">        cancelled too: the worker will find CANCELLED and not run it over.</span>
+</span><span data-line="1124">
+</span><span data-line="1125"><span class="sd">        Writes a first-class :attr:`ComputationStatus.CANCELLED` result (not a</span>
+</span><span data-line="1126"><span class="sd">        ``FAILED`` one), so callers can tell a deliberate cancellation apart from</span>
+</span><span data-line="1127"><span class="sd">        a genuine failure via :meth:`get_status` without inspecting error text.</span>
+</span><span data-line="1128">
+</span><span data-line="1129"><span class="sd">        Args:</span>
+</span><span data-line="1130"><span class="sd">            reason: Human-readable reason stored on the result's</span>
+</span><span data-line="1131"><span class="sd">                ``terminal_reason`` (surfaced by</span>
+</span><span data-line="1132"><span class="sd">                :class:`ComputationCancelledError` from :meth:`get_result`).</span>
+</span><span data-line="1133">
+</span><span data-line="1134"><span class="sd">        Returns:</span>
+</span><span data-line="1135"><span class="sd">            True if cancelled, False if already in a terminal state.</span>
+</span><span data-line="1136">
+</span><span data-line="1137"><span class="sd">        Note:</span>
+</span><span data-line="1138"><span class="sd">            A thread, or a pool task that is already running, cannot be</span>
+</span><span data-line="1139"><span class="sd">            stopped; the au workers keep CANCELLED final anyway by not writing</span>
+</span><span data-line="1140"><span class="sd">            their outcome over it. ``after_compute`` then receives the CANCELLED</span>
+</span><span data-line="1141"><span class="sd">            result. A worker finishing in the instant between its check and its</span>
+</span><span data-line="1142"><span class="sd">            write can still overwrite it (no compare-and-set).</span>
+</span><span data-line="1143"><span class="sd">        """</span>
+</span><span data-line="1144">        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current</span><span class="p">()</span>
+</span><span data-line="1145">        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">is_ready</span><span class="p">:</span>
+</span><span data-line="1146">            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
+</span><span data-line="1147">                <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1148">                <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">,</span>
+</span><span data-line="1149">                <span class="n">terminal_reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
+</span><span data-line="1150">            <span class="p">)</span>
+</span><span data-line="1151">            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
+</span><span data-line="1152">                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+</span><span data-line="1153">                <span class="c1"># A worker that started between the first write and the</span>
+</span><span data-line="1154">                <span class="c1"># terminate may have written RUNNING over it, and nothing writes</span>
+</span><span data-line="1155">                <span class="c1"># after the terminate returns (ProcessBackend waits for the</span>
+</span><span data-line="1156">                <span class="c1"># process to exit): say it again so CANCELLED is what is left.</span>
+</span><span data-line="1157">                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
+</span><span data-line="1158">                    <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1159">                    <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">,</span>
+</span><span data-line="1160">                    <span class="n">terminal_reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
+</span><span data-line="1161">                <span class="p">)</span>
+</span><span data-line="1162">            <span class="k">return</span> <span class="kc">True</span>
+</span><span data-line="1163">        <span class="k">return</span> <span class="kc">False</span></div>
 
-</span><span data-line="1145">
-</span><span data-line="1146">    <span class="nd">@property</span>
-</span><span data-line="1147">    <span class="k">def</span><span class="w"> </span><span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span data-line="1148"><span class="w">        </span><span class="sd">"""Get computation metadata."""</span>
-</span><span data-line="1149">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span></div>
+</span><span data-line="1164">
+</span><span data-line="1165">    <span class="nd">@property</span>
+</span><span data-line="1166">    <span class="k">def</span><span class="w"> </span><span class="nf">metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span data-line="1167"><span class="w">        </span><span class="sd">"""Get computation metadata."""</span>
+</span><span data-line="1168">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span></div>
 
-</span><span data-line="1150">
-</span><span data-line="1151">
-</span><span data-line="1152"><span class="n">_default_backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="1153"><span class="sd">"""The backend :func:`async_compute` uses when given none (ProcessBackend if</span>
-</span><span data-line="1154"><span class="sd">None); :func:`au.testing.mock_async` swaps it."""</span>
-</span><span data-line="1155">
-</span><span data-line="1156">
+</span><span data-line="1169">
+</span><span data-line="1170">
+</span><span data-line="1171"><span class="n">_default_backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="1172"><span class="sd">"""The backend :func:`async_compute` uses when given none (ProcessBackend if</span>
+</span><span data-line="1173"><span class="sd">None); :func:`au.testing.mock_async` swaps it."""</span>
+</span><span data-line="1174">
+</span><span data-line="1175">
 <div class="viewcode-block" id="async_compute">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.async_compute">[docs]</a>
-</span><span data-line="1157"><span class="k">def</span><span class="w"> </span><span class="nf">async_compute</span><span class="p">(</span>
-</span><span data-line="1158">    <span class="n">backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1159">    <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1160">    <span class="o">*</span><span class="p">,</span>
-</span><span data-line="1161">    <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"/tmp/computations"</span><span class="p">,</span>
-</span><span data-line="1162">    <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
-</span><span data-line="1163">    <span class="n">serialization</span><span class="p">:</span> <span class="n">SerializationFormat</span> <span class="o">=</span> <span class="n">SerializationFormat</span><span class="o">.</span><span class="n">JSON</span><span class="p">,</span>
-</span><span data-line="1164">    <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1165"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-</span><span data-line="1166"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="1167"><span class="sd">    Decorator to make functions asynchronous with status tracking.</span>
-</span><span data-line="1168">
-</span><span data-line="1169"><span class="sd">    Args:</span>
-</span><span data-line="1170"><span class="sd">        backend: Backend to execute computations (default: the module's</span>
-</span><span data-line="1171"><span class="sd">            ``_default_backend``, else ProcessBackend). ``@async_compute`` may</span>
-</span><span data-line="1172"><span class="sd">            also be used bare, without parentheses.</span>
-</span><span data-line="1173"><span class="sd">        store: Store for results (default: FileSystemStore)</span>
-</span><span data-line="1174"><span class="sd">        base_path: Path for FileSystemStore if no store provided</span>
-</span><span data-line="1175"><span class="sd">        ttl_seconds: Time-to-live for results (default: 1 hour)</span>
-</span><span data-line="1176"><span class="sd">        serialization: Format for storing results</span>
-</span><span data-line="1177"><span class="sd">        middleware: List of middleware components</span>
-</span><span data-line="1178">
-</span><span data-line="1179"><span class="sd">    The default backend runs each call with a copy of its middleware, in a</span>
-</span><span data-line="1180"><span class="sd">    child process: a plain :class:`MetricsMiddleware` counts there, not in the</span>
-</span><span data-line="1181"><span class="sd">    instance you hold. Use :class:`SharedMetricsMiddleware` to count across</span>
-</span><span data-line="1182"><span class="sd">    processes.</span>
-</span><span data-line="1183">
-</span><span data-line="1184"><span class="sd">    Example:</span>
-</span><span data-line="1185"><span class="sd">        &gt;&gt;&gt; metrics = SharedMetricsMiddleware()</span>
-</span><span data-line="1186"><span class="sd">        &gt;&gt;&gt; @async_compute(</span>
-</span><span data-line="1187"><span class="sd">        ...     ttl_seconds=7200,</span>
-</span><span data-line="1188"><span class="sd">        ...     middleware=[LoggingMiddleware(), metrics]</span>
-</span><span data-line="1189"><span class="sd">        ... )</span>
-</span><span data-line="1190"><span class="sd">        ... def slow_computation(x: int) -&gt; int:</span>
-</span><span data-line="1191"><span class="sd">        ...     return x * x</span>
-</span><span data-line="1192"><span class="sd">        &gt;&gt;&gt; handle = slow_computation(5)  # Returns immediately</span>
-</span><span data-line="1193"><span class="sd">        &gt;&gt;&gt; result = handle.get_result(timeout=10)</span>
-</span><span data-line="1194"><span class="sd">    """</span>
-</span><span data-line="1195">    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="s2">"launch"</span><span class="p">):</span>
-</span><span data-line="1196">        <span class="n">decorate</span> <span class="o">=</span> <span class="n">async_compute</span><span class="p">(</span>
-</span><span data-line="1197">            <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
-</span><span data-line="1198">            <span class="n">base_path</span><span class="o">=</span><span class="n">base_path</span><span class="p">,</span>
-</span><span data-line="1199">            <span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">,</span>
-</span><span data-line="1200">            <span class="n">serialization</span><span class="o">=</span><span class="n">serialization</span><span class="p">,</span>
-</span><span data-line="1201">            <span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">,</span>
-</span><span data-line="1202">        <span class="p">)</span>
-</span><span data-line="1203">        <span class="k">return</span> <span class="n">decorate</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>  <span class="c1"># used bare: @async_compute</span>
-</span><span data-line="1204">
-</span><span data-line="1205">    <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1206">        <span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span>
-</span><span data-line="1207">            <span class="n">base_path</span><span class="p">,</span>
-</span><span data-line="1208">            <span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">,</span>
-</span><span data-line="1209">            <span class="n">serialization</span><span class="o">=</span><span class="n">serialization</span><span class="p">,</span>  <span class="c1"># This was missing - use the passed serialization</span>
-</span><span data-line="1210">        <span class="p">)</span>
-</span><span data-line="1211">
-</span><span data-line="1212">    <span class="n">backend_given</span> <span class="o">=</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span data-line="1213">    <span class="k">if</span> <span class="ow">not</span> <span class="n">backend_given</span><span class="p">:</span>
-</span><span data-line="1214">        <span class="n">backend</span> <span class="o">=</span> <span class="n">ProcessBackend</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="1215">
-</span><span data-line="1216">    <span class="k">def</span><span class="w"> </span><span class="nf">_active_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ComputationBackend</span><span class="p">:</span>
-</span><span data-line="1217"><span class="w">        </span><span class="sd">"""The default backend is looked up per call, so that one swapped in</span>
-</span><span data-line="1218"><span class="sd">        later (:func:`au.testing.mock_async`) also reaches functions decorated</span>
-</span><span data-line="1219"><span class="sd">        before, at import time."""</span>
-</span><span data-line="1220">        <span class="k">if</span> <span class="n">backend_given</span> <span class="ow">or</span> <span class="n">_default_backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1221">            <span class="k">return</span> <span class="n">backend</span>
-</span><span data-line="1222">        <span class="k">if</span> <span class="n">middleware</span><span class="p">:</span>
-</span><span data-line="1223">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>  <span class="c1"># once per call site, not once per call</span>
-</span><span data-line="1224">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_default_backend</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> replaces the default backend: "</span>
-</span><span data-line="1225">                <span class="s2">"the middleware given to async_compute does not run"</span><span class="p">,</span>
-</span><span data-line="1226">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-</span><span data-line="1227">            <span class="p">)</span>
-</span><span data-line="1228">        <span class="k">return</span> <span class="n">_default_backend</span>
-</span><span data-line="1229">
-</span><span data-line="1230">    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ComputationHandle</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
-</span><span data-line="1231">        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-</span><span data-line="1232">        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationHandle</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
-</span><span data-line="1233">            <span class="n">key</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">create_key</span><span class="p">()</span>
-</span><span data-line="1234">            <span class="n">active</span> <span class="o">=</span> <span class="n">_active_backend</span><span class="p">()</span>
-</span><span data-line="1235">            <span class="n">active</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
-</span><span data-line="1236">            <span class="k">return</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
-</span><span data-line="1237">
-</span><span data-line="1238">        <span class="c1"># Attach utility methods</span>
-</span><span data-line="1239">        <span class="n">wrapper</span><span class="o">.</span><span class="n">cleanup_expired</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">cleanup_expired</span><span class="p">()</span>
-</span><span data-line="1240">        <span class="n">wrapper</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="1241">        <span class="n">wrapper</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>  <span class="c1"># as decorated; a call may use _default_backend</span>
-</span><span data-line="1242">
-</span><span data-line="1243">        <span class="k">return</span> <span class="n">wrapper</span>
-</span><span data-line="1244">
-</span><span data-line="1245">    <span class="k">return</span> <span class="n">decorator</span></div>
+</span><span data-line="1176"><span class="k">def</span><span class="w"> </span><span class="nf">async_compute</span><span class="p">(</span>
+</span><span data-line="1177">    <span class="n">backend</span><span class="p">:</span> <span class="n">ComputationBackend</span> <span class="o">|</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1178">    <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1179">    <span class="o">*</span><span class="p">,</span>
+</span><span data-line="1180">    <span class="n">base_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"/tmp/computations"</span><span class="p">,</span>
+</span><span data-line="1181">    <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">,</span>
+</span><span data-line="1182">    <span class="n">serialization</span><span class="p">:</span> <span class="n">SerializationFormat</span> <span class="o">=</span> <span class="n">SerializationFormat</span><span class="o">.</span><span class="n">JSON</span><span class="p">,</span>
+</span><span data-line="1183">    <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1184"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+</span><span data-line="1185"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="1186"><span class="sd">    Decorator to make functions asynchronous with status tracking.</span>
+</span><span data-line="1187">
+</span><span data-line="1188"><span class="sd">    Args:</span>
+</span><span data-line="1189"><span class="sd">        backend: Backend to execute computations (default: the module's</span>
+</span><span data-line="1190"><span class="sd">            ``_default_backend``, else ProcessBackend). ``@async_compute`` may</span>
+</span><span data-line="1191"><span class="sd">            also be used bare, without parentheses.</span>
+</span><span data-line="1192"><span class="sd">        store: Store for results (default: FileSystemStore)</span>
+</span><span data-line="1193"><span class="sd">        base_path: Path for FileSystemStore if no store provided</span>
+</span><span data-line="1194"><span class="sd">        ttl_seconds: Time-to-live for results (default: 1 hour)</span>
+</span><span data-line="1195"><span class="sd">        serialization: Format for storing results</span>
+</span><span data-line="1196"><span class="sd">        middleware: List of middleware components</span>
+</span><span data-line="1197">
+</span><span data-line="1198"><span class="sd">    The default backend runs each call with a copy of its middleware, in a</span>
+</span><span data-line="1199"><span class="sd">    child process: a plain :class:`MetricsMiddleware` counts there, not in the</span>
+</span><span data-line="1200"><span class="sd">    instance you hold. Use :class:`SharedMetricsMiddleware` to count across</span>
+</span><span data-line="1201"><span class="sd">    processes.</span>
+</span><span data-line="1202">
+</span><span data-line="1203"><span class="sd">    Example:</span>
+</span><span data-line="1204"><span class="sd">        &gt;&gt;&gt; metrics = SharedMetricsMiddleware()</span>
+</span><span data-line="1205"><span class="sd">        &gt;&gt;&gt; @async_compute(</span>
+</span><span data-line="1206"><span class="sd">        ...     ttl_seconds=7200,</span>
+</span><span data-line="1207"><span class="sd">        ...     middleware=[LoggingMiddleware(), metrics]</span>
+</span><span data-line="1208"><span class="sd">        ... )</span>
+</span><span data-line="1209"><span class="sd">        ... def slow_computation(x: int) -&gt; int:</span>
+</span><span data-line="1210"><span class="sd">        ...     return x * x</span>
+</span><span data-line="1211"><span class="sd">        &gt;&gt;&gt; handle = slow_computation(5)  # Returns immediately</span>
+</span><span data-line="1212"><span class="sd">        &gt;&gt;&gt; result = handle.get_result(timeout=10)</span>
+</span><span data-line="1213"><span class="sd">    """</span>
+</span><span data-line="1214">    <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="s2">"launch"</span><span class="p">):</span>
+</span><span data-line="1215">        <span class="n">decorate</span> <span class="o">=</span> <span class="n">async_compute</span><span class="p">(</span>
+</span><span data-line="1216">            <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
+</span><span data-line="1217">            <span class="n">base_path</span><span class="o">=</span><span class="n">base_path</span><span class="p">,</span>
+</span><span data-line="1218">            <span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">,</span>
+</span><span data-line="1219">            <span class="n">serialization</span><span class="o">=</span><span class="n">serialization</span><span class="p">,</span>
+</span><span data-line="1220">            <span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">,</span>
+</span><span data-line="1221">        <span class="p">)</span>
+</span><span data-line="1222">        <span class="k">return</span> <span class="n">decorate</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>  <span class="c1"># used bare: @async_compute</span>
+</span><span data-line="1223">
+</span><span data-line="1224">    <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1225">        <span class="n">store</span> <span class="o">=</span> <span class="n">FileSystemStore</span><span class="p">(</span>
+</span><span data-line="1226">            <span class="n">base_path</span><span class="p">,</span>
+</span><span data-line="1227">            <span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">,</span>
+</span><span data-line="1228">            <span class="n">serialization</span><span class="o">=</span><span class="n">serialization</span><span class="p">,</span>  <span class="c1"># This was missing - use the passed serialization</span>
+</span><span data-line="1229">        <span class="p">)</span>
+</span><span data-line="1230">
+</span><span data-line="1231">    <span class="n">backend_given</span> <span class="o">=</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span data-line="1232">    <span class="k">if</span> <span class="ow">not</span> <span class="n">backend_given</span><span class="p">:</span>
+</span><span data-line="1233">        <span class="n">backend</span> <span class="o">=</span> <span class="n">ProcessBackend</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="1234">
+</span><span data-line="1235">    <span class="k">def</span><span class="w"> </span><span class="nf">_active_backend</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ComputationBackend</span><span class="p">:</span>
+</span><span data-line="1236"><span class="w">        </span><span class="sd">"""The default backend is looked up per call, so that one swapped in</span>
+</span><span data-line="1237"><span class="sd">        later (:func:`au.testing.mock_async`) also reaches functions decorated</span>
+</span><span data-line="1238"><span class="sd">        before, at import time."""</span>
+</span><span data-line="1239">        <span class="k">if</span> <span class="n">backend_given</span> <span class="ow">or</span> <span class="n">_default_backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1240">            <span class="k">return</span> <span class="n">backend</span>
+</span><span data-line="1241">        <span class="k">if</span> <span class="n">middleware</span><span class="p">:</span>
+</span><span data-line="1242">            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>  <span class="c1"># once per call site, not once per call</span>
+</span><span data-line="1243">                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">_default_backend</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> replaces the default backend: "</span>
+</span><span data-line="1244">                <span class="s2">"the middleware given to async_compute does not run"</span><span class="p">,</span>
+</span><span data-line="1245">                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+</span><span data-line="1246">            <span class="p">)</span>
+</span><span data-line="1247">        <span class="k">return</span> <span class="n">_default_backend</span>
+</span><span data-line="1248">
+</span><span data-line="1249">    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ComputationHandle</span><span class="p">[</span><span class="n">T</span><span class="p">]]:</span>
+</span><span data-line="1250">        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+</span><span data-line="1251">        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationHandle</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+</span><span data-line="1252">            <span class="n">key</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">create_key</span><span class="p">()</span>
+</span><span data-line="1253">            <span class="n">active</span> <span class="o">=</span> <span class="n">_active_backend</span><span class="p">()</span>
+</span><span data-line="1254">            <span class="n">active</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
+</span><span data-line="1255">            <span class="k">return</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+</span><span data-line="1256">
+</span><span data-line="1257">        <span class="c1"># Attach utility methods</span>
+</span><span data-line="1258">        <span class="n">wrapper</span><span class="o">.</span><span class="n">cleanup_expired</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">cleanup_expired</span><span class="p">()</span>
+</span><span data-line="1259">        <span class="n">wrapper</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="1260">        <span class="n">wrapper</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>  <span class="c1"># as decorated; a call may use _default_backend</span>
+</span><span data-line="1261">
+</span><span data-line="1262">        <span class="k">return</span> <span class="n">wrapper</span>
+</span><span data-line="1263">
+</span><span data-line="1264">    <span class="k">return</span> <span class="n">decorator</span></div>
 
-</span><span data-line="1246">
-</span><span data-line="1247">
-</span><span data-line="1248"><span class="c1"># Example implementations for other backends</span>
+</span><span data-line="1265">
+</span><span data-line="1266">
+</span><span data-line="1267"><span class="c1"># Example implementations for other backends</span>
 <div class="viewcode-block" id="ThreadBackend">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ThreadBackend">[docs]</a>
-</span><span data-line="1249"><span class="k">class</span><span class="w"> </span><span class="nc">ThreadBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
-</span><span data-line="1250"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="1251"><span class="sd">    Execute computations in separate threads (good for I/O-bound tasks).</span>
-</span><span data-line="1252">
-</span><span data-line="1253"><span class="sd">    &gt;&gt;&gt; import threading</span>
-</span><span data-line="1254"><span class="sd">    &gt;&gt;&gt; store = FileSystemStore("/tmp/thread_computations")</span>
-</span><span data-line="1255"><span class="sd">    &gt;&gt;&gt; backend = ThreadBackend(store)</span>
-</span><span data-line="1256"><span class="sd">    """</span>
-</span><span data-line="1257">
-</span><span data-line="1258">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span data-line="1259">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="1260">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1261">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1262">    <span class="p">):</span>
-</span><span data-line="1263">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="1264">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="1265">
+</span><span data-line="1268"><span class="k">class</span><span class="w"> </span><span class="nc">ThreadBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+</span><span data-line="1269"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="1270"><span class="sd">    Execute computations in separate threads (good for I/O-bound tasks).</span>
+</span><span data-line="1271">
+</span><span data-line="1272"><span class="sd">    &gt;&gt;&gt; import threading</span>
+</span><span data-line="1273"><span class="sd">    &gt;&gt;&gt; store = FileSystemStore("/tmp/thread_computations")</span>
+</span><span data-line="1274"><span class="sd">    &gt;&gt;&gt; backend = ThreadBackend(store)</span>
+</span><span data-line="1275"><span class="sd">    """</span>
+</span><span data-line="1276">
+</span><span data-line="1277">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="1278">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="1279">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1280">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1281">    <span class="p">):</span>
+</span><span data-line="1282">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="1283">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="1284">
 <div class="viewcode-block" id="ThreadBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.ThreadBackend.launch">[docs]</a>
-</span><span data-line="1266">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="1267">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="1268">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="1269">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="1270">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="1271">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="1272">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1273">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1274"><span class="w">        </span><span class="sd">"""Launch computation in a new thread."""</span>
-</span><span data-line="1275">        <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
-</span><span data-line="1276">
-</span><span data-line="1277">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="1278">
-</span><span data-line="1279">        <span class="k">def</span><span class="w"> </span><span class="nf">_worker</span><span class="p">():</span>
-</span><span data-line="1280">            <span class="n">compute_and_record</span><span class="p">(</span>
-</span><span data-line="1281">                <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
-</span><span data-line="1282">            <span class="p">)</span>
-</span><span data-line="1283">
-</span><span data-line="1284">        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_worker</span><span class="p">)</span>
-</span><span data-line="1285">        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+</span><span data-line="1285">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="1286">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="1287">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="1288">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="1289">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="1290">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="1291">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1292">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1293"><span class="w">        </span><span class="sd">"""Launch computation in a new thread."""</span>
+</span><span data-line="1294">        <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span data-line="1295">
+</span><span data-line="1296">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="1297">
+</span><span data-line="1298">        <span class="k">def</span><span class="w"> </span><span class="nf">_worker</span><span class="p">():</span>
+</span><span data-line="1299">            <span class="n">compute_and_record</span><span class="p">(</span>
+</span><span data-line="1300">                <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
+</span><span data-line="1301">            <span class="p">)</span>
+</span><span data-line="1302">
+</span><span data-line="1303">        <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_worker</span><span class="p">)</span>
+</span><span data-line="1304">        <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 </div>
 
-</span><span data-line="1286">
-</span><span data-line="1287">
+</span><span data-line="1305">
+</span><span data-line="1306">
 <div class="viewcode-block" id="RemoteAPIBackend">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.RemoteAPIBackend">[docs]</a>
-</span><span data-line="1288"><span class="k">class</span><span class="w"> </span><span class="nc">RemoteAPIBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
-</span><span data-line="1289"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="1290"><span class="sd">    Example backend for remote computation services.</span>
-</span><span data-line="1291">
-</span><span data-line="1292"><span class="sd">    This integrates with external APIs that have their own</span>
-</span><span data-line="1293"><span class="sd">    job tracking mechanisms.</span>
-</span><span data-line="1294"><span class="sd">    """</span>
-</span><span data-line="1295">
-</span><span data-line="1296">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span data-line="1297">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="1298">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span><span class="p">,</span>
-</span><span data-line="1299">        <span class="o">*</span><span class="p">,</span>
-</span><span data-line="1300">        <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="1301">        <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="1302">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1303">    <span class="p">):</span>
-</span><span data-line="1304">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="1305">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="1306">        <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="n">api_url</span>
-</span><span data-line="1307">        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
-</span><span data-line="1308">
+</span><span data-line="1307"><span class="k">class</span><span class="w"> </span><span class="nc">RemoteAPIBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+</span><span data-line="1308"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="1309"><span class="sd">    Example backend for remote computation services.</span>
+</span><span data-line="1310">
+</span><span data-line="1311"><span class="sd">    This integrates with external APIs that have their own</span>
+</span><span data-line="1312"><span class="sd">    job tracking mechanisms.</span>
+</span><span data-line="1313"><span class="sd">    """</span>
+</span><span data-line="1314">
+</span><span data-line="1315">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="1316">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="1317">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span><span class="p">,</span>
+</span><span data-line="1318">        <span class="o">*</span><span class="p">,</span>
+</span><span data-line="1319">        <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="1320">        <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="1321">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1322">    <span class="p">):</span>
+</span><span data-line="1323">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="1324">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="1325">        <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="n">api_url</span>
+</span><span data-line="1326">        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+</span><span data-line="1327">
 <div class="viewcode-block" id="RemoteAPIBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.RemoteAPIBackend.launch">[docs]</a>
-</span><span data-line="1309">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="1310">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="1311">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="1312">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="1313">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="1314">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="1315">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1316">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="1317"><span class="w">        </span><span class="sd">"""</span>
-</span><span data-line="1318"><span class="sd">        Launch computation via remote API.</span>
-</span><span data-line="1319">
-</span><span data-line="1320"><span class="sd">        In a real implementation, this would:</span>
-</span><span data-line="1321"><span class="sd">        1. Serialize the function and arguments</span>
-</span><span data-line="1322"><span class="sd">        2. Submit to the remote API</span>
-</span><span data-line="1323"><span class="sd">        3. Poll for status updates</span>
-</span><span data-line="1324"><span class="sd">        4. Store results when complete</span>
-</span><span data-line="1325"><span class="sd">        """</span>
-</span><span data-line="1326">        <span class="c1"># This is a skeleton - actual implementation would depend on the API</span>
-</span><span data-line="1327">        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Implement based on your specific API"</span><span class="p">)</span></div>
+</span><span data-line="1328">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="1329">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="1330">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="1331">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="1332">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="1333">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="1334">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="1335">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="1336"><span class="w">        </span><span class="sd">"""</span>
+</span><span data-line="1337"><span class="sd">        Launch computation via remote API.</span>
+</span><span data-line="1338">
+</span><span data-line="1339"><span class="sd">        In a real implementation, this would:</span>
+</span><span data-line="1340"><span class="sd">        1. Serialize the function and arguments</span>
+</span><span data-line="1341"><span class="sd">        2. Submit to the remote API</span>
+</span><span data-line="1342"><span class="sd">        3. Poll for status updates</span>
+</span><span data-line="1343"><span class="sd">        4. Store results when complete</span>
+</span><span data-line="1344"><span class="sd">        """</span>
+</span><span data-line="1345">        <span class="c1"># This is a skeleton - actual implementation would depend on the API</span>
+</span><span data-line="1346">        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Implement based on your specific API"</span><span class="p">)</span></div>
 </div>
 
-</span><span data-line="1328">
-</span><span data-line="1329">
-</span><span data-line="1330"><span class="c1"># Context manager for temporary async computations</span>
+</span><span data-line="1347">
+</span><span data-line="1348">
+</span><span data-line="1349"><span class="c1"># Context manager for temporary async computations</span>
 <div class="viewcode-block" id="temporary_async_compute">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.temporary_async_compute">[docs]</a>
-</span><span data-line="1331"><span class="nd">@contextmanager</span>
-</span><span data-line="1332"><span class="k">def</span><span class="w"> </span><span class="nf">temporary_async_compute</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span data-line="1333"><span class="w">    </span><span class="sd">"""</span>
-</span><span data-line="1334"><span class="sd">    Context manager for temporary async computations with automatic cleanup.</span>
-</span><span data-line="1335">
-</span><span data-line="1336"><span class="sd">    Example:</span>
-</span><span data-line="1337"><span class="sd">        &gt;&gt;&gt; with temporary_async_compute(ttl_seconds=60) as async_func:</span>
-</span><span data-line="1338"><span class="sd">        ...     @async_func</span>
-</span><span data-line="1339"><span class="sd">        ...     def compute(x):</span>
-</span><span data-line="1340"><span class="sd">        ...         return x * 2</span>
-</span><span data-line="1341"><span class="sd">        ...     handle = compute(5)</span>
-</span><span data-line="1342"><span class="sd">        ...     result = handle.get_result(timeout=5)</span>
-</span><span data-line="1343"><span class="sd">    """</span>
-</span><span data-line="1344">    <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-</span><span data-line="1345">    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
-</span><span data-line="1346">
-</span><span data-line="1347">    <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
-</span><span data-line="1348">    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"base_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_dir</span>
-</span><span data-line="1349">
-</span><span data-line="1350">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="1351">        <span class="k">yield</span> <span class="n">async_compute</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="1352">    <span class="k">finally</span><span class="p">:</span>
-</span><span data-line="1353">        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
-
+</span><span data-line="1350"><span class="nd">@contextmanager</span>
+</span><span data-line="1351"><span class="k">def</span><span class="w"> </span><span class="nf">temporary_async_compute</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span data-line="1352"><span class="w">    </span><span class="sd">"""</span>
+</span><span data-line="1353"><span class="sd">    Context manager for temporary async computations with automatic cleanup.</span>
 </span><span data-line="1354">
-</span><span data-line="1355">
-</span><span data-line="1356"><span class="c1"># Example usage patterns</span>
-</span><span data-line="1357"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-</span><span data-line="1358">    <span class="c1"># Configure logging</span>
-</span><span data-line="1359">    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span><span data-line="1360">
-</span><span data-line="1361">    <span class="c1"># Clean up any old files first</span>
-</span><span data-line="1362">    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+</span><span data-line="1355"><span class="sd">    Example:</span>
+</span><span data-line="1356"><span class="sd">        &gt;&gt;&gt; with temporary_async_compute(ttl_seconds=60) as async_func:</span>
+</span><span data-line="1357"><span class="sd">        ...     @async_func</span>
+</span><span data-line="1358"><span class="sd">        ...     def compute(x):</span>
+</span><span data-line="1359"><span class="sd">        ...         return x * 2</span>
+</span><span data-line="1360"><span class="sd">        ...     handle = compute(5)</span>
+</span><span data-line="1361"><span class="sd">        ...     result = handle.get_result(timeout=5)</span>
+</span><span data-line="1362"><span class="sd">    """</span>
 </span><span data-line="1363">    <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-</span><span data-line="1364">
-</span><span data-line="1365">    <span class="n">base_dir</span> <span class="o">=</span> <span class="s2">"/tmp/computations_clean"</span>
-</span><span data-line="1366">    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-</span><span data-line="1367">        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+</span><span data-line="1364">    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+</span><span data-line="1365">
+</span><span data-line="1366">    <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+</span><span data-line="1367">    <span class="n">kwargs</span><span class="p">[</span><span class="s2">"base_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_dir</span>
 </span><span data-line="1368">
-</span><span data-line="1369">    <span class="c1"># Create middleware</span>
-</span><span data-line="1370">    <span class="n">logging_mw</span> <span class="o">=</span> <span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span><span data-line="1371">    <span class="n">metrics_mw</span> <span class="o">=</span> <span class="n">MetricsMiddleware</span><span class="p">()</span>
-</span><span data-line="1372">
-</span><span data-line="1373">    <span class="c1"># Example with middleware and TTL</span>
-</span><span data-line="1374">    <span class="nd">@async_compute</span><span class="p">(</span>
-</span><span data-line="1375">        <span class="n">base_path</span><span class="o">=</span><span class="n">base_dir</span><span class="p">,</span>
-</span><span data-line="1376">        <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>  <span class="c1"># 5 minutes</span>
-</span><span data-line="1377">        <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">logging_mw</span><span class="p">,</span> <span class="n">metrics_mw</span><span class="p">],</span>
-</span><span data-line="1378">        <span class="n">serialization</span><span class="o">=</span><span class="n">SerializationFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>  <span class="c1"># For complex objects</span>
-</span><span data-line="1379">    <span class="p">)</span>
-</span><span data-line="1380">    <span class="k">def</span><span class="w"> </span><span class="nf">expensive_calculation</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-</span><span data-line="1381"><span class="w">        </span><span class="sd">"""Calculate factorial with metadata."""</span>
-</span><span data-line="1382">        <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span data-line="1383">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-</span><span data-line="1384">            <span class="n">result</span> <span class="o">*=</span> <span class="n">i</span>
-</span><span data-line="1385">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># Simulate slow computation</span>
-</span><span data-line="1386">
-</span><span data-line="1387">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="1388">            <span class="s2">"factorial"</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span>
-</span><span data-line="1389">            <span class="s2">"input"</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
-</span><span data-line="1390">            <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-</span><span data-line="1391">        <span class="p">}</span>
-</span><span data-line="1392">
-</span><span data-line="1393">    <span class="c1"># Launch computation</span>
-</span><span data-line="1394">    <span class="n">handle</span> <span class="o">=</span> <span class="n">expensive_calculation</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-</span><span data-line="1395">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Computation launched with key: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="1396">
-</span><span data-line="1397">    <span class="c1"># Check status</span>
-</span><span data-line="1398">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial status: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="1399">
-</span><span data-line="1400">    <span class="c1"># Wait for result</span>
-</span><span data-line="1401">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="1402">        <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>  <span class="c1"># Increased timeout</span>
-</span><span data-line="1403">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="1404">    <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
-</span><span data-line="1405">        <span class="nb">print</span><span class="p">(</span><span class="s2">"Computation still running..."</span><span class="p">)</span>
-</span><span data-line="1406">
-</span><span data-line="1407">    <span class="c1"># Check metrics (note: metrics won't be shared between processes)</span>
-</span><span data-line="1408">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Main process metrics: </span><span class="si">{</span><span class="n">metrics_mw</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="1409">
-</span><span data-line="1410">    <span class="c1"># Manual cleanup</span>
-</span><span data-line="1411">    <span class="n">cleaned</span> <span class="o">=</span> <span class="n">expensive_calculation</span><span class="o">.</span><span class="n">cleanup_expired</span><span class="p">()</span>
-</span><span data-line="1412">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cleaned up </span><span class="si">{</span><span class="n">cleaned</span><span class="si">}</span><span class="s2"> expired results"</span><span class="p">)</span>
+</span><span data-line="1369">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="1370">        <span class="k">yield</span> <span class="n">async_compute</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="1371">    <span class="k">finally</span><span class="p">:</span>
+</span><span data-line="1372">        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+</span><span data-line="1373">
+</span><span data-line="1374">
+</span><span data-line="1375"><span class="c1"># Example usage patterns</span>
+</span><span data-line="1376"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+</span><span data-line="1377">    <span class="c1"># Configure logging</span>
+</span><span data-line="1378">    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span><span data-line="1379">
+</span><span data-line="1380">    <span class="c1"># Clean up any old files first</span>
+</span><span data-line="1381">    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+</span><span data-line="1382">    <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+</span><span data-line="1383">
+</span><span data-line="1384">    <span class="n">base_dir</span> <span class="o">=</span> <span class="s2">"/tmp/computations_clean"</span>
+</span><span data-line="1385">    <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+</span><span data-line="1386">        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+</span><span data-line="1387">
+</span><span data-line="1388">    <span class="c1"># Create middleware</span>
+</span><span data-line="1389">    <span class="n">logging_mw</span> <span class="o">=</span> <span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span><span data-line="1390">    <span class="n">metrics_mw</span> <span class="o">=</span> <span class="n">MetricsMiddleware</span><span class="p">()</span>
+</span><span data-line="1391">
+</span><span data-line="1392">    <span class="c1"># Example with middleware and TTL</span>
+</span><span data-line="1393">    <span class="nd">@async_compute</span><span class="p">(</span>
+</span><span data-line="1394">        <span class="n">base_path</span><span class="o">=</span><span class="n">base_dir</span><span class="p">,</span>
+</span><span data-line="1395">        <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>  <span class="c1"># 5 minutes</span>
+</span><span data-line="1396">        <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">logging_mw</span><span class="p">,</span> <span class="n">metrics_mw</span><span class="p">],</span>
+</span><span data-line="1397">        <span class="n">serialization</span><span class="o">=</span><span class="n">SerializationFormat</span><span class="o">.</span><span class="n">PICKLE</span><span class="p">,</span>  <span class="c1"># For complex objects</span>
+</span><span data-line="1398">    <span class="p">)</span>
+</span><span data-line="1399">    <span class="k">def</span><span class="w"> </span><span class="nf">expensive_calculation</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span data-line="1400"><span class="w">        </span><span class="sd">"""Calculate factorial with metadata."""</span>
+</span><span data-line="1401">        <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span data-line="1402">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span><span data-line="1403">            <span class="n">result</span> <span class="o">*=</span> <span class="n">i</span>
+</span><span data-line="1404">            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># Simulate slow computation</span>
+</span><span data-line="1405">
+</span><span data-line="1406">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="1407">            <span class="s2">"factorial"</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span>
+</span><span data-line="1408">            <span class="s2">"input"</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+</span><span data-line="1409">            <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+</span><span data-line="1410">        <span class="p">}</span>
+</span><span data-line="1411">
+</span><span data-line="1412">    <span class="c1"># Launch computation</span>
+</span><span data-line="1413">    <span class="n">handle</span> <span class="o">=</span> <span class="n">expensive_calculation</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</span><span data-line="1414">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Computation launched with key: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span data-line="1415">
+</span><span data-line="1416">    <span class="c1"># Check status</span>
+</span><span data-line="1417">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial status: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span data-line="1418">
+</span><span data-line="1419">    <span class="c1"># Wait for result</span>
+</span><span data-line="1420">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="1421">        <span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>  <span class="c1"># Increased timeout</span>
+</span><span data-line="1422">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span data-line="1423">    <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+</span><span data-line="1424">        <span class="nb">print</span><span class="p">(</span><span class="s2">"Computation still running..."</span><span class="p">)</span>
+</span><span data-line="1425">
+</span><span data-line="1426">    <span class="c1"># Check metrics (note: metrics won't be shared between processes)</span>
+</span><span data-line="1427">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Main process metrics: </span><span class="si">{</span><span class="n">metrics_mw</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span data-line="1428">
+</span><span data-line="1429">    <span class="c1"># Manual cleanup</span>
+</span><span data-line="1430">    <span class="n">cleaned</span> <span class="o">=</span> <span class="n">expensive_calculation</span><span class="o">.</span><span class="n">cleanup_expired</span><span class="p">()</span>
+</span><span data-line="1431">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cleaned up </span><span class="si">{</span><span class="n">cleaned</span><span class="si">}</span><span class="s2"> expired results"</span><span class="p">)</span>
 </span></pre></div>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -1723,7 +1742,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=8618f531"></script>
+      <script src="../../_static/documentation_options.js?v=bafade30"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

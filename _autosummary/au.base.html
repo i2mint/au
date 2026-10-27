@@ -414,6 +414,8 @@ construction by the <code class="docutils literal notranslate"><span class="pre"
 <dt class="sig sig-object py" id="au.base.ComputationHandle.cancel">
 <span class="sig-name descname"><span class="pre">cancel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Computation</span> <span class="pre">cancelled'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationHandle.cancel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationHandle.cancel" title="Link to this definition">#</a></dt>
 <dd><p>Attempt to cancel the computation.</p>
+<p>A computation nothing has written yet (the worker has not started) is
+cancelled too: the worker will find CANCELLED and not run it over.</p>
 <p>Writes a first-class <code class="xref py py-attr docutils literal notranslate"><span class="pre">ComputationStatus.CANCELLED</span></code> result (not a
 <code class="docutils literal notranslate"><span class="pre">FAILED</span></code> one), so callers can tell a deliberate cancellation apart from
 a genuine failure via <a class="reference internal" href="#au.base.ComputationHandle.get_status" title="au.base.ComputationHandle.get_status"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_status()</span></code></a> without inspecting error text.</p>
@@ -1069,7 +1071,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=8618f531"></script>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

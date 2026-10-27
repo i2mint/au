@@ -2,18 +2,20 @@
 
 # About this build
 
-This documentation was built on **2026-10-27 14:22 UTC** from commit <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a888</code></a> on branch <code>master</code>, for **au 0.1.9** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 14:33 UTC** from commit <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49</code></a> on branch <code>master</code>, for **au 0.1.10** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.10) is ahead of the latest release on PyPI (0.1.9): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a88861ca1c1964620cd080b2fd8043857cb09</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49402747b1d635f98d83e89606ac9942b23</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.9</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.10</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40520263240">40520263240</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40521898213">40521898213</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>ecbc7257a954af04e6448f7cb316daa1db5c3efd</code> (in the history of the built commit) |
+| Event commit | <code>d6f398c8a8ba041848ac1f59fd47414984805a2d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, older than the documented version (0.1.10).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 3b2a88861ca1c1964620cd080b2fd8043857cb09
+git checkout 71dfa49402747b1d635f98d83e89606ac9942b23
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

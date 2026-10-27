@@ -1,4 +1,4 @@
-> built 2026-10-27 14:22 UTC from 3b2a888 (master) · au 0.1.9. Details: build_info.json
+> built 2026-10-27 14:33 UTC from 71dfa49 (master) · au 0.1.10. Details: build_info.json
 
 # index.html.md
 
@@ -1104,6 +1104,9 @@ False
 
 Attempt to cancel the computation.
 
+A computation nothing has written yet (the worker has not started) is
+cancelled too: the worker will find CANCELLED and not run it over.
+
 Writes a first-class `ComputationStatus.CANCELLED` result (not a
 `FAILED` one), so callers can tell a deliberate cancellation apart from
 a genuine failure via [`get_status()`](_autosummary/au.base.html.md#au.base.ComputationHandle.get_status) without inspecting error text.
@@ -1927,7 +1930,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`set_global_config`](_autosummary/au.html.md#au.set_global_config)(config)                         | Set the global configuration instance.                                         |
 | [`reset_global_config`](_autosummary/au.html.md#au.reset_global_config)()                             | Reset the global configuration to None.                                        |
 | [`retry_with_policy`](_autosummary/au.html.md#au.retry_with_policy)(func[, args, kwargs, policy])   | Execute a function with retry policy.                                          |
-| [`mock_async`](_autosummary/au.html.md#au.mock_async)([backend])                             | Run every task launched inside the block on a synchronous test backend.        |
+| [`mock_async`](_autosummary/au.html.md#au.mock_async)([backend, store])                      | Run every task launched inside the block on a synchronous test backend.        |
 | [`create_test_backend`](_autosummary/au.html.md#au.create_test_backend)(\*\*kwargs)                   | Create a test backend with optional configuration.                             |
 | [`create_test_store`](_autosummary/au.html.md#au.create_test_store)(\*\*kwargs)                     | Create a test store with optional configuration.                               |
 | [`depends_on`](_autosummary/au.html.md#au.depends_on)(\*dependency_funcs)                    | Decorator to specify task dependencies.                                        |
@@ -2043,6 +2046,9 @@ False
 #### cancel(, reason='Computation cancelled')
 
 Attempt to cancel the computation.
+
+A computation nothing has written yet (the worker has not started) is
+cancelled too: the worker will find CANCELLED and not run it over.
 
 Writes a first-class `ComputationStatus.CANCELLED` result (not a
 `FAILED` one), so callers can tell a deliberate cancellation apart from
@@ -3399,12 +3405,14 @@ Create a FastAPI application for task management.
 >>> # Run with: uvicorn main:app --reload
 ```
 
-### au.mock_async(backend=None)
+### au.mock_async(backend=None, , store=None)
 
 Run every task launched inside the block on a synchronous test backend.
 
-It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) (for functions
-decorated inside the block) and of the simple API (`au.submit_task`, …).
+It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) and of the
+simple API (`au.submit_task`, …). The simple API’s results go to
+`store` (a fresh InMemoryStore by default), which is restored on exit:
+read them inside the block, or pass a store you keep.
 
 Usage:
 
@@ -3420,7 +3428,8 @@ with mock_async() as mock:
 ```
 
 * **Parameters:**
-  **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)]) – The simple API’s store inside the block (default: in memory)
 * **Yields:**
   MockTaskTracker instance
 
@@ -3899,7 +3908,7 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 | [`create_test_backend`](_autosummary/au.testing.html.md#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.                      |
 |------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | [`create_test_store`](_autosummary/au.testing.html.md#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.                        |
-| [`mock_async`](_autosummary/au.testing.html.md#au.testing.mock_async)([backend])             | Run every task launched inside the block on a synchronous test backend. |
+| [`mock_async`](_autosummary/au.testing.html.md#au.testing.mock_async)([backend, store])      | Run every task launched inside the block on a synchronous test backend. |
 
 ### Classes
 
@@ -4115,12 +4124,14 @@ Create a test store with optional configuration.
 * **Returns:**
   InMemoryStore instance
 
-### au.testing.mock_async(backend=None)
+### au.testing.mock_async(backend=None, , store=None)
 
 Run every task launched inside the block on a synchronous test backend.
 
-It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) (for functions
-decorated inside the block) and of the simple API (`au.submit_task`, …).
+It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) and of the
+simple API (`au.submit_task`, …). The simple API’s results go to
+`store` (a fresh InMemoryStore by default), which is restored on exit:
+read them inside the block, or pass a store you keep.
 
 Usage:
 
@@ -4136,7 +4147,8 @@ with mock_async() as mock:
 ```
 
 * **Parameters:**
-  **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)]) – The simple API’s store inside the block (default: in memory)
 * **Yields:**
   MockTaskTracker instance
 
@@ -4399,18 +4411,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 14:22 UTC** from commit <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a888</code></a> on branch <code>master</code>, for **au 0.1.9** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 14:33 UTC** from commit <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49</code></a> on branch <code>master</code>, for **au 0.1.10** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.10) is ahead of the latest release on PyPI (0.1.9): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a88861ca1c1964620cd080b2fd8043857cb09</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49402747b1d635f98d83e89606ac9942b23</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.9</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.10</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4419,9 +4433,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40520263240">40520263240</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40521898213">40521898213</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>ecbc7257a954af04e6448f7cb316daa1db5c3efd</code> (in the history of the built commit) |
+| Event commit | <code>d6f398c8a8ba041848ac1f59fd47414984805a2d</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4446,13 +4460,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, older than the documented version (0.1.10).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 3b2a88861ca1c1964620cd080b2fd8043857cb09
+git checkout 71dfa49402747b1d635f98d83e89606ac9942b23
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

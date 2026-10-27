@@ -9,7 +9,7 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 | [`create_test_backend`](#au.testing.create_test_backend)(\*\*kwargs)   | Create a test backend with optional configuration.                      |
 |------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | [`create_test_store`](#au.testing.create_test_store)(\*\*kwargs)     | Create a test store with optional configuration.                        |
-| [`mock_async`](#au.testing.mock_async)([backend])             | Run every task launched inside the block on a synchronous test backend. |
+| [`mock_async`](#au.testing.mock_async)([backend, store])      | Run every task launched inside the block on a synchronous test backend. |
 
 ### Classes
 
@@ -225,12 +225,14 @@ Create a test store with optional configuration.
 * **Returns:**
   InMemoryStore instance
 
-### au.testing.mock_async(backend=None)
+### au.testing.mock_async(backend=None, , store=None)
 
 Run every task launched inside the block on a synchronous test backend.
 
-It becomes the default backend of [`au.async_compute()`](au.html.md#au.async_compute) (for functions
-decorated inside the block) and of the simple API (`au.submit_task`, …).
+It becomes the default backend of [`au.async_compute()`](au.html.md#au.async_compute) and of the
+simple API (`au.submit_task`, …). The simple API’s results go to
+`store` (a fresh InMemoryStore by default), which is restored on exit:
+read them inside the block, or pass a store you keep.
 
 Usage:
 
@@ -246,6 +248,7 @@ with mock_async() as mock:
 ```
 
 * **Parameters:**
-  **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](au.base.html.md#au.base.ComputationBackend)]) – Optional custom backend (defaults to TrackingTestBackend)
+  * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](au.base.html.md#au.base.ComputationStore)]) – The simple API’s store inside the block (default: in memory)
 * **Yields:**
   MockTaskTracker instance

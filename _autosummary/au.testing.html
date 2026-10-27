@@ -178,7 +178,7 @@ data-aria-dark="Switch to auto color mode">
 <tr class="row-even"><td><p><a class="reference internal" href="#au.testing.create_test_store" title="au.testing.create_test_store"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_test_store</span></code></a>(**kwargs)</p></td>
 <td><p>Create a test store with optional configuration.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.mock_async" title="au.testing.mock_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mock_async</span></code></a>([backend])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.mock_async" title="au.testing.mock_async"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mock_async</span></code></a>([backend, store])</p></td>
 <td><p>Run every task launched inside the block on a synchronous test backend.</p></td>
 </tr>
 </tbody>
@@ -515,10 +515,12 @@ recorded FAILED, then re-raised to the caller.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="au.testing.mock_async">
-<span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">mock_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#mock_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.mock_async" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">mock_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#mock_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.mock_async" title="Link to this definition">#</a></dt>
 <dd><p>Run every task launched inside the block on a synchronous test backend.</p>
-<p>It becomes the default backend of <a class="reference internal" href="au.html#au.async_compute" title="au.async_compute"><code class="xref py py-func docutils literal notranslate"><span class="pre">au.async_compute()</span></code></a> (for functions
-decorated inside the block) and of the simple API (<code class="docutils literal notranslate"><span class="pre">au.submit_task</span></code>, …).</p>
+<p>It becomes the default backend of <a class="reference internal" href="au.html#au.async_compute" title="au.async_compute"><code class="xref py py-func docutils literal notranslate"><span class="pre">au.async_compute()</span></code></a> and of the
+simple API (<code class="docutils literal notranslate"><span class="pre">au.submit_task</span></code>, …). The simple API’s results go to
+<code class="docutils literal notranslate"><span class="pre">store</span></code> (a fresh InMemoryStore by default), which is restored on exit:
+read them inside the block, or pass a store you keep.</p>
 <p>Usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">with</span> <span class="n">mock_async</span><span class="p">()</span> <span class="k">as</span> <span class="n">mock</span><span class="p">:</span>
 </span><span data-line="2">    <span class="nd">@async_compute</span>
@@ -532,7 +534,10 @@ decorated inside the block) and of the simple API (<code class="docutils literal
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a>]</span>) – Optional custom backend (defaults to TrackingTestBackend)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a>]</span>) – Optional custom backend (defaults to TrackingTestBackend)</p></li>
+<li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a>]</span>) – The simple API’s store inside the block (default: in memory)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><p>MockTaskTracker instance</p>
@@ -582,7 +587,7 @@ decorated inside the block) and of the simple API (<code class="docutils literal
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=8618f531"></script>
+      <script src="../_static/documentation_options.js?v=bafade30"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

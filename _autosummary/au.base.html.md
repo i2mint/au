@@ -141,6 +141,9 @@ False
 
 Attempt to cancel the computation.
 
+A computation nothing has written yet (the worker has not started) is
+cancelled too: the worker will find CANCELLED and not run it over.
+
 Writes a first-class `ComputationStatus.CANCELLED` result (not a
 `FAILED` one), so callers can tell a deliberate cancellation apart from
 a genuine failure via [`get_status()`](#au.base.ComputationHandle.get_status) without inspecting error text.
