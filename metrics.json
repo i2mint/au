@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.860189437866211,
-  "commit_message": "ProcessBackend runs middleware in the child only; one rebuild rule for queue workers (#16)\n\n* ProcessBackend runs middleware in the child only; one rebuild rule for queues (#14)\n\n- ProcessBackend hands its middleware to the child, which runs\n  _compute_and_record: the parent no longer calls before_compute without a\n  matching release, and LoggingMiddleware no longer logs the start twice.\n  _worker_function and ProcessBackend._serialize_middleware are gone.\n- Queue workers (StdLibQueue, RQ, Supabase) rebuild middleware by one rule:\n  its class plus Middleware.worker_kwargs() (new, default {}; Logging and\n  SharedMetrics override it). Four serialisers with two rules become one\n  _middleware_configs. A class that rule cannot rebuild is refused at launch\n  instead of being silently dropped.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Queue backends send middleware pickled: one rebuild rule (#14)\n\nProcessBackend already hands its middleware instances to the child. The\nqueue backends (StdLibQueueBackend, RQ, Supabase) now do the same: the\ninstances go in task_data[\"middleware\"] and the worker runs the unpickled\ncopies. This replaces the worker_kwargs() rebuild, which refused\nCompositeMiddleware, dropped HooksMiddleware callbacks and TracingMiddleware's\nservice_name, and could not carry SharedMetricsMiddleware.\n\n- Delete Middleware.worker_kwargs and its overrides, _middleware_configs and\n  the inspect import.\n- Add _picklable_middleware, shared by the queue backends: a middleware that\n  does not pickle (a thread lock, SharedMetricsMiddleware's Values) is refused\n  at launch with a TypeError that names it and says how to make it picklable.\n- Keep _reconstruct_middleware, minimal, only for payloads queued with\n  middleware_configs by older au versions.\n- MetricsMiddleware pickles: __getstate__/__setstate__ drop and recreate its\n  lock.\n- ProcessBackend's spawn refusal also covers middleware that does not pickle.\n- Document that MetricsMiddleware counts per process, so with the default\n  ProcessBackend the parent's instance counts nothing; point to\n  SharedMetricsMiddleware (async_compute docstring, MetricsMiddleware\n  docstring, README Observability).\n- Tests: custom middleware with constructor state on StdLibQueueBackend in\n  thread and process mode (thread mode proves an unpickled copy ran),\n  create_observability_middleware with hooks and tracing on a queue, clear\n  refusals for a lock-holding middleware and SharedMetricsMiddleware, a\n  MetricsMiddleware pickle round trip, a legacy middleware_configs payload,\n  and ProcessBackend under spawn with Logging, Metrics and custom middleware\n  plus its refusal of unpicklable middleware.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Re-review fixes: old payloads skip what they cannot rebuild; one queue payload (#14)\n\n- _reconstruct_middleware (payloads from au <= 0.1.4 only) skips, with a\n  warning, a class it cannot rebuild, as 0.1.4 did, instead of failing the job.\n- _queue_payload builds and pickles the task once for StdLibQueue, RQ and\n  Supabase (three copies of the task_data literal gone), and names the\n  unpicklable middleware only when pickling fails.\n- Docs say MetricsMiddleware counts per copy; the async_compute example no\n  longer reads a count that may not have settled.\n- Tests: the legacy test uses 0.1.4's payload shape; the child-only test\n  proves the child ran the middleware; two racy assertions made robust.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "657558c4cdf307fc0e89c4fe0c20b319278dce51",
+  "collection_duration_seconds": 5.552989959716797,
+  "commit_message": "SyncTestBackend and CompositeMiddleware use the shared worker body and hook runner (#15)\n\n- SyncTestBackend.launch runs _compute_and_record, so the test double follows\n  the real backends' contract: BaseException recorded then re-raised, one\n  release hook per job, error stored as the exception (was str; see #18).\n- InMemoryStore stamps completed_at on a terminal write, as FileSystemStore\n  does, so results keep their duration.\n- CompositeMiddleware drives its children through _call_hooks: one failing\n  child no longer stops the rest.\n- ComputationBackend._run_middleware_* had no caller left: deleted.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "d8a5d7283a7e69d8b884f3608daec36f1d4c7696",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35220,
-      "comment_lines_ratio": 0.06522657066026624,
-      "docs_lines": 42371,
-      "empty_lines": 70711,
-      "empty_lines_ratio": 0.13095502663140507,
-      "files_analyzed": 1332,
-      "function_lines": 323523,
-      "function_lines_ratio": 0.599156610440696,
-      "mean_lines_per_function": 15.95438406154453,
-      "num_classes": 3021,
-      "num_functions": 20278,
+      "comment_lines": 35365,
+      "comment_lines_ratio": 0.06519470847190166,
+      "docs_lines": 42462,
+      "empty_lines": 71106,
+      "empty_lines_ratio": 0.13108256583070946,
+      "files_analyzed": 1347,
+      "function_lines": 325259,
+      "function_lines_ratio": 0.5996088133143578,
+      "mean_lines_per_function": 15.957366432811657,
+      "num_classes": 3036,
+      "num_functions": 20383,
       "pypi_version": "0.1.4",
-      "total_lines": 539964
+      "total_lines": 542452
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:30:17.898918Z",
+  "timestamp": "2026-10-27T13:31:47.185171Z",
   "workflow_status": {}
 }
