@@ -859,9 +859,25 @@ def test_logging_middleware_takes_a_level_name_or_number(level, caplog):
     assert mw.level == logging.INFO and "Starting computation k" in caplog.text
 
 
-def test_an_unknown_level_name_is_refused_at_construction():
-    with pytest.raises(ValueError, match="NOISY"):
-        LoggingMiddleware(level="noisy")
+def test_a_custom_level_name_is_found_as_registered():
+    logging.addLevelName(5, "trace17")
+    assert LoggingMiddleware(level="trace17").level == 5
+
+
+@pytest.mark.parametrize(
+    "level, error, says", [("noisy", ValueError, "'noisy'"), (20.0, TypeError, "20.0")]
+)
+def test_a_level_that_is_not_one_is_refused_at_construction(level, error, says):
+    with pytest.raises(error, match=says):
+        LoggingMiddleware(level=level)
+
+
+def test_observability_middleware_hands_its_level_name_to_logging_middleware():
+    from au.hooks import create_observability_middleware
+
+    stack = create_observability_middleware(logging_level="DEBUG")
+    (logging_mw,) = [m for m in stack.middlewares if isinstance(m, LoggingMiddleware)]
+    assert logging_mw.level == logging.DEBUG
 
 
 def test_shared_metrics_middleware_is_exported_from_au():
