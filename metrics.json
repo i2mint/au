@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 5.7150349617004395,
-  "commit_message": "ProcessBackend on Windows: no 'fork', spawn with a clear refusal (#7) (#11)\n\n* ProcessBackend: do not ask for 'fork' where it does not exist; refuse unpicklable work under spawn; run the process tests on Windows (#7)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* Spawn: no up-front pickling (start() is the test), picklable retry wrapper, a failed launch does not leave the key RUNNING (review of #7)\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* FileStore on Windows: retry rename/open briefly while another handle holds the file (au#10); un-skip the race test\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
-  "commit_sha": "8547ff099f647878420f5db29c5ede50b1e31504",
+  "collection_duration_seconds": 5.663940668106079,
+  "commit_message": "Workers record every failure and always run the middleware release hook (#12)\n\nThreadBackend, ProcessBackend's worker and the queue entrypoint each carried\ntheir own copy of compute/record/hooks, and all three caught only Exception\nand wrote RUNNING outside the try. One _compute_and_record now runs in all\nthree: a BaseException is recorded FAILED then re-raised, a failing store\nwrite (RUNNING, COMPLETED or FAILED) still ends in on_error, and exactly one\nof after_compute / on_error follows every before_compute. The three hook\nloops become one _call_hooks.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "bb0af93cd8ef7f9add2c82a3b259aa4271779ca9",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35321,
-      "comment_lines_ratio": 0.06517414954940326,
-      "docs_lines": 42332,
-      "empty_lines": 71025,
-      "empty_lines_ratio": 0.13105500896765004,
-      "files_analyzed": 1342,
-      "function_lines": 324978,
-      "function_lines_ratio": 0.5996479367024142,
-      "mean_lines_per_function": 15.956105464722345,
+      "comment_lines": 35378,
+      "comment_lines_ratio": 0.06521362448248276,
+      "docs_lines": 42430,
+      "empty_lines": 71111,
+      "empty_lines_ratio": 0.13108163408258894,
+      "files_analyzed": 1347,
+      "function_lines": 325313,
+      "function_lines_ratio": 0.5996619317448673,
+      "mean_lines_per_function": 15.956884289007702,
       "num_classes": 3036,
-      "num_functions": 20367,
-      "pypi_version": "0.1.2",
-      "total_lines": 541948
+      "num_functions": 20387,
+      "pypi_version": "0.1.3",
+      "total_lines": 542494
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-10-13T14:52:44Z",
+      "last_success_timestamp": "2026-10-13T14:58:32Z",
       "recent_failure_count": 1,
-      "run_url": "https://github.com/i2mint/au/actions/runs/38416945764",
+      "run_url": "https://github.com/i2mint/au/actions/runs/38417946288",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-13T14:56:59.380027Z",
+  "timestamp": "2026-10-27T12:53:29.295727Z",
   "workflow_status": {}
 }

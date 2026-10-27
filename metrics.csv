@@ -1,42 +1,36 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-13T14:56:59.380027Z
-commit_sha,8547ff099f647878420f5db29c5ede50b1e31504
-commit_message,"ProcessBackend on Windows: no 'fork', spawn with a clear refusal (#7) (#11)
+timestamp,2026-10-27T12:53:29.295727Z
+commit_sha,bb0af93cd8ef7f9add2c82a3b259aa4271779ca9
+commit_message,"Workers record every failure and always run the middleware release hook (#12)
 
-* ProcessBackend: do not ask for 'fork' where it does not exist; refuse unpicklable work under spawn; run the process tests on Windows (#7)
+ThreadBackend, ProcessBackend's worker and the queue entrypoint each carried
+their own copy of compute/record/hooks, and all three caught only Exception
+and wrote RUNNING outside the try. One _compute_and_record now runs in all
+three: a BaseException is recorded FAILED then re-raised, a failing store
+write (RUNNING, COMPLETED or FAILED) still ends in on_error, and exactly one
+of after_compute / on_error follows every before_compute. The three hook
+loops become one _call_hooks.
 
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
-
-* Spawn: no up-front pickling (start() is the test), picklable retry wrapper, a failed launch does not leave the key RUNNING (review of #7)
-
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
-
-* FileStore on Windows: retry rename/open briefly while another handle holds the file (au#10); un-skip the race test
-
-Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
-
----------
-
-Co-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20367
+metrics.umpyre_stats.num_functions,20387
 metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,541948
-metrics.umpyre_stats.empty_lines,71025
-metrics.umpyre_stats.comment_lines,35321
-metrics.umpyre_stats.docs_lines,42332
-metrics.umpyre_stats.function_lines,324978
-metrics.umpyre_stats.empty_lines_ratio,0.13105500896765004
-metrics.umpyre_stats.comment_lines_ratio,0.06517414954940326
-metrics.umpyre_stats.function_lines_ratio,0.5996479367024142
-metrics.umpyre_stats.mean_lines_per_function,15.956105464722345
-metrics.umpyre_stats.files_analyzed,1342
-metrics.umpyre_stats.pypi_version,0.1.2
+metrics.umpyre_stats.total_lines,542494
+metrics.umpyre_stats.empty_lines,71111
+metrics.umpyre_stats.comment_lines,35378
+metrics.umpyre_stats.docs_lines,42430
+metrics.umpyre_stats.function_lines,325313
+metrics.umpyre_stats.empty_lines_ratio,0.13108163408258894
+metrics.umpyre_stats.comment_lines_ratio,0.06521362448248276
+metrics.umpyre_stats.function_lines_ratio,0.5996619317448673
+metrics.umpyre_stats.mean_lines_per_function,15.956884289007702
+metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.pypi_version,0.1.3
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-13T14:52:44Z
+metrics.workflow_status.last_success_timestamp,2026-10-13T14:58:32Z
 metrics.workflow_status.recent_failure_count,1
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/38416945764
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/38417946288
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -52,4 +46,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.7150349617004395
+collection_duration_seconds,5.663940668106079
