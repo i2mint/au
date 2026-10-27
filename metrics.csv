@@ -1,26 +1,26 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:22:14.546286Z
-commit_sha,dc10fe5e87047f438c29a66233e79f0c39202750
-commit_message,Merge 80506458d39fc19bc770bf4ef04e6b08a829f69a into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14
+timestamp,2026-10-27T13:27:40.740342Z
+commit_sha,5c5150724ee73d9a02992937674020a77c6115ff
+commit_message,Merge 1c51752ea13697ea477a71407b3032a34e2e9666 into 3b4f8fef51891af1558d395d52dac5d5eb0b1d14
 python_version,3.10
-metrics.umpyre_stats.num_functions,20386
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542485
-metrics.umpyre_stats.empty_lines,71112
-metrics.umpyre_stats.comment_lines,35370
-metrics.umpyre_stats.docs_lines,42467
-metrics.umpyre_stats.function_lines,325290
-metrics.umpyre_stats.empty_lines_ratio,0.13108565213784712
-metrics.umpyre_stats.comment_lines_ratio,0.06519995944588329
-metrics.umpyre_stats.function_lines_ratio,0.5996294828428436
-metrics.umpyre_stats.mean_lines_per_function,15.956538801138036
-metrics.umpyre_stats.files_analyzed,1347
+metrics.umpyre_stats.num_functions,20278
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539964
+metrics.umpyre_stats.empty_lines,70711
+metrics.umpyre_stats.comment_lines,35220
+metrics.umpyre_stats.docs_lines,42371
+metrics.umpyre_stats.function_lines,323523
+metrics.umpyre_stats.empty_lines_ratio,0.13095502663140507
+metrics.umpyre_stats.comment_lines_ratio,0.06522657066026624
+metrics.umpyre_stats.function_lines_ratio,0.599156610440696
+metrics.umpyre_stats.mean_lines_per_function,15.95438406154453
+metrics.umpyre_stats.files_analyzed,1332
 metrics.umpyre_stats.pypi_version,0.1.4
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T13:13:00Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T13:22:21Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40509904498
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40511264383
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -36,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.087676048278809
+collection_duration_seconds,7.227682828903198
