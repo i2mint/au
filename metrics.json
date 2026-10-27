@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.008959054946899,
-  "commit_message": "Merge f7663f16987ced7c0d1de9d76a81ea036d1db810 into 3b2a88861ca1c1964620cd080b2fd8043857cb09",
-  "commit_sha": "1914bf52a08269b32480303644d125986e35d22d",
+  "collection_duration_seconds": 7.703815698623657,
+  "commit_message": "Review fixes: zero durations, one read, started_at in responses, no made-up times (part of #24)\n\n- _timing reports a zero duration as 0.0 (a timedelta(0) reached the\n  response model: HTTP 500), sends started_at (when the run began; created_at\n  is when the record was written), and nothing for a PENDING record, which\n  FileSystemStore makes up, stamped now, for any unknown id.\n- /status reads the store once, so status and timing agree; the Flask status\n  route reports timing too.\n- mock_async(store=...) keeps the simple API's results where the caller can\n  read them after the block.\n- ComputationHandle treats a key nothing has written yet as PENDING:\n  get_result right after submit_task on an InMemoryStore raised KeyError.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "f7663f16987ced7c0d1de9d76a81ea036d1db810",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.953846153846154,
       "num_classes": 3021,
       "num_functions": 20280,
-      "pypi_version": "0.1.9",
+      "pypi_version": "0.1.8",
       "total_lines": 540022
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:28:17.071429Z",
+  "timestamp": "2026-10-27T14:28:22.446952Z",
   "workflow_status": {}
 }
