@@ -1050,3 +1050,9 @@ def test_a_handle_on_an_unwritten_key_waits_instead_of_raising():
     assert handle.get_status() == ComputationStatus.PENDING and not handle.is_ready()
     with pytest.raises(TimeoutError):
         handle.get_result(timeout=0.05)
+
+
+def test_a_computation_can_be_cancelled_before_its_first_write():
+    handle = ComputationHandle("not-yet", InMemoryStore())
+    assert handle.cancel() is True
+    assert handle.get_status() == ComputationStatus.CANCELLED

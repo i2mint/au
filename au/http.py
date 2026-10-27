@@ -258,6 +258,8 @@ def mk_http_interface(
         If wait=true, blocks until task completes or timeout.
         Otherwise, returns current status immediately.
         """
+        if task_id not in _store:  # else a handle waits on it as PENDING
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
         try:
             handle = ComputationHandle(task_id, _store)
 
@@ -470,6 +472,8 @@ def mk_flask_interface(
     def result(task_id):
         wait = request.args.get("wait", "false").lower() == "true"
         timeout = request.args.get("timeout", type=float)
+        if task_id not in _store:  # else a handle waits on it as PENDING
+            return jsonify({"error": "Task not found"}), 404
 
         try:
             if wait:

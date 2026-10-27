@@ -1048,7 +1048,11 @@ class ComputationHandle(Generic[T]):
 
     def _current(self) -> ComputationResult:
         """The stored result; PENDING while the worker has written nothing yet
-        (a store such as InMemoryStore raises KeyError for an unwritten key)."""
+        (a store such as InMemoryStore raises KeyError for an unwritten key).
+
+        Like FileSystemStore's reads, a key that will never be written (a typo)
+        reads PENDING too: ``get_result`` then waits for its timeout.
+        """
         try:
             return self.store[self.key]
         except KeyError:
@@ -1114,6 +1118,9 @@ class ComputationHandle(Generic[T]):
     def cancel(self, *, reason: str = "Computation cancelled") -> bool:
         """
         Attempt to cancel the computation.
+
+        A computation nothing has written yet (the worker has not started) is
+        cancelled too: the worker will find CANCELLED and not run it over.
 
         Writes a first-class :attr:`ComputationStatus.CANCELLED` result (not a
         ``FAILED`` one), so callers can tell a deliberate cancellation apart from

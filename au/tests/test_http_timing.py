@@ -59,3 +59,18 @@ def test_an_unknown_id_gets_no_made_up_timestamps(tmp_path):
     """FileSystemStore reports any unknown id as PENDING, stamped at the read."""
     body = _client(FileSystemStore(tmp_path)).get("/tasks/nope/status").json()
     assert body["status"] == "pending" and body["created_at"] is None
+
+
+@pytest.mark.parametrize("framework", ["fastapi", "flask"])
+def test_an_unknown_task_result_is_404_at_once(framework):
+    """A handle now reads an unwritten key as PENDING: the route must check."""
+    store = InMemoryStore()
+    if framework == "fastapi":
+        response = _client(store).get("/tasks/nope/result?wait=true&timeout=5")
+    else:
+        pytest.importorskip("flask")
+        from au.http import mk_flask_interface
+
+        app = mk_flask_interface([naps], backend=SyncTestBackend(), store=store)
+        response = app.test_client().get("/tasks/nope/result?wait=true&timeout=5")
+    assert response.status_code == 404
