@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 7.524389266967773,
+  "collection_duration_seconds": 7.573906898498535,
   "commit_message": "HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (#27)\n\n* HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (part of #24)\n\n- The status and result endpoints read created_at/completed_at/duration\n  from the stored result (they read them off handle.metadata, a plain dict,\n  so they were never sent); one _timing helper for both.\n- _mark_running writes started_at, so a running job shows when it began.\n- mock_async also swaps the simple API's default store for an in-memory one.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Review fixes: zero durations, one read, started_at in responses, no made-up times (part of #24)\n\n- _timing reports a zero duration as 0.0 (a timedelta(0) reached the\n  response model: HTTP 500), sends started_at (when the run began; created_at\n  is when the record was written), and nothing for a PENDING record, which\n  FileSystemStore makes up, stamped now, for any unknown id.\n- /status reads the store once, so status and timing agree; the Flask status\n  route reports timing too.\n- mock_async(store=...) keeps the simple API's results where the caller can\n  read them after the block.\n- ComputationHandle treats a key nothing has written yet as PENDING:\n  get_result right after submit_task on an InMemoryStore raised KeyError.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n* Re-review fixes: unknown task results are 404 again, at once (part of #24)\n\nWith a handle now reading an unwritten key as PENDING, the FastAPI and\nFlask /result routes check the key exists first (Flask had lost its 404\non InMemoryStore; FastAPI waited out the timeout before it). Docstrings\nsay a typo'd key reads PENDING, and that cancel() works before the\nfirst write; tested.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
   "commit_sha": "d6f398c8a8ba041848ac1f59fd47414984805a2d",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35210,
-      "comment_lines_ratio": 0.06519971927641459,
-      "docs_lines": 42402,
-      "empty_lines": 70708,
-      "empty_lines_ratio": 0.13093273929556157,
-      "files_analyzed": 1332,
-      "function_lines": 323559,
-      "function_lines_ratio": 0.5991467188116282,
-      "mean_lines_per_function": 15.954585798816568,
-      "num_classes": 3021,
-      "num_functions": 20280,
+      "comment_lines": 35360,
+      "comment_lines_ratio": 0.06517263560276394,
+      "docs_lines": 42496,
+      "empty_lines": 71109,
+      "empty_lines_ratio": 0.1310622439218592,
+      "files_analyzed": 1347,
+      "function_lines": 325331,
+      "function_lines_ratio": 0.5996232667783596,
+      "mean_lines_per_function": 15.956984500686678,
+      "num_classes": 3036,
+      "num_functions": 20388,
       "pypi_version": "0.1.9",
-      "total_lines": 540033
+      "total_lines": 542559
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:32:27.606768Z",
+  "timestamp": "2026-10-27T14:32:31.107560Z",
   "workflow_status": {}
 }

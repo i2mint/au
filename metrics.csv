@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:32:27.606768Z
+timestamp,2026-10-27T14:32:31.107560Z
 commit_sha,d6f398c8a8ba041848ac1f59fd47414984805a2d
 commit_message,"HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (#27)
 
@@ -43,18 +43,18 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20280
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,540033
-metrics.umpyre_stats.empty_lines,70708
-metrics.umpyre_stats.comment_lines,35210
-metrics.umpyre_stats.docs_lines,42402
-metrics.umpyre_stats.function_lines,323559
-metrics.umpyre_stats.empty_lines_ratio,0.13093273929556157
-metrics.umpyre_stats.comment_lines_ratio,0.06519971927641459
-metrics.umpyre_stats.function_lines_ratio,0.5991467188116282
-metrics.umpyre_stats.mean_lines_per_function,15.954585798816568
-metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.num_functions,20388
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542559
+metrics.umpyre_stats.empty_lines,71109
+metrics.umpyre_stats.comment_lines,35360
+metrics.umpyre_stats.docs_lines,42496
+metrics.umpyre_stats.function_lines,325331
+metrics.umpyre_stats.empty_lines_ratio,0.1310622439218592
+metrics.umpyre_stats.comment_lines_ratio,0.06517263560276394
+metrics.umpyre_stats.function_lines_ratio,0.5996232667783596
+metrics.umpyre_stats.mean_lines_per_function,15.956984500686678
+metrics.umpyre_stats.files_analyzed,1347
 metrics.umpyre_stats.pypi_version,0.1.9
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T14:30:53Z
@@ -75,4 +75,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.524389266967773
+collection_duration_seconds,7.573906898498535
