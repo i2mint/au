@@ -63,6 +63,7 @@ import multiprocessing
 import pickle
 import time
 import uuid
+import warnings
 import concurrent.futures
 import threading
 import random
@@ -83,46 +84,36 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
                         store_reconstruction_info, and middleware (the
                         instances themselves, rebuilt here by unpickling)
     """
+    task_data: dict = {}
     try:
-        # Deserialize the task data
         task_data = pickle.loads(serialized_data)
         func = task_data["func"]
         args = task_data["args"]
         kwargs = task_data["kwargs"]
         key = task_data["key"]
-        store_info = task_data["store_reconstruction_info"]
-        store = _reconstruct_store(store_info)
+        store = _reconstruct_store(task_data["store_reconstruction_info"])
         middleware = task_data.get("middleware")
         if middleware is None:
             middleware = _reconstruct_middleware(
                 task_data.get("middleware_configs", [])
             )
-
-        compute_and_record(
-            func, args, kwargs, key=key, store=store, middleware=middleware
-        )
-
     except Exception as e:
+        # The task could not even be set up: record that, if it says where.
         logger.error(f"Worker entrypoint failed: {e}", exc_info=True)
-        # Always write a failed result to the store on error
         try:
-            # Try to extract key and store if possible
-            key = (
-                task_data["key"]
-                if "task_data" in locals() and "key" in task_data
-                else None
-            )
-            store = (
-                _reconstruct_store(task_data["store_reconstruction_info"])
-                if "task_data" in locals() and "store_reconstruction_info" in task_data
-                else None
-            )
-            if key and store:
-                store[key] = ComputationResult(None, ComputationStatus.FAILED, error=e)
+            if "key" in task_data and "store_reconstruction_info" in task_data:
+                store = _reconstruct_store(task_data["store_reconstruction_info"])
+                failure = ComputationResult(None, ComputationStatus.FAILED, error=e)
+                _record_unless_cancelled(store, task_data["key"], failure)
         except Exception as inner_e:
             logger.error(
                 f"Failed to write failed result in worker entrypoint: {inner_e}"
             )
+        raise  # so the queue records the job as failed, not done
+
+    # Outside the handler above: what compute_and_record raises (a BaseException,
+    # or a failure the store would not record) reaches the queue's own record.
+    compute_and_record(func, args, kwargs, key=key, store=store, middleware=middleware)
 
 
 def _reconstruct_store(store_info: dict[str, Any]) -> "ComputationStore":
@@ -242,6 +233,7 @@ class ComputationResult:
     completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     terminal_reason: str | None = None
+    started_at: datetime | None = None  # when the run began, if a worker ran it
 
     def __post_init__(self):
         # A terminal result is stamped when made, whatever store holds it.
@@ -259,9 +251,9 @@ class ComputationResult:
 
     @property
     def duration(self) -> timedelta | None:
-        """Get computation duration if completed."""
+        """How long the run took (from the record's creation, if no start)."""
         if self.completed_at:
-            return self.completed_at - self.created_at
+            return self.completed_at - (self.started_at or self.created_at)
         return None
 
 
@@ -407,6 +399,7 @@ class FileSystemStore(ComputationStore):
             ),
             "metadata": result.metadata,
             "terminal_reason": result.terminal_reason,
+            "started_at": result.started_at and result.started_at.isoformat(),
         }
 
         if self.serialization == SerializationFormat.JSON:
@@ -428,6 +421,8 @@ class FileSystemStore(ComputationStore):
             created_at=datetime.fromisoformat(obj["created_at"]),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
+            started_at=obj.get("started_at")
+            and datetime.fromisoformat(obj["started_at"]),
         )
         # What was stored, not the read time __post_init__ would stamp.
         completed_at = obj.get("completed_at")
@@ -799,23 +794,35 @@ def compute_and_record(
     ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
     then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
+    started = None
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
+        started = datetime.now()
+        value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
             key,
-            ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED),
+            ComputationResult(value, ComputationStatus.COMPLETED, started_at=started),
         )
     except BaseException as error:
-        failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
+        failure = ComputationResult(
+            None, ComputationStatus.FAILED, error=error, started_at=started
+        )
+        unrecorded = None
         try:
             _record_unless_cancelled(store, key, failure)
-        except Exception:
-            logger.exception(f"Could not record the failure of {key}")
+        except Exception as e:
+            unrecorded = e
         call_hooks(middleware, "on_error", key, error)
+        if unrecorded is not None:
+            logger.error(f"Could not record the failure of {key}: {unrecorded!r}")
         if not isinstance(error, Exception):
             raise
+        if unrecorded is not None:
+            # The store holds RUNNING for good: fail loudly, so the worker's
+            # failure shows and a synchronous caller can record it itself.
+            raise unrecorded from error
     else:
         call_hooks(middleware, "after_compute", key, result)
 
@@ -1073,7 +1080,10 @@ class ComputationHandle(Generic[T]):
                 return result.value
             elif result.status == ComputationStatus.FAILED:
                 error_msg = result.error or "Computation failed"
-                raise RuntimeError(error_msg)
+                cause = (
+                    result.error if isinstance(result.error, BaseException) else None
+                )
+                raise RuntimeError(error_msg) from cause
             elif result.status == ComputationStatus.CANCELLED:
                 reason = result.terminal_reason or "Computation cancelled"
                 raise ComputationCancelledError(reason)
@@ -1139,8 +1149,13 @@ class ComputationHandle(Generic[T]):
         return self.store[self.key].metadata
 
 
+_default_backend: ComputationBackend | None = None
+"""The backend :func:`async_compute` uses when given none (ProcessBackend if
+None); :func:`au.testing.mock_async` swaps it."""
+
+
 def async_compute(
-    backend: ComputationBackend | None = None,
+    backend: ComputationBackend | Callable | None = None,
     store: ComputationStore | None = None,
     *,
     base_path: str = "/tmp/computations",
@@ -1152,7 +1167,9 @@ def async_compute(
     Decorator to make functions asynchronous with status tracking.
 
     Args:
-        backend: Backend to execute computations (default: ProcessBackend)
+        backend: Backend to execute computations (default: the module's
+            ``_default_backend``, else ProcessBackend). ``@async_compute`` may
+            also be used bare, without parentheses.
         store: Store for results (default: FileSystemStore)
         base_path: Path for FileSystemStore if no store provided
         ttl_seconds: Time-to-live for results (default: 1 hour)
@@ -1175,6 +1192,16 @@ def async_compute(
         >>> handle = slow_computation(5)  # Returns immediately
         >>> result = handle.get_result(timeout=10)
     """
+    if callable(backend) and not hasattr(backend, "launch"):
+        decorate = async_compute(
+            store=store,
+            base_path=base_path,
+            ttl_seconds=ttl_seconds,
+            serialization=serialization,
+            middleware=middleware,
+        )
+        return decorate(backend)  # used bare: @async_compute
+
     if store is None:
         store = FileSystemStore(
             base_path,
@@ -1182,20 +1209,36 @@ def async_compute(
             serialization=serialization,  # This was missing - use the passed serialization
         )
 
-    if backend is None:
+    backend_given = backend is not None
+    if not backend_given:
         backend = ProcessBackend(store, middleware=middleware)
+
+    def _active_backend() -> ComputationBackend:
+        """The default backend is looked up per call, so that one swapped in
+        later (:func:`au.testing.mock_async`) also reaches functions decorated
+        before, at import time."""
+        if backend_given or _default_backend is None:
+            return backend
+        if middleware:
+            warnings.warn(  # once per call site, not once per call
+                f"{type(_default_backend).__name__} replaces the default backend: "
+                "the middleware given to async_compute does not run",
+                stacklevel=3,
+            )
+        return _default_backend
 
     def decorator(func: Callable[..., T]) -> Callable[..., ComputationHandle[T]]:
         @wraps(func)
         def wrapper(*args, **kwargs) -> ComputationHandle[T]:
             key = store.create_key()
-            backend.launch(func, args, kwargs, key, store)
-            return ComputationHandle(key, store, backend)
+            active = _active_backend()
+            active.launch(func, args, kwargs, key, store)
+            return ComputationHandle(key, store, active)
 
         # Attach utility methods
         wrapper.cleanup_expired = lambda: store.cleanup_expired()
         wrapper.store = store
-        wrapper.backend = backend
+        wrapper.backend = backend  # as decorated; a call may use _default_backend
 
         return wrapper
 
