@@ -98,45 +98,9 @@ def _au_worker_entrypoint(serialized_data: bytes) -> None:
         # Recreate middleware instances
         middleware_instances = _reconstruct_middleware(middleware_configs)
 
-        # Run before hooks
-        for mw in middleware_instances:
-            try:
-                mw.before_compute(func, args, kwargs, key)
-            except Exception as e:
-                logger.error(
-                    f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
-                )
-
-        # Set status to running
-        _mark_running(store, key)
-
-        # Execute the function
-        try:
-            result_value = func(*args, **kwargs)
-            result = ComputationResult(result_value, ComputationStatus.COMPLETED)
-            store[key] = result
-
-            # Run after hooks
-            for mw in middleware_instances:
-                try:
-                    mw.after_compute(key, result)
-                except Exception as e:
-                    logger.error(
-                        f"Middleware {mw.__class__.__name__} after_compute failed: {e}"
-                    )
-
-        except Exception as e:
-            result = ComputationResult(None, ComputationStatus.FAILED, error=e)
-            store[key] = result
-
-            # Run error hooks
-            for mw in middleware_instances:
-                try:
-                    mw.on_error(key, e)
-                except Exception as ex:
-                    logger.error(
-                        f"Middleware {mw.__class__.__name__} on_error failed: {ex}"
-                    )
+        _compute_and_record(
+            func, args, kwargs, key=key, store=store, middleware=middleware_instances
+        )
 
     except Exception as e:
         logger.error(f"Worker entrypoint failed: {e}", exc_info=True)
@@ -388,7 +352,12 @@ class FileSystemStore(ComputationStore):
         data = {
             "value": result.value,
             "status": result.status.value,
-            "error": str(result.error) if result.error else None,
+            # ``str()`` of a bare KeyboardInterrupt or CancelledError is empty.
+            "error": (
+                (str(result.error) or type(result.error).__name__)
+                if result.error
+                else None
+            ),
             "created_at": result.created_at.isoformat(),
             "completed_at": (
                 result.completed_at.isoformat() if result.completed_at else None
@@ -727,31 +696,96 @@ class ComputationBackend(ABC):
         self, func: Callable, args: tuple, kwargs: dict, key: str
     ) -> None:
         """Run all middleware before hooks."""
-        for mw in self.middleware:
-            try:
-                mw.before_compute(func, args, kwargs, key)
-            except Exception as e:
-                logger.error(
-                    f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
-                )
+        _call_hooks(self.middleware, "before_compute", func, args, kwargs, key)
 
     def _run_middleware_after(self, key: str, result: ComputationResult) -> None:
         """Run all middleware after hooks."""
-        for mw in self.middleware:
-            try:
-                mw.after_compute(key, result)
-            except Exception as e:
-                logger.error(
-                    f"Middleware {mw.__class__.__name__} after_compute failed: {e}"
-                )
+        _call_hooks(self.middleware, "after_compute", key, result)
 
     def _run_middleware_error(self, key: str, error: Exception) -> None:
         """Run all middleware error hooks."""
-        for mw in self.middleware:
-            try:
-                mw.on_error(key, error)
-            except Exception as e:
-                logger.error(f"Middleware {mw.__class__.__name__} on_error failed: {e}")
+        _call_hooks(self.middleware, "on_error", key, error)
+
+
+def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
+    """Call ``hook`` on every middleware, whatever the others raise.
+
+    A failing hook is logged. A ``BaseException`` from one is re-raised once all
+    have run, so one hook cannot leave another middleware's key registered.
+    """
+    interrupt = None
+    for mw in middleware:
+        try:
+            getattr(mw, hook)(*args)
+        except Exception:
+            logger.exception(f"Middleware {mw.__class__.__name__} {hook} failed")
+        except BaseException as e:
+            if interrupt is None:
+                interrupt = e
+            else:
+                logger.exception(f"Middleware {mw.__class__.__name__} {hook} failed")
+    if interrupt is not None:
+        raise interrupt
+
+
+def _compute_and_record(
+    func: Callable,
+    args: tuple,
+    kwargs: dict,
+    *,
+    key: str,
+    store: "ComputationStore",
+    middleware: list["Middleware"],
+) -> None:
+    """Run ``func``, record its outcome under ``key``, and drive the middleware.
+
+    The body the thread and queue workers run, and ProcessBackend's child. Once
+    ``before_compute`` has run, exactly one of ``after_compute`` / ``on_error``
+    runs too, whatever fails (a hook, the RUNNING write, the COMPLETED write, the
+    FAILED write), so middleware that registers a key in one can always release
+    it in the other. A ``BaseException`` (``asyncio.CancelledError``,
+    ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
+    then re-raised (i2mint/au#12). A cancellation already recorded is final.
+    """
+    try:
+        _call_hooks(middleware, "before_compute", func, args, kwargs, key)
+        _mark_running(store, key)
+        result = _record_unless_cancelled(
+            store,
+            key,
+            ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED),
+        )
+    except BaseException as error:
+        failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
+        try:
+            _record_unless_cancelled(store, key, failure)
+        except Exception:
+            logger.exception(f"Could not record the failure of {key}")
+        _call_hooks(middleware, "on_error", key, error)
+        if not isinstance(error, Exception):
+            raise
+    else:
+        _call_hooks(middleware, "after_compute", key, result)
+
+
+def _record_unless_cancelled(
+    store: "ComputationStore", key: str, result: ComputationResult
+) -> ComputationResult:
+    """Record a worker's outcome unless the caller cancelled meanwhile, and
+    return what the store now holds.
+
+    A thread cannot be killed, so a cancelled one runs on; its outcome must not
+    turn the cancellation back into COMPLETED or FAILED. A read that fails means
+    "not known to be cancelled": the outcome is written rather than lost.
+    """
+    try:
+        current = store.get(key)
+    except Exception:
+        current = None
+    if current is not None and current.status == ComputationStatus.CANCELLED:
+        return current
+    store[key] = result
+    return result
 
 
 def _mark_running(store: "ComputationStore", key: str) -> None:
@@ -796,50 +830,10 @@ def _worker_function(
     middleware_configs: list[dict[str, Any]],
 ) -> None:
     """Global worker function for multiprocessing with middleware support."""
-    # Recreate middleware instances in the worker process
-    middleware_instances = []
-    for config in middleware_configs:
-        cls = config["class"]
-        mw_kwargs = config.get("kwargs", {})  # FIX: use mw_kwargs, not kwargs
-        middleware_instances.append(cls(**mw_kwargs))
-
-    # Run before hooks
-    for mw in middleware_instances:
-        try:
-            mw.before_compute(func, args, kwargs, key)
-        except Exception as e:
-            logger.error(
-                f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
-            )
-
-    _mark_running(store, key)
-
-    try:
-        result_value = func(*args, **kwargs)  # FIX: do not pass mw_kwargs here
-        result = ComputationResult(result_value, ComputationStatus.COMPLETED)
-        store[key] = result
-
-        # Run after hooks
-        for mw in middleware_instances:
-            try:
-                mw.after_compute(key, result)
-            except Exception as e:
-                logger.error(
-                    f"Middleware {mw.__class__.__name__} after_compute failed: {e}"
-                )
-
-    except Exception as e:
-        result = ComputationResult(None, ComputationStatus.FAILED, error=e)
-        store[key] = result
-
-        # Run error hooks
-        for mw in middleware_instances:
-            try:
-                mw.on_error(key, e)
-            except Exception as ex:
-                logger.error(
-                    f"Middleware {mw.__class__.__name__} on_error failed: {ex}"
-                )
+    middleware = [
+        config["class"](**config.get("kwargs", {})) for config in middleware_configs
+    ]
+    _compute_and_record(func, args, kwargs, key=key, store=store, middleware=middleware)
 
 
 class ProcessBackend(ComputationBackend):
@@ -905,14 +899,10 @@ class ProcessBackend(ComputationBackend):
         store = self._resolve_store(store)
 
         # Only run non-metrics middleware in the main process
-        for mw in self.middleware:
-            if not isinstance(mw, SharedMetricsMiddleware):
-                try:
-                    mw.before_compute(func, args, kwargs, key)
-                except Exception as e:
-                    logger.error(
-                        f"Middleware {mw.__class__.__name__} before_compute failed: {e}"
-                    )
+        main_process_middleware = [
+            mw for mw in self.middleware if not isinstance(mw, SharedMetricsMiddleware)
+        ]
+        _call_hooks(main_process_middleware, "before_compute", func, args, kwargs, key)
 
         middleware_configs = self._serialize_middleware()
         process = multiprocessing.Process(
@@ -1126,9 +1116,11 @@ class ComputationHandle(Generic[T]):
             True if cancelled, False if already in a terminal state.
 
         Note:
-            Only a backend that can stop the work (``ProcessBackend``) makes
-            CANCELLED final. A thread, or a pool task that is already running,
-            cannot be stopped and may still write its own result afterwards.
+            A thread, or a pool task that is already running, cannot be
+            stopped; the au workers keep CANCELLED final anyway by not writing
+            their outcome over it. ``after_compute`` then receives the CANCELLED
+            result. A worker finishing in the instant between its check and its
+            write can still overwrite it (no compare-and-set).
         """
         result = self.store[self.key]
         if not result.is_ready:
@@ -1246,20 +1238,9 @@ class ThreadBackend(ComputationBackend):
         store = self._resolve_store(store)
 
         def _worker():
-            self._run_middleware_before(func, args, kwargs, key)
-            _mark_running(store, key)
-
-            try:
-                result = func(*args, **kwargs)
-                final_result = ComputationResult(result, ComputationStatus.COMPLETED)
-                store[key] = final_result
-                self._run_middleware_after(key, final_result)
-            except Exception as e:
-                final_result = ComputationResult(
-                    None, ComputationStatus.FAILED, error=e
-                )
-                store[key] = final_result
-                self._run_middleware_error(key, e)
+            _compute_and_record(
+                func, args, kwargs, key=key, store=store, middleware=self.middleware
+            )
 
         thread = threading.Thread(target=_worker)
         thread.start()

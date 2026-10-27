@@ -1,3 +1,4 @@
+import contextlib
 import time
 from pathlib import Path
 from datetime import timedelta
@@ -470,3 +471,198 @@ def test_a_busy_file_is_retried_on_windows_and_not_elsewhere(tmp_path, monkeypat
     monkeypatch.setattr(base, "_RETRY_PERMISSION_ERRORS", False)
     store[other] = ComputationResult(2, ComputationStatus.COMPLETED)
     assert len(refusals) == 1 and store[other].status == ComputationStatus.PENDING
+
+
+# --- i2mint/au#12: every failure is recorded and the release hook always runs --
+
+
+class _Recorder(MetricsMiddleware):
+    """Middleware that tracks in-flight keys, as nw's job manager does."""
+
+    def __init__(self):
+        super().__init__()
+        self.in_flight, self.calls, self.results = set(), [], []
+
+    def before_compute(self, func, args, kwargs, key):
+        self.in_flight.add(key)
+
+    def after_compute(self, key, result):
+        self.calls.append(("after", key))
+        self.results.append(result.status)
+        self.in_flight.discard(key)
+
+    def on_error(self, key, error):
+        self.calls.append(("error", key, type(error)))
+        self.in_flight.discard(key)
+
+
+class _Refusing(dict):
+    """A store that raises when asked to write any of the ``refused`` statuses."""
+
+    def __init__(self, *refused):
+        super().__init__()
+        self.refused = refused
+
+    def __setitem__(self, key, result):
+        if result.status in self.refused:
+            raise OSError(f"cannot write {result.status}")
+        super().__setitem__(key, result)
+
+
+class _Interrupt(BaseException):
+    pass
+
+
+def _interrupted():
+    raise _Interrupt("stop")
+
+
+def test_a_base_exception_is_recorded_as_failed_then_re_raised():
+    from au.base import _compute_and_record
+
+    store, mw = {}, _Recorder()
+    with pytest.raises(_Interrupt):
+        _compute_and_record(_interrupted, (), {}, key="k", store=store, middleware=[mw])
+    assert store["k"].status == ComputationStatus.FAILED
+    assert isinstance(store["k"].error, _Interrupt)
+    assert mw.calls == [("error", "k", _Interrupt)] and not mw.in_flight
+
+
+@pytest.mark.parametrize(
+    "refused, recorded",
+    [
+        ((ComputationStatus.RUNNING,), ComputationStatus.FAILED),
+        ((ComputationStatus.COMPLETED,), ComputationStatus.FAILED),
+        # Nothing more can be written: RUNNING stays, but the hook still runs.
+        (
+            (ComputationStatus.COMPLETED, ComputationStatus.FAILED),
+            ComputationStatus.RUNNING,
+        ),
+        (
+            (
+                ComputationStatus.RUNNING,
+                ComputationStatus.COMPLETED,
+                ComputationStatus.FAILED,
+            ),
+            None,
+        ),
+    ],
+)
+def test_a_store_that_fails_to_write_still_gets_the_release_hook(refused, recorded):
+    from au.base import _compute_and_record
+
+    store, mw = _Refusing(*refused), _Recorder()
+    _compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
+    assert mw.calls == [("error", "k", OSError)] and not mw.in_flight
+    assert (store["k"].status if "k" in store else None) == recorded
+
+
+def test_a_thread_backend_job_raising_a_base_exception_ends_failed(monkeypatch):
+    import threading
+
+    from au.base import ThreadBackend
+    from au.testing import InMemoryStore
+
+    escaped = threading.Event()
+    monkeypatch.setattr(
+        threading,
+        "excepthook",
+        lambda a: escaped.set() if a.exc_type is _Interrupt else None,
+    )
+    store, mw = InMemoryStore(), _Recorder()
+    handle = async_compute(backend=ThreadBackend(store, middleware=[mw]), store=store)(
+        _interrupted
+    )()
+    with pytest.raises(RuntimeError, match="stop"):
+        handle.get_result(timeout=5)
+    assert handle.get_status() == ComputationStatus.FAILED
+    assert escaped.wait(5), "the BaseException was swallowed, not re-raised"
+    assert mw.calls == [("error", handle.key, _Interrupt)] and not mw.in_flight
+
+
+def test_a_cancellation_is_final_whatever_the_cancelled_job_then_does():
+    from au.base import _compute_and_record
+
+    def cancelled_then(outcome):
+        def job():
+            store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+            return outcome()
+
+        return job
+
+    for outcome, raised, hook in [
+        (lambda: 1, None, "after"),
+        (_interrupted, _Interrupt, "error"),
+    ]:
+        store, mw = {}, _Recorder()
+        with pytest.raises(raised) if raised else contextlib.nullcontext():
+            _compute_and_record(
+                cancelled_then(outcome), (), {}, key="k", store=store, middleware=[mw]
+            )
+        assert store["k"].status == ComputationStatus.CANCELLED
+        assert not mw.in_flight and [c[0] for c in mw.calls] == [hook]
+        if hook == "after":
+            assert mw.results == [ComputationStatus.CANCELLED]
+
+
+class _ForgetfulStore(dict):
+    """A store whose reads fail once the job has started (a dropped connection)."""
+
+    def get(self, key, default=None):
+        if key in self:
+            raise ConnectionError("store unreachable")
+        return default
+
+
+def test_a_store_read_that_fails_does_not_lose_a_finished_job():
+    from au.base import _compute_and_record
+
+    store, mw = _ForgetfulStore(), _Recorder()
+    _compute_and_record(_double, (21,), {}, key="k", store=store, middleware=[mw])
+    assert dict.get(store, "k").value == 42
+    assert [c[0] for c in mw.calls] == ["after"]
+
+
+def _interrupted_hook(*args):
+    raise _Interrupt("hook")
+
+
+@pytest.mark.parametrize("hook", ["before_compute", "after_compute"])
+def test_a_hook_raising_a_base_exception_does_not_strand_the_others(hook):
+    from au.base import _compute_and_record
+
+    store, mw, interrupting = {}, _Recorder(), MetricsMiddleware()
+    setattr(interrupting, hook, _interrupted_hook)
+    with pytest.raises(_Interrupt):
+        _compute_and_record(
+            _double,
+            (2,),
+            {},
+            key="k",
+            store=store,
+            middleware=[interrupting, mw],
+        )
+    assert not mw.in_flight and len(mw.calls) == 1
+    expected = {"before_compute": ComputationStatus.FAILED}
+    assert store["k"].status == expected.get(hook, ComputationStatus.COMPLETED)
+
+
+def _interrupted_without_a_message():
+    raise _Interrupt()
+
+
+def test_a_queue_job_raising_a_base_exception_ends_failed_and_says_what(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    with StdLibQueueBackend(store, use_processes=False) as backend:
+        handle = async_compute(backend=backend, store=store)(
+            _interrupted_without_a_message
+        )()
+        with pytest.raises(RuntimeError, match="_Interrupt"):
+            handle.get_result(timeout=5)
+        assert handle.get_status() == ComputationStatus.FAILED
+        assert (
+            async_compute(backend=backend, store=store)(_double)(4).get_result(
+                timeout=5
+            )
+            == 8
+        ), "the queue worker did not survive"
