@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.231788396835327,
-  "commit_message": "Re-review fixes: quiet only the task logger, keep au's own errors visible (#22)\n\nThe NullHandler on \"au\" also hid errors au catches and only logs (a result\nthe store could not write, a failing hook), which master printed to stderr.\nThe simple API's task logging now goes to its own \"au.tasks\" logger, and\nonly that one has a NullHandler. The test fixture also sets USERPROFILE,\nwhich Path.home() reads on Windows.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "bcba48ed284596e628ac3a0eca2b64ea8be546aa",
+  "collection_duration_seconds": 7.562948942184448,
+  "commit_message": "Merge bcba48ed284596e628ac3a0eca2b64ea8be546aa into 04e39a8f3b4dcfcc27e4a378c20566804f5b59bf",
+  "commit_sha": "3a6aca061fc5b352186a895f5971ca33f9db7d4a",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:20:19.569298Z",
+  "timestamp": "2026-10-27T14:20:21.390412Z",
   "workflow_status": {}
 }
