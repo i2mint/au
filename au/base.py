@@ -242,6 +242,7 @@ class ComputationResult:
     completed_at: datetime | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     terminal_reason: str | None = None
+    started_at: datetime | None = None  # when the run began, if a worker ran it
 
     def __post_init__(self):
         # A terminal result is stamped when made, whatever store holds it.
@@ -259,9 +260,9 @@ class ComputationResult:
 
     @property
     def duration(self) -> timedelta | None:
-        """Get computation duration if completed."""
+        """How long the run took (from the record's creation, if no start)."""
         if self.completed_at:
-            return self.completed_at - self.created_at
+            return self.completed_at - (self.started_at or self.created_at)
         return None
 
 
@@ -407,6 +408,7 @@ class FileSystemStore(ComputationStore):
             ),
             "metadata": result.metadata,
             "terminal_reason": result.terminal_reason,
+            "started_at": result.started_at and result.started_at.isoformat(),
         }
 
         if self.serialization == SerializationFormat.JSON:
@@ -428,6 +430,8 @@ class FileSystemStore(ComputationStore):
             created_at=datetime.fromisoformat(obj["created_at"]),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
+            started_at=obj.get("started_at")
+            and datetime.fromisoformat(obj["started_at"]),
         )
         # What was stored, not the read time __post_init__ would stamp.
         completed_at = obj.get("completed_at")
@@ -799,23 +803,34 @@ def compute_and_record(
     ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
     then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
+    started = datetime.now()
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
+        value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
             key,
-            ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED),
+            ComputationResult(value, ComputationStatus.COMPLETED, started_at=started),
         )
     except BaseException as error:
-        failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
+        failure = ComputationResult(
+            None, ComputationStatus.FAILED, error=error, started_at=started
+        )
+        unrecorded = None
         try:
             _record_unless_cancelled(store, key, failure)
-        except Exception:
-            logger.exception(f"Could not record the failure of {key}")
+        except Exception as e:
+            unrecorded = e
         call_hooks(middleware, "on_error", key, error)
         if not isinstance(error, Exception):
+            if unrecorded is not None:
+                logger.error(f"Could not record the failure of {key}: {unrecorded!r}")
             raise
+        if unrecorded is not None:
+            # The store holds RUNNING for good: fail loudly, so the worker's
+            # failure shows and a synchronous caller can record it itself.
+            raise unrecorded from error
     else:
         call_hooks(middleware, "after_compute", key, result)
 
@@ -1073,7 +1088,10 @@ class ComputationHandle(Generic[T]):
                 return result.value
             elif result.status == ComputationStatus.FAILED:
                 error_msg = result.error or "Computation failed"
-                raise RuntimeError(error_msg)
+                cause = (
+                    result.error if isinstance(result.error, BaseException) else None
+                )
+                raise RuntimeError(error_msg) from cause
             elif result.status == ComputationStatus.CANCELLED:
                 reason = result.terminal_reason or "Computation cancelled"
                 raise ComputationCancelledError(reason)
@@ -1139,8 +1157,13 @@ class ComputationHandle(Generic[T]):
         return self.store[self.key].metadata
 
 
+_default_backend: ComputationBackend | None = None
+"""The backend :func:`async_compute` uses when given none (ProcessBackend if
+None); :func:`au.testing.mock_async` swaps it."""
+
+
 def async_compute(
-    backend: ComputationBackend | None = None,
+    backend: ComputationBackend | Callable | None = None,
     store: ComputationStore | None = None,
     *,
     base_path: str = "/tmp/computations",
@@ -1152,7 +1175,9 @@ def async_compute(
     Decorator to make functions asynchronous with status tracking.
 
     Args:
-        backend: Backend to execute computations (default: ProcessBackend)
+        backend: Backend to execute computations (default: the module's
+            ``_default_backend``, else ProcessBackend). ``@async_compute`` may
+            also be used bare, without parentheses.
         store: Store for results (default: FileSystemStore)
         base_path: Path for FileSystemStore if no store provided
         ttl_seconds: Time-to-live for results (default: 1 hour)
@@ -1175,6 +1200,16 @@ def async_compute(
         >>> handle = slow_computation(5)  # Returns immediately
         >>> result = handle.get_result(timeout=10)
     """
+    if callable(backend) and not isinstance(backend, ComputationBackend):
+        decorate = async_compute(
+            store=store,
+            base_path=base_path,
+            ttl_seconds=ttl_seconds,
+            serialization=serialization,
+            middleware=middleware,
+        )
+        return decorate(backend)  # used bare: @async_compute
+
     if store is None:
         store = FileSystemStore(
             base_path,
@@ -1183,7 +1218,7 @@ def async_compute(
         )
 
     if backend is None:
-        backend = ProcessBackend(store, middleware=middleware)
+        backend = _default_backend or ProcessBackend(store, middleware=middleware)
 
     def decorator(func: Callable[..., T]) -> Callable[..., ComputationHandle[T]]:
         @wraps(func)

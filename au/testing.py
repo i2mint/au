@@ -271,7 +271,10 @@ class TrackingTestBackend(SyncTestBackend):
 
 @contextmanager
 def mock_async(backend: Optional[ComputationBackend] = None):
-    """Context manager for mocking async execution.
+    """Run every task launched inside the block on a synchronous test backend.
+
+    It becomes the default backend of :func:`au.async_compute` (for functions
+    decorated inside the block) and of the simple API (``au.submit_task``, ...).
 
     Usage:
         with mock_async() as mock:
@@ -279,7 +282,7 @@ def mock_async(backend: Optional[ComputationBackend] = None):
             def my_func(n: int) -> int:
                 return n * 2
 
-            handle = my_func.async_run(n=5)
+            handle = my_func(5)
             assert mock.task_count == 1
             assert handle.get_result() == 10
 
@@ -289,31 +292,20 @@ def mock_async(backend: Optional[ComputationBackend] = None):
     Yields:
         MockTaskTracker instance
     """
+    import au.api
+    import au.base
+
     if backend is None:
         backend = TrackingTestBackend()
-
-    # Import here to avoid circular dependency
-    from au.base import async_compute
-
-    # Store original defaults
-    original_backend = getattr(async_compute, "_default_backend", None)
-
-    # Set test backend as default
-    async_compute._default_backend = backend
-
+    originals = (au.base._default_backend, au.api._default_backend)
+    au.base._default_backend = au.api._default_backend = backend
     try:
-        # Yield tracker if backend has one
         if isinstance(backend, TrackingTestBackend):
             yield backend.tracker
         else:
             yield MockTaskTracker()
-
     finally:
-        # Restore original backend
-        if original_backend is not None:
-            async_compute._default_backend = original_backend
-        elif hasattr(async_compute, "_default_backend"):
-            delattr(async_compute, "_default_backend")
+        au.base._default_backend, au.api._default_backend = originals
 
 
 def create_test_backend(**kwargs) -> SyncTestBackend:

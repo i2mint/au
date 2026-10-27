@@ -563,7 +563,10 @@ def test_a_store_that_fails_to_write_still_gets_the_release_hook(refused, record
     from au.base import compute_and_record
 
     store, mw = _Refusing(*refused), _Recorder()
-    compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
+    # A failure the store will not record is raised (au#20), after the hook.
+    unrecordable = ComputationStatus.FAILED in refused
+    with pytest.raises(OSError) if unrecordable else contextlib.nullcontext():
+        compute_and_record(_double, (2,), {}, key="k", store=store, middleware=[mw])
     assert mw.calls == [("error", "k", OSError)] and not mw.in_flight
     assert (store["k"].status if "k" in store else None) == recorded
 
@@ -884,3 +887,63 @@ def test_shared_metrics_middleware_is_exported_from_au():
     import au
 
     assert au.SharedMetricsMiddleware is SharedMetricsMiddleware
+
+
+# --- i2mint/au#20 ---------------------------------------------------------------
+
+
+def _naps(seconds):
+    time.sleep(seconds)
+    return seconds
+
+
+def test_a_result_duration_is_the_time_the_run_took(tmp_path):
+    """The result used to be made after the call returned: duration ~0."""
+    from au.base import compute_and_record
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    compute_and_record(_naps, (0.2,), {}, key="k", store=store, middleware=[])
+    assert store["k"].duration.total_seconds() >= 0.2  # through a JSON round trip
+
+
+def test_a_long_job_is_not_expired_the_moment_it_finishes(tmp_path):
+    """TTL still counts from the record's creation, not the run's start."""
+    from au.base import compute_and_record
+
+    store = FileSystemStore(tmp_path, ttl_seconds=1, auto_cleanup=False)
+    compute_and_record(_naps, (1.2,), {}, key="k", store=store, middleware=[])
+    assert not store.is_expired(store["k"])
+
+
+def _fails():
+    raise KeyError("the cause")
+
+
+def test_get_result_chains_the_original_error():
+    from au.base import ThreadBackend
+    from au.testing import InMemoryStore
+
+    store = InMemoryStore()
+    handle = async_compute(backend=ThreadBackend(store), store=store)(_fails)()
+    with pytest.raises(RuntimeError) as raised:
+        handle.get_result(timeout=5)
+    assert isinstance(raised.value.__cause__, KeyError)
+
+
+def test_mock_async_runs_bare_decorated_tasks_and_the_simple_api_synchronously():
+    import au.api
+    import au.base
+    from au.testing import mock_async
+
+    before = (au.base._default_backend, au.api._default_backend)
+    with mock_async() as mock:
+
+        @async_compute
+        def task(x):
+            return x * 2
+
+        assert task(5).get_result() == 10
+        key = au.api.submit_task(_double, 4)
+        assert au.api.get_result(key, timeout=1) == 8
+        assert mock.task_count == 2
+    assert (au.base._default_backend, au.api._default_backend) == before
