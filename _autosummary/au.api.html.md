@@ -5,6 +5,11 @@ Simplified API for AU - direct task submission without decorators.
 Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.
 
+### Module Attributes
+
+| [`TASKS_LOGGER`](#au.api.TASKS_LOGGER)   | like any library log, it shows only once the app configures logging (au's own warnings and errors, on `au.base`, still reach stderr by default).   |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`async_task`](#au.api.async_task)(func, \*args[, backend, store, ...])   | Context manager for async task execution.            |
@@ -19,6 +24,15 @@ without requiring decorator patterns.
 | [`set_default_store`](#au.api.set_default_store)(store)                          | Set the default store for simple API calls.          |
 | [`submit_many`](#au.api.submit_many)(tasks[, backend, store])              | Submit multiple tasks at once.                       |
 | [`submit_task`](#au.api.submit_task)(func, \*args[, key, backend, ...])    | Submit a task for async execution without decorator. |
+
+### au.api.TASKS_LOGGER *= 'au.tasks'*
+
+like
+any library log, it shows only once the app configures logging (au’s own
+warnings and errors, on `au.base`, still reach stderr by default).
+
+* **Type:**
+  Where the simple API logs each task’s lifecycle. It has a NullHandler
 
 ### au.api.async_task(func, \*args, backend=None, store=None, timeout=None, \*\*kwargs)
 

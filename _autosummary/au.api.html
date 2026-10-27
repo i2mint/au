@@ -95,6 +95,7 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#au.api.TASKS_LOGGER"><code class="docutils literal notranslate"><span class="pre">TASKS_LOGGER</span></code></a></li>
 <li><a class="reference internal" href="#au.api.async_task"><code class="docutils literal notranslate"><span class="pre">async_task()</span></code></a></li>
 <li><a class="reference internal" href="#au.api.cancel_task"><code class="docutils literal notranslate"><span class="pre">cancel_task()</span></code></a></li>
 <li><a class="reference internal" href="#au.api.get_handle"><code class="docutils literal notranslate"><span class="pre">get_handle()</span></code></a></li>
@@ -149,6 +150,16 @@ data-aria-dark="Switch to auto color mode">
 <p>Simplified API for AU - direct task submission without decorators.</p>
 <p>Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.</p>
+<p class="rubric">Module Attributes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.api.TASKS_LOGGER" title="au.api.TASKS_LOGGER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TASKS_LOGGER</span></code></a></p></td>
+<td><p>like any library log, it shows only once the app configures logging (au's own warnings and errors, on <code class="docutils literal notranslate"><span class="pre">au.base</span></code>, still reach stderr by default).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Functions</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -189,6 +200,19 @@ without requiring decorator patterns.</p>
 </tbody>
 </table>
 </div>
+<dl class="py data">
+<dt class="sig sig-object py" id="au.api.TASKS_LOGGER">
+<span class="sig-prename descclassname"><span class="pre">au.api.</span></span><span class="sig-name descname"><span class="pre">TASKS_LOGGER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'au.tasks'</span></span><a class="headerlink" href="#au.api.TASKS_LOGGER" title="Link to this definition">#</a></dt>
+<dd><p>like
+any library log, it shows only once the app configures logging (au’s own
+warnings and errors, on <code class="docutils literal notranslate"><span class="pre">au.base</span></code>, still reach stderr by default).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Where the simple API logs each task’s lifecycle. It has a NullHandler</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="au.api.async_task">
 <span class="sig-prename descclassname"><span class="pre">au.api.</span></span><span class="sig-name descname"><span class="pre">async_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/api.html#async_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.api.async_task" title="Link to this definition">#</a></dt>
@@ -524,7 +548,7 @@ key re-runs.</p></li>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=22607128"></script>
+      <script src="../_static/documentation_options.js?v=8618f531"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

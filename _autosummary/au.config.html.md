@@ -77,7 +77,8 @@ Environment variables:
 - AU_SERIALIZATION: Serialization format (json, pickle)
 - AU_RETRY_ENABLED: Enable retry (true/false)
 - AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
-- AU_LOGGING_LEVEL: Logging level
+- AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
+  (a level name or number; not a filter: configure logging for that)
 - AU_METRICS_ENABLED: Enable metrics (true/false)
 
 * **Return type:**

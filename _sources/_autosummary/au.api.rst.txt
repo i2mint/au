@@ -4,6 +4,12 @@ au.api
 .. automodule:: au.api
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      TASKS_LOGGER
+   
    .. rubric:: Functions
 
    .. autosummary::

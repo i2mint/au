@@ -1,4 +1,4 @@
-> built 2026-10-27 14:08 UTC from 04e39a8 (master) · au 0.1.8. Details: build_info.json
+> built 2026-10-27 14:22 UTC from 3b2a888 (master) · au 0.1.9. Details: build_info.json
 
 # index.html.md
 
@@ -574,6 +574,11 @@ Simplified API for AU - direct task submission without decorators.
 Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.
 
+### Module Attributes
+
+| [`TASKS_LOGGER`](_autosummary/au.api.html.md#au.api.TASKS_LOGGER)   | like any library log, it shows only once the app configures logging (au's own warnings and errors, on `au.base`, still reach stderr by default).   |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`async_task`](_autosummary/au.api.html.md#au.api.async_task)(func, \*args[, backend, store, ...])   | Context manager for async task execution.            |
@@ -588,6 +593,15 @@ without requiring decorator patterns.
 | [`set_default_store`](_autosummary/au.api.html.md#au.api.set_default_store)(store)                          | Set the default store for simple API calls.          |
 | [`submit_many`](_autosummary/au.api.html.md#au.api.submit_many)(tasks[, backend, store])              | Submit multiple tasks at once.                       |
 | [`submit_task`](_autosummary/au.api.html.md#au.api.submit_task)(func, \*args[, key, backend, ...])    | Submit a task for async execution without decorator. |
+
+### au.api.TASKS_LOGGER *= 'au.tasks'*
+
+like
+any library log, it shows only once the app configures logging (au’s own
+warnings and errors, on `au.base`, still reach stderr by default).
+
+* **Type:**
+  Where the simple API logs each task’s lifecycle. It has a NullHandler
 
 ### au.api.async_task(func, \*args, backend=None, store=None, timeout=None, \*\*kwargs)
 
@@ -1624,7 +1638,8 @@ Environment variables:
 - AU_SERIALIZATION: Serialization format (json, pickle)
 - AU_RETRY_ENABLED: Enable retry (true/false)
 - AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
-- AU_LOGGING_LEVEL: Logging level
+- AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
+  (a level name or number; not a filter: configure logging for that)
 - AU_METRICS_ENABLED: Enable metrics (true/false)
 
 * **Return type:**
@@ -4384,7 +4399,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 14:08 UTC** from commit <a href="https://github.com/i2mint/au/commit/04e39a8f3b4dcfcc27e4a378c20566804f5b59bf"><code>04e39a8</code></a> on branch <code>master</code>, for **au 0.1.8** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 14:22 UTC** from commit <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a888</code></a> on branch <code>master</code>, for **au 0.1.9** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4393,9 +4408,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/04e39a8f3b4dcfcc27e4a378c20566804f5b59bf"><code>04e39a8f3b4dcfcc27e4a378c20566804f5b59bf</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/3b2a88861ca1c1964620cd080b2fd8043857cb09"><code>3b2a88861ca1c1964620cd080b2fd8043857cb09</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.8</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.9</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4404,9 +4419,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40517996089">40517996089</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40520263240">40520263240</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>27a77753f3314712f4e8ad4329cc72d5654937d4</code> (in the history of the built commit) |
+| Event commit | <code>ecbc7257a954af04e6448f7cb316daa1db5c3efd</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4431,13 +4446,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.8/">0.1.8</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 04e39a8f3b4dcfcc27e4a378c20566804f5b59bf
+git checkout 3b2a88861ca1c1964620cd080b2fd8043857cb09
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
