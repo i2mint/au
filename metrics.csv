@@ -1,38 +1,34 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:17:28.435840Z
-commit_sha,d87613072f6344dae816c4823bbd89b53c759812
-commit_message,"Review fixes: au logs nothing unless configured; a bad level names its setting (#22)
+timestamp,2026-10-27T14:20:19.569298Z
+commit_sha,bcba48ed284596e628ac3a0eca2b64ea8be546aa
+commit_message,"Re-review fixes: quiet only the task logger, keep au's own errors visible (#22)
 
-- A NullHandler on the ""au"" logger: a failing task no longer prints a
-  traceback to stderr in an app that has not configured logging (the
-  caller gets the error from get_result anyway).
-- _middleware_from_config builds the middleware and re-raises a bad
-  AU_LOGGING_LEVEL under the setting's name.
-- The config docs say logging_level is the level task start/end is logged
-  at, not a filter.
-- Tests: AU_LOGGING_LEVEL changes what is logged (caplog), isolated from
-  ambient AU_* variables and config files; the refusal; the NullHandler.
+The NullHandler on ""au"" also hid errors au catches and only logs (a result
+the store could not write, a failing hook), which master printed to stderr.
+The simple API's task logging now goes to its own ""au.tasks"" logger, and
+only that one has a NullHandler. The test fixture also sets USERPROFILE,
+which Path.home() reads on Windows.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20278
-metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539996
-metrics.umpyre_stats.empty_lines,70709
-metrics.umpyre_stats.comment_lines,35213
-metrics.umpyre_stats.docs_lines,42386
-metrics.umpyre_stats.function_lines,323551
-metrics.umpyre_stats.empty_lines_ratio,0.13094356254490774
-metrics.umpyre_stats.comment_lines_ratio,0.06520974229438736
-metrics.umpyre_stats.function_lines_ratio,0.5991729568367173
-metrics.umpyre_stats.mean_lines_per_function,15.95576486833021
-metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.num_functions,20386
+metrics.umpyre_stats.num_classes,3036
+metrics.umpyre_stats.total_lines,542525
+metrics.umpyre_stats.empty_lines,71110
+metrics.umpyre_stats.comment_lines,35362
+metrics.umpyre_stats.docs_lines,42480
+metrics.umpyre_stats.function_lines,325323
+metrics.umpyre_stats.empty_lines_ratio,0.13107230081563062
+metrics.umpyre_stats.comment_lines_ratio,0.06518040643288328
+metrics.umpyre_stats.function_lines_ratio,0.5996460992580988
+metrics.umpyre_stats.mean_lines_per_function,15.958157559109193
+metrics.umpyre_stats.files_analyzed,1347
 metrics.umpyre_stats.pypi_version,0.1.8
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T14:15:34Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T14:17:36Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40519062503
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40519512848
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -48,4 +44,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.84758186340332
+collection_duration_seconds,6.231788396835327

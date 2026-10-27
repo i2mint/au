@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.84758186340332,
-  "commit_message": "Review fixes: au logs nothing unless configured; a bad level names its setting (#22)\n\n- A NullHandler on the \"au\" logger: a failing task no longer prints a\n  traceback to stderr in an app that has not configured logging (the\n  caller gets the error from get_result anyway).\n- _middleware_from_config builds the middleware and re-raises a bad\n  AU_LOGGING_LEVEL under the setting's name.\n- The config docs say logging_level is the level task start/end is logged\n  at, not a filter.\n- Tests: AU_LOGGING_LEVEL changes what is logged (caplog), isolated from\n  ambient AU_* variables and config files; the refusal; the NullHandler.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "d87613072f6344dae816c4823bbd89b53c759812",
+  "collection_duration_seconds": 6.231788396835327,
+  "commit_message": "Re-review fixes: quiet only the task logger, keep au's own errors visible (#22)\n\nThe NullHandler on \"au\" also hid errors au catches and only logs (a result\nthe store could not write, a failing hook), which master printed to stderr.\nThe simple API's task logging now goes to its own \"au.tasks\" logger, and\nonly that one has a NullHandler. The test fixture also sets USERPROFILE,\nwhich Path.home() reads on Windows.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "bcba48ed284596e628ac3a0eca2b64ea8be546aa",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35213,
-      "comment_lines_ratio": 0.06520974229438736,
-      "docs_lines": 42386,
-      "empty_lines": 70709,
-      "empty_lines_ratio": 0.13094356254490774,
-      "files_analyzed": 1332,
-      "function_lines": 323551,
-      "function_lines_ratio": 0.5991729568367173,
-      "mean_lines_per_function": 15.95576486833021,
-      "num_classes": 3021,
-      "num_functions": 20278,
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.06518040643288328,
+      "docs_lines": 42480,
+      "empty_lines": 71110,
+      "empty_lines_ratio": 0.13107230081563062,
+      "files_analyzed": 1347,
+      "function_lines": 325323,
+      "function_lines_ratio": 0.5996460992580988,
+      "mean_lines_per_function": 15.958157559109193,
+      "num_classes": 3036,
+      "num_functions": 20386,
       "pypi_version": "0.1.8",
-      "total_lines": 539996
+      "total_lines": 542525
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-10-27T14:15:34Z",
+      "last_success_timestamp": "2026-10-27T14:17:36Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/40519062503",
+      "run_url": "https://github.com/i2mint/au/actions/runs/40519512848",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T14:17:28.435840Z",
+  "timestamp": "2026-10-27T14:20:19.569298Z",
   "workflow_status": {}
 }

@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 6.231788396835327,
+  "commit_message": "Re-review fixes: quiet only the task logger, keep au's own errors visible (#22)\n\nThe NullHandler on \"au\" also hid errors au catches and only logs (a result\nthe store could not write, a failing hook), which master printed to stderr.\nThe simple API's task logging now goes to its own \"au.tasks\" logger, and\nonly that one has a NullHandler. The test fixture also sets USERPROFILE,\nwhich Path.home() reads on Windows.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "bcba48ed284596e628ac3a0eca2b64ea8be546aa",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35362,
+      "comment_lines_ratio": 0.06518040643288328,
+      "docs_lines": 42480,
+      "empty_lines": 71110,
+      "empty_lines_ratio": 0.13107230081563062,
+      "files_analyzed": 1347,
+      "function_lines": 325323,
+      "function_lines_ratio": 0.5996460992580988,
+      "mean_lines_per_function": 15.958157559109193,
+      "num_classes": 3036,
+      "num_functions": 20386,
+      "pypi_version": "0.1.8",
+      "total_lines": 542525
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-10-27T14:17:36Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/40519512848",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-27T14:20:19.569298Z",
+  "workflow_status": {}
+}
