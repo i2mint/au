@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 5.312727928161621,
+  "collection_duration_seconds": 8.3133225440979,
   "commit_message": "Re-review fixes: keep TTL from created_at; stable completion time on read (#15)\n\n- Revert created_at=start: TTL expiry counts from created_at, so a job longer\n  than its TTL was expired the moment it finished. The duration question\n  goes to #20.\n- FileSystemStore._deserialize restores the stored completed_at instead of\n  letting __post_init__ stamp the read time.\n- on_error overrides are annotated BaseException like the protocol.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
   "commit_sha": "b41aeb46f60fa3616e479739e28019871ad06a36",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35366,
-      "comment_lines_ratio": 0.06519631157664982,
-      "docs_lines": 42466,
-      "empty_lines": 71107,
-      "empty_lines_ratio": 0.13108392601031607,
-      "files_analyzed": 1347,
-      "function_lines": 325260,
-      "function_lines_ratio": 0.5996084460617859,
-      "mean_lines_per_function": 15.956632653061224,
-      "num_classes": 3036,
-      "num_functions": 20384,
+      "comment_lines": 35216,
+      "comment_lines_ratio": 0.06522351128298588,
+      "docs_lines": 42372,
+      "empty_lines": 70706,
+      "empty_lines_ratio": 0.13095449763672193,
+      "files_analyzed": 1332,
+      "function_lines": 323488,
+      "function_lines_ratio": 0.5991317360833296,
+      "mean_lines_per_function": 15.95423160386664,
+      "num_classes": 3021,
+      "num_functions": 20276,
       "pypi_version": "0.1.4",
-      "total_lines": 542454
+      "total_lines": 539928
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:38:07.424850Z",
+  "timestamp": "2026-10-27T13:38:24.212646Z",
   "workflow_status": {}
 }
