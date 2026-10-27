@@ -1,33 +1,22 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:35:41.459713Z
-commit_sha,9fe5430b578d487620f76e406d3459eeada35117
-commit_message,"Review fixes: real durations, one completion stamp, public helper names (#15)
-
-- compute_and_record takes created_at before the call, so a result's
-  duration is the run's (it was ~0 on every backend).
-- ComputationResult stamps completed_at on a terminal result when made; the
-  two stores' copies of that stamp are gone.
-- _compute_and_record / _call_hooks are used across modules: renamed
-  compute_and_record / call_hooks.
-- error and on_error are annotated BaseException; SyncTestBackend's
-  docstring says what it records.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+timestamp,2026-10-27T13:35:44.909241Z
+commit_sha,c034af31a329547fb704c85d6c7e5b9ec695dab9
+commit_message,Merge 9fe5430b578d487620f76e406d3459eeada35117 into 2cdeefe3573737a7eb27084b156da4ee505cc484
 python_version,3.10
-metrics.umpyre_stats.num_functions,20384
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542459
-metrics.umpyre_stats.empty_lines,71107
-metrics.umpyre_stats.comment_lines,35365
-metrics.umpyre_stats.docs_lines,42466
-metrics.umpyre_stats.function_lines,325265
-metrics.umpyre_stats.empty_lines_ratio,0.13108271777221872
-metrics.umpyre_stats.comment_lines_ratio,0.06519386718627583
-metrics.umpyre_stats.function_lines_ratio,0.5996121365854378
-metrics.umpyre_stats.mean_lines_per_function,15.956877943485086
-metrics.umpyre_stats.files_analyzed,1347
-metrics.umpyre_stats.pypi_version,0.1.4
+metrics.umpyre_stats.num_functions,20276
+metrics.umpyre_stats.num_classes,3021
+metrics.umpyre_stats.total_lines,539933
+metrics.umpyre_stats.empty_lines,70706
+metrics.umpyre_stats.comment_lines,35215
+metrics.umpyre_stats.docs_lines,42372
+metrics.umpyre_stats.function_lines,323493
+metrics.umpyre_stats.empty_lines_ratio,0.1309532849446135
+metrics.umpyre_stats.comment_lines_ratio,0.06522105520499766
+metrics.umpyre_stats.function_lines_ratio,0.5991354482871023
+metrics.umpyre_stats.mean_lines_per_function,15.954478200828566
+metrics.umpyre_stats.files_analyzed,1332
+metrics.umpyre_stats.pypi_version,0.1.5
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-10-27T13:34:22Z
 metrics.workflow_status.recent_failure_count,0
@@ -47,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.861047029495239
+collection_duration_seconds,7.324413061141968
