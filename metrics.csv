@@ -1,51 +1,37 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T13:48:30.446937Z
-commit_sha,df5af6c3034fd6f5193498901b20c3021b31d8a0
-commit_message,"LoggingMiddleware takes a level name; export SharedMetricsMiddleware (#21)
+timestamp,2026-10-27T13:51:01.249765Z
+commit_sha,3f5c44c99a41b38df801fcc658feda87f06f6d2c
+commit_message,"mock_async works; results keep the run's duration; failures report their cause (#20)
 
-* LoggingMiddleware takes a level name; export SharedMetricsMiddleware (#17)
+- mock_async swaps a default-backend seam that async_compute and the simple
+  API both read (it set an attribute nothing read, so tasks ran on a
+  ProcessBackend); @async_compute may be used bare, as the README shows.
+- ComputationResult.started_at: a worker records when the run began, so
+  duration is the run's (it was ~0); TTL still counts from created_at.
+- get_result chains the original error as __cause__.
+- A failure the store will not record is raised after on_error, instead of
+  only logged with RUNNING left behind for good.
 
-- LoggingMiddleware(level=""INFO"") works (the README example passed a string
-  that logger.log rejected on every hook); an unknown name is refused at
-  construction. create_observability_middleware no longer converts the level
-  itself, nor silently falls back to INFO for an unknown name.
-- SharedMetricsMiddleware, the one to count across processes with the
-  default backend, is exported from au.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Review fixes: level names found as registered, refusals say what was passed (#17)
-
-- A level name is looked up exactly, then case-insensitively, so a custom
-  lowercase level resolves; the ValueError quotes the caller's value; a level
-  that is neither int nor str is a TypeError at construction.
-- Tests: custom level, both refusals, create_observability_middleware's
-  level reaching LoggingMiddleware; the docstring shows the name form.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
----------
-
-Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python_version,3.10
 metrics.umpyre_stats.num_functions,20276
 metrics.umpyre_stats.num_classes,3021
-metrics.umpyre_stats.total_lines,539937
+metrics.umpyre_stats.total_lines,539964
 metrics.umpyre_stats.empty_lines,70705
-metrics.umpyre_stats.comment_lines,35215
-metrics.umpyre_stats.docs_lines,42375
-metrics.umpyre_stats.function_lines,323492
-metrics.umpyre_stats.empty_lines_ratio,0.1309504627391714
-metrics.umpyre_stats.comment_lines_ratio,0.06522057202969976
-metrics.umpyre_stats.function_lines_ratio,0.5991291576609864
-metrics.umpyre_stats.mean_lines_per_function,15.954428881436181
+metrics.umpyre_stats.comment_lines,35212
+metrics.umpyre_stats.docs_lines,42380
+metrics.umpyre_stats.function_lines,323513
+metrics.umpyre_stats.empty_lines_ratio,0.13094391477950382
+metrics.umpyre_stats.comment_lines_ratio,0.06521175485773126
+metrics.umpyre_stats.function_lines_ratio,0.5991380906875273
+metrics.umpyre_stats.mean_lines_per_function,15.955464588676268
 metrics.umpyre_stats.files_analyzed,1332
 metrics.umpyre_stats.pypi_version,0.1.6
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T13:46:56Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T13:49:54Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40514921160
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40515409016
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -61,4 +47,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.728122711181641
+collection_duration_seconds,4.464568853378296
