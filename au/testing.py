@@ -17,6 +17,7 @@ from au.base import (
     ComputationResult,
     ComputationStatus,
     Middleware,
+    _compute_and_record,
 )
 
 
@@ -47,7 +48,9 @@ class InMemoryStore(ComputationStore):
         return self._data[key]
 
     def __setitem__(self, key: str, value: ComputationResult) -> None:
-        """Store result by key."""
+        """Store result by key, stamping completion as FileSystemStore does."""
+        if value.is_ready and value.completed_at is None:
+            value.completed_at = datetime.now()
         self._data[key] = value
 
     def __delitem__(self, key: str) -> None:
@@ -124,35 +127,11 @@ class SyncTestBackend(ComputationBackend):
         # Track execution
         self._executions[key] = (func, args, kwargs)
 
-        # Execute with middleware (base.Middleware protocol:
-        # before_compute(func, args, kwargs, key) / after_compute(key, result) /
-        # on_error(key, error) — driven via the _run_middleware_* helpers).
-        try:
-            # Before middleware
-            self._run_middleware_before(func, args, kwargs, key)
-
-            # Execute function
-            value = func(*args, **kwargs)
-
-            # Store successful result, then run after middleware with it
-            result = ComputationResult(
-                value=value,
-                status=ComputationStatus.COMPLETED,
-                error=None,
-                completed_at=datetime.now(),
-            )
-            store[key] = result
-            self._run_middleware_after(key, result)
-
-        except Exception as e:
-            # Store failed result, then run error middleware
-            store[key] = ComputationResult(
-                value=None,
-                status=ComputationStatus.FAILED,
-                error=str(e),
-                completed_at=datetime.now(),
-            )
-            self._run_middleware_error(key, e)
+        # The body every au worker runs: the same recording, middleware
+        # lifecycle and BaseException handling as the real backends.
+        _compute_and_record(
+            func, args, kwargs, key=key, store=store, middleware=self.middleware
+        )
 
     def terminate(self, key: str) -> None:
         """No-op for synchronous backend (already completed).

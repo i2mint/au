@@ -744,20 +744,6 @@ class ComputationBackend(ABC):
         """Attempt to terminate the computation. Default: do nothing."""
         pass
 
-    def _run_middleware_before(
-        self, func: Callable, args: tuple, kwargs: dict, key: str
-    ) -> None:
-        """Run all middleware before hooks."""
-        _call_hooks(self.middleware, "before_compute", func, args, kwargs, key)
-
-    def _run_middleware_after(self, key: str, result: ComputationResult) -> None:
-        """Run all middleware after hooks."""
-        _call_hooks(self.middleware, "after_compute", key, result)
-
-    def _run_middleware_error(self, key: str, error: Exception) -> None:
-        """Run all middleware error hooks."""
-        _call_hooks(self.middleware, "on_error", key, error)
-
 
 def _call_hooks(middleware: list["Middleware"], hook: str, *args) -> None:
     """Call ``hook`` on every middleware, whatever the others raise.

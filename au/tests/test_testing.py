@@ -10,7 +10,7 @@ from au.testing import (
     create_test_backend,
     create_test_store,
 )
-from au.base import ComputationResult, ComputationStatus
+from au.base import ComputationResult, ComputationStatus, MetricsMiddleware
 
 
 def simple_func(x: int) -> int:
@@ -113,7 +113,7 @@ class TestSyncTestBackend:
         # Should store failure
         result = store[key]
         assert result.status == ComputationStatus.FAILED
-        assert "Test error" in result.error
+        assert "Test error" in str(result.error)
 
     def test_get_execution(self):
         """Test getting execution record."""
@@ -210,3 +210,63 @@ def test_create_test_store():
 
     store = create_test_store(ttl_seconds=7200)
     assert store.ttl_seconds == 7200
+
+
+# --- i2mint/au#15: SyncTestBackend runs the body the real backends run ---------
+
+
+class _Interrupt(BaseException):
+    pass
+
+
+def _interrupted():
+    raise _Interrupt("stop")
+
+
+class _Releases(MetricsMiddleware):
+    def __init__(self):
+        super().__init__()
+        self.in_flight, self.calls = set(), []
+
+    def before_compute(self, func, args, kwargs, key):
+        self.in_flight.add(key)
+
+    def after_compute(self, key, result):
+        self.calls.append("after")
+        self.in_flight.discard(key)
+
+    def on_error(self, key, error):
+        self.calls.append(("error", type(error)))
+        self.in_flight.discard(key)
+
+
+def test_sync_backend_records_a_base_exception_and_lets_it_through():
+    mw, store = _Releases(), InMemoryStore()
+    backend = SyncTestBackend(middleware=[mw])
+    key = store.create_key()
+    with pytest.raises(_Interrupt):
+        backend.launch(_interrupted, (), {}, key, store)
+    assert store[key].status == ComputationStatus.FAILED
+    assert isinstance(store[key].error, _Interrupt)
+    assert mw.calls == [("error", _Interrupt)] and not mw.in_flight
+
+
+def test_sync_backend_results_carry_their_completion_time():
+    store = InMemoryStore()
+    key = store.create_key()
+    SyncTestBackend().launch(simple_func, (1,), {}, key, store)
+    assert store[key].duration is not None
+
+
+def test_a_failing_middleware_in_a_composite_does_not_stop_the_others():
+    from au.hooks import CompositeMiddleware
+
+    class Broken(MetricsMiddleware):
+        def after_compute(self, key, result):
+            raise RuntimeError("broken")
+
+    mw, store = _Releases(), InMemoryStore()
+    backend = SyncTestBackend(middleware=[CompositeMiddleware([Broken(), mw])])
+    key = store.create_key()
+    backend.launch(simple_func, (1,), {}, key, store)
+    assert mw.calls == ["after"] and not mw.in_flight
