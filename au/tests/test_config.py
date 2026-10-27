@@ -1,10 +1,12 @@
 """Tests for configuration module."""
 
+import logging
 import os
 import pytest
 from pathlib import Path
 import tempfile
 
+from au.testing import InMemoryStore
 from au.config import (
     AUConfig,
     get_config,
@@ -120,3 +122,62 @@ def test_global_config():
 
     # Reset
     reset_global_config()
+
+
+# --- i2mint/au#22: the observability settings reach the simple API ------------
+
+
+@pytest.fixture
+def isolated_config(monkeypatch, tmp_path):
+    """Only the environment the test sets: no ambient AU_* nor config file."""
+    import au.api
+
+    for name in [n for n in os.environ if n.startswith("AU_")]:
+        monkeypatch.delenv(name)
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))  # Path.home() on Windows
+    monkeypatch.setenv("AU_BACKEND", "thread")
+    monkeypatch.setattr(au.api, "_default_backend", None)
+    reset_global_config()
+    yield monkeypatch
+    reset_global_config()
+
+
+def test_au_logging_level_sets_the_level_tasks_are_logged_at(isolated_config, caplog):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_LEVEL", "DEBUG")
+    with caplog.at_level(logging.DEBUG, logger="au.tasks"):
+        store = InMemoryStore()
+        key = au.api.submit_task(abs, -3, store=store)
+        assert au.api.get_result(key, timeout=5, store=store) == 3
+    starts = [r for r in caplog.records if "Starting computation" in r.message]
+    assert [r.levelno for r in starts] == [logging.DEBUG]
+
+
+def test_au_logging_enabled_false_logs_nothing(isolated_config):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_ENABLED", "false")
+    assert au.api._get_default_backend().middleware == []
+
+
+def test_a_bad_logging_level_is_refused_by_its_setting_name(isolated_config):
+    import au.api
+
+    isolated_config.setenv("AU_LOGGING_LEVEL", "loud")
+    with pytest.raises(ValueError, match="AU_LOGGING_LEVEL.*'loud'"):
+        au.api._get_default_backend()
+
+
+def test_task_logs_stay_quiet_unless_configured_but_au_errors_do_not():
+    import au.api
+
+    def has_null_handler(name):
+        return any(
+            isinstance(h, logging.NullHandler) for h in logging.getLogger(name).handlers
+        )
+
+    assert has_null_handler(au.api.TASKS_LOGGER)
+    assert not has_null_handler("au") and not has_null_handler("au.base")

@@ -38,8 +38,8 @@ class AUConfig:
     retry_initial_delay: float = 1.0
 
     # Observability
-    logging_enabled: bool = True
-    logging_level: str = "INFO"
+    logging_enabled: bool = True  # the simple API logs each task's start/end
+    logging_level: str = "INFO"  # the level those are logged at, not a filter
     metrics_enabled: bool = False
 
     # HTTP configuration (for HTTP module)
@@ -63,7 +63,8 @@ def load_config_from_env() -> dict[str, Any]:
     - AU_SERIALIZATION: Serialization format (json, pickle)
     - AU_RETRY_ENABLED: Enable retry (true/false)
     - AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
-    - AU_LOGGING_LEVEL: Logging level
+    - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
+      (a level name or number; not a filter: configure logging for that)
     - AU_METRICS_ENABLED: Enable metrics (true/false)
 
     Returns:

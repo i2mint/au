@@ -5,6 +5,7 @@ Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.
 """
 
+import logging
 from typing import Any, Callable, Optional, TypeVar
 from contextlib import contextmanager
 
@@ -18,6 +19,7 @@ from au.base import (
     ProcessBackend,
     SerializationFormat,
     Middleware,
+    LoggingMiddleware,
 )
 from au.config import get_global_config
 from au.retry import RetryPolicy, retry_with_policy
@@ -30,12 +32,31 @@ _default_backend: Optional[ComputationBackend] = None
 _default_store: Optional[ComputationStore] = None
 
 
+TASKS_LOGGER = "au.tasks"
+"""Where the simple API logs each task's lifecycle. It has a NullHandler: like
+any library log, it shows only once the app configures logging (au's own
+warnings and errors, on ``au.base``, still reach stderr by default)."""
+logging.getLogger(TASKS_LOGGER).addHandler(logging.NullHandler())
+
+
+def _middleware_from_config(config) -> list[Middleware]:
+    """The middleware the observability settings ask for (``logging_enabled``,
+    ``logging_level``), refusing a bad setting by its name."""
+    if not config.logging_enabled:
+        return []
+    try:
+        return [LoggingMiddleware(level=config.logging_level, logger_name=TASKS_LOGGER)]
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"AU_LOGGING_LEVEL (config.logging_level): {e}") from e
+
+
 def _get_default_backend() -> ComputationBackend:
     """Get or create the default backend based on configuration."""
     global _default_backend
 
     if _default_backend is None:
         config = get_global_config()
+        middleware = _middleware_from_config(config)
 
         # Create backend based on config. Backends take the result store
         # per-launch (submit_task passes it), so no store is bound here.
@@ -46,7 +67,9 @@ def _get_default_backend() -> ComputationBackend:
 
             redis_url = config.redis_url or "redis://localhost:6379"
             connection = redis.Redis.from_url(redis_url)
-            _default_backend = RQBackend(rq_queue=Queue(connection=connection))
+            _default_backend = RQBackend(
+                rq_queue=Queue(connection=connection), middleware=middleware
+            )
 
         elif config.backend == "supabase":
             from au.backends.supabase_backend import SupabaseQueueBackend
@@ -58,12 +81,14 @@ def _get_default_backend() -> ComputationBackend:
             from supabase import create_client
 
             client = create_client(config.supabase_url, config.supabase_key)
-            _default_backend = SupabaseQueueBackend(supabase_client=client)
+            _default_backend = SupabaseQueueBackend(
+                supabase_client=client, middleware=middleware
+            )
 
         elif config.backend == "process":
             from au.base import ProcessBackend
 
-            _default_backend = ProcessBackend()
+            _default_backend = ProcessBackend(middleware=middleware)
 
         elif config.backend == "stdlib":
             from au.base import StdLibQueueBackend
@@ -71,12 +96,13 @@ def _get_default_backend() -> ComputationBackend:
             _default_backend = StdLibQueueBackend(
                 max_workers=config.max_workers,
                 use_processes=False,
+                middleware=middleware,
             )
 
         else:  # Default to thread
             from au.base import ThreadBackend
 
-            _default_backend = ThreadBackend()
+            _default_backend = ThreadBackend(middleware=middleware)
 
     return _default_backend
 
