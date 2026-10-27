@@ -7,7 +7,7 @@ import threading
 import logging
 import time
 from pathlib import Path
-from datetime import timedelta
+from datetime import datetime, timedelta
 import pytest
 from au.testing import InMemoryStore
 from au.base import (
@@ -999,3 +999,24 @@ def test_a_queue_job_that_cannot_be_set_up_fails_its_queue_job(payload):
 
     with pytest.raises(Exception):
         _au_worker_entrypoint(payload)
+
+
+def test_a_running_record_says_when_the_run_began(tmp_path):
+    from au.base import _mark_running
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    began = datetime.now()
+    _mark_running(store, "k", started_at=began)
+    assert store["k"].started_at == began
+
+
+def test_mock_async_keeps_the_simple_apis_results_in_memory():
+    import au.api
+    from au.testing import mock_async
+
+    before = au.api._default_store
+    with mock_async():
+        key = au.api.submit_task(_double, 4)
+        assert isinstance(au.api._default_store, InMemoryStore)
+        assert au.api.get_result(key, timeout=1) == 8
+    assert au.api._default_store is before

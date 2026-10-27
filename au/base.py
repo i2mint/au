@@ -797,8 +797,8 @@ def compute_and_record(
     started = None
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
-        _mark_running(store, key)
-        started = datetime.now()
+        started = datetime.now()  # on RUNNING too, so a running job shows it
+        _mark_running(store, key, started_at=started)
         value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
@@ -847,7 +847,9 @@ def _record_unless_cancelled(
     return result
 
 
-def _mark_running(store: "ComputationStore", key: str) -> None:
+def _mark_running(
+    store: "ComputationStore", key: str, *, started_at: datetime | None = None
+) -> None:
     """Record RUNNING, unless the computation was already cancelled or finished.
 
     A worker starts after the caller may have cancelled it; writing RUNNING over
@@ -855,7 +857,9 @@ def _mark_running(store: "ComputationStore", key: str) -> None:
     """
     current = store.get(key)  # a store may raise KeyError for a key not yet written
     if current is None or not current.is_ready:
-        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+        store[key] = ComputationResult(
+            None, ComputationStatus.RUNNING, started_at=started_at
+        )
 
 
 def _explained_start_failure(error: Exception) -> Exception:

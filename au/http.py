@@ -40,6 +40,7 @@ except ImportError:
 from au.base import (
     ComputationStatus,
     ComputationHandle,
+    ComputationResult,
     ComputationBackend,
     ComputationStore,
 )
@@ -52,7 +53,6 @@ from au.api import (
     _get_default_backend,
     _get_default_store,
 )
-
 
 # Pydantic models for API
 
@@ -110,6 +110,19 @@ class TaskCancelResponse(BaseModel):
     task_id: str
     cancelled: bool
     message: str
+
+
+def _timing(result: ComputationResult) -> dict[str, Any]:
+    """The timing fields of a task's response, from its stored result.
+
+    (They used to be read off ``handle.metadata``, a plain dict: never sent.)
+    """
+    duration = result.duration
+    return {
+        "created_at": result.created_at.isoformat(),
+        "completed_at": result.completed_at and result.completed_at.isoformat(),
+        "duration": duration and duration.total_seconds(),
+    }
 
 
 def mk_http_interface(
@@ -217,25 +230,9 @@ def mk_http_interface(
         """Get the status of a task."""
         try:
             status = get_status(task_id, store=_store)
-
-            # Get additional metadata if available
-            handle = ComputationHandle(task_id, _store)
-            metadata = handle.metadata
-
-            response = TaskStatusResponse(
-                task_id=task_id,
-                status=status.value,
+            return TaskStatusResponse(
+                task_id=task_id, status=status.value, **_timing(_store[task_id])
             )
-
-            if metadata:
-                if metadata.created_at:
-                    response.created_at = metadata.created_at.isoformat()
-                if metadata.completed_at:
-                    response.completed_at = metadata.completed_at.isoformat()
-                if metadata.duration is not None:
-                    response.duration = metadata.duration
-
-            return response
 
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
@@ -291,24 +288,13 @@ def mk_http_interface(
                     result_value = None
                     error = None
 
-            # Get metadata
-            metadata = handle.metadata
-            response = TaskResultResponse(
+            return TaskResultResponse(
                 task_id=task_id,
                 status=status.value,
                 result=result_value,
                 error=error,
+                **_timing(_store[task_id]),
             )
-
-            if metadata:
-                if metadata.created_at:
-                    response.created_at = metadata.created_at.isoformat()
-                if metadata.completed_at:
-                    response.completed_at = metadata.completed_at.isoformat()
-                if metadata.duration is not None:
-                    response.duration = metadata.duration
-
-            return response
 
         except KeyError:
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
@@ -339,9 +325,9 @@ def mk_http_interface(
             return TaskCancelResponse(
                 task_id=task_id,
                 cancelled=cancelled,
-                message="Cancellation attempted"
-                if cancelled
-                else "Task not cancellable",
+                message=(
+                    "Cancellation attempted" if cancelled else "Task not cancellable"
+                ),
             )
 
         except HTTPException:
