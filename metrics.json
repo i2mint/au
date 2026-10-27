@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.566533803939819,
-  "commit_message": "LoggingMiddleware takes a level name; export SharedMetricsMiddleware (#17)\n\n- LoggingMiddleware(level=\"INFO\") works (the README example passed a string\n  that logger.log rejected on every hook); an unknown name is refused at\n  construction. create_observability_middleware no longer converts the level\n  itself, nor silently falls back to INFO for an unknown name.\n- SharedMetricsMiddleware, the one to count across processes with the\n  default backend, is exported from au.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
-  "commit_sha": "8fd8074171c76e601e39a1465cd18506c31b8c97",
+  "collection_duration_seconds": 8.199155569076538,
+  "commit_message": "Review fixes: level names found as registered, refusals say what was passed (#17)\n\n- A level name is looked up exactly, then case-insensitively, so a custom\n  lowercase level resolves; the ValueError quotes the caller's value; a level\n  that is neither int nor str is a TypeError at construction.\n- Tests: custom level, both refusals, create_observability_middleware's\n  level reaching LoggingMiddleware; the docstring shows the name form.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "c23c82aea240b55ddf55559f911339fe9a2bcc19",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -12,18 +12,18 @@
     },
     "umpyre_stats": {
       "comment_lines": 35215,
-      "comment_lines_ratio": 0.06522153838745465,
-      "docs_lines": 42372,
+      "comment_lines_ratio": 0.06522057202969976,
+      "docs_lines": 42375,
       "empty_lines": 70705,
-      "empty_lines_ratio": 0.13095240300113534,
+      "empty_lines_ratio": 0.1309504627391714,
       "files_analyzed": 1332,
-      "function_lines": 323487,
-      "function_lines_ratio": 0.5991287743388483,
-      "mean_lines_per_function": 15.954182284474255,
+      "function_lines": 323492,
+      "function_lines_ratio": 0.5991291576609864,
+      "mean_lines_per_function": 15.954428881436181,
       "num_classes": 3021,
       "num_functions": 20276,
       "pypi_version": "0.1.6",
-      "total_lines": 539929
+      "total_lines": 539937
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:46:08.514662Z",
+  "timestamp": "2026-10-27T13:46:45.317281Z",
   "workflow_status": {}
 }
