@@ -1,4 +1,4 @@
-> built 2026-10-27 13:06 UTC from 3b4f8fe (master) · au 0.1.4. Details: build_info.json
+> built 2026-10-27 13:31 UTC from 2cdeefe (master) · au 0.1.5. Details: build_info.json
 
 # index.html.md
 
@@ -303,6 +303,8 @@ from au import async_compute, LoggingMiddleware, MetricsMiddleware
 def monitored_task(x):
     return x * 2
 ```
+
+`MetricsMiddleware` counts in the process that runs the task. With the default backend each call runs in a child process, so the instance you hold counts nothing: use `SharedMetricsMiddleware` (from `au.base`) to count across processes.
 
 ### Custom Hooks
 
@@ -1012,22 +1014,22 @@ True
 
 ### Classes
 
-| [`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)([middleware])               | Abstract base for computation execution backends.                        |
-|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [`ComputationHandle`](_autosummary/au.base.html.md#au.base.ComputationHandle)(key, store[, backend])       | Handle to check status and retrieve results of async computation.        |
-| [`ComputationResult`](_autosummary/au.base.html.md#au.base.ComputationResult)(value, status[, error, ...]) | Result of a computation with metadata.                                   |
-| [`ComputationStatus`](_autosummary/au.base.html.md#au.base.ComputationStatus)(\*values)                    | Status of a computation task.                                            |
-| [`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)(\*[, ttl_seconds])            | Abstract base for storing computation results with TTL support.          |
-| [`FileSystemStore`](_autosummary/au.base.html.md#au.base.FileSystemStore)(base_path, \*[, suffix, ...])  | Store computation results in the filesystem with automatic cleanup.      |
-| [`LoggingMiddleware`](_autosummary/au.base.html.md#au.base.LoggingMiddleware)(\*[, level, logger_name])    | Middleware for logging computation lifecycle.                            |
-| [`MetricsMiddleware`](_autosummary/au.base.html.md#au.base.MetricsMiddleware)()                            | Middleware for collecting computation metrics.                           |
-| [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)()                                   | Base class for middleware components.                                    |
-| [`ProcessBackend`](_autosummary/au.base.html.md#au.base.ProcessBackend)([store, middleware])            | Execute computations in separate processes with middleware support.      |
-| [`RemoteAPIBackend`](_autosummary/au.base.html.md#au.base.RemoteAPIBackend)(store, \*, api_url[, ...])    | Example backend for remote computation services.                         |
-| [`SerializationFormat`](_autosummary/au.base.html.md#au.base.SerializationFormat)(\*values)                  | Supported serialization formats.                                         |
-| [`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetricsMiddleware)([...])                 | Metrics middleware using shared memory for multiprocessing.              |
-| [`StdLibQueueBackend`](_autosummary/au.base.html.md#au.base.StdLibQueueBackend)([store, max_workers, ...])  | Execute computations using Python's standard library concurrent.futures. |
-| [`ThreadBackend`](_autosummary/au.base.html.md#au.base.ThreadBackend)([store, middleware])             | Execute computations in separate threads (good for I/O-bound tasks).     |
+| [`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)([middleware])               | Abstract base for computation execution backends.                                     |
+|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`ComputationHandle`](_autosummary/au.base.html.md#au.base.ComputationHandle)(key, store[, backend])       | Handle to check status and retrieve results of async computation.                     |
+| [`ComputationResult`](_autosummary/au.base.html.md#au.base.ComputationResult)(value, status[, error, ...]) | Result of a computation with metadata.                                                |
+| [`ComputationStatus`](_autosummary/au.base.html.md#au.base.ComputationStatus)(\*values)                    | Status of a computation task.                                                         |
+| [`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)(\*[, ttl_seconds])            | Abstract base for storing computation results with TTL support.                       |
+| [`FileSystemStore`](_autosummary/au.base.html.md#au.base.FileSystemStore)(base_path, \*[, suffix, ...])  | Store computation results in the filesystem with automatic cleanup.                   |
+| [`LoggingMiddleware`](_autosummary/au.base.html.md#au.base.LoggingMiddleware)(\*[, level, logger_name])    | Middleware for logging computation lifecycle.                                         |
+| [`MetricsMiddleware`](_autosummary/au.base.html.md#au.base.MetricsMiddleware)()                            | Middleware for collecting computation metrics, in the copy that runs the computation. |
+| [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)()                                   | Base class for middleware components.                                                 |
+| [`ProcessBackend`](_autosummary/au.base.html.md#au.base.ProcessBackend)([store, middleware])            | Execute computations in separate processes with middleware support.                   |
+| [`RemoteAPIBackend`](_autosummary/au.base.html.md#au.base.RemoteAPIBackend)(store, \*, api_url[, ...])    | Example backend for remote computation services.                                      |
+| [`SerializationFormat`](_autosummary/au.base.html.md#au.base.SerializationFormat)(\*values)                  | Supported serialization formats.                                                      |
+| [`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetricsMiddleware)([...])                 | Metrics middleware using shared memory for multiprocessing.                           |
+| [`StdLibQueueBackend`](_autosummary/au.base.html.md#au.base.StdLibQueueBackend)([store, max_workers, ...])  | Execute computations using Python's standard library concurrent.futures.              |
+| [`ThreadBackend`](_autosummary/au.base.html.md#au.base.ThreadBackend)([store, middleware])             | Execute computations in separate threads (good for I/O-bound tasks).                  |
 
 ### Exceptions
 
@@ -1270,7 +1272,13 @@ Log computation error.
 
 Bases: [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)
 
-Middleware for collecting computation metrics.
+Middleware for collecting computation metrics, in the copy that runs the
+computation.
+
+Every backend but ThreadBackend runs a copy (a child process’s, or one a
+queue worker unpickled), so there the instance you hold counts nothing. Use
+[`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetricsMiddleware) with ProcessBackend to count across
+processes.
 
 ```pycon
 >>> metrics = MetricsMiddleware()
@@ -1342,6 +1350,11 @@ Execute computations in separate processes with middleware support.
 #### launch(func, args, kwargs, key, store=None)
 
 Launch computation in a new process.
+
+The middleware goes to the child with the work and runs there only, so
+each `before_compute` is released by an `after_compute` or
+`on_error` in the same process (i2mint/au#14). Count across processes
+with [`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetricsMiddleware); a plain one counts in the child.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -1463,12 +1476,18 @@ Decorator to make functions asynchronous with status tracking.
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)
 
+The default backend runs each call with a copy of its middleware, in a
+child process: a plain [`MetricsMiddleware`](_autosummary/au.base.html.md#au.base.MetricsMiddleware) counts there, not in the
+instance you hold. Use [`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetricsMiddleware) to count across
+processes.
+
 ### Example
 
 ```pycon
+>>> metrics = SharedMetricsMiddleware()
 >>> @async_compute(
 ...     ttl_seconds=7200,
-...     middleware=[LoggingMiddleware(), MetricsMiddleware()]
+...     middleware=[LoggingMiddleware(), metrics]
 ... )
 ... def slow_computation(x: int) -> int:
 ...     return x * x
@@ -1872,36 +1891,36 @@ A lightweight, convention-over-configuration async framework for Python.
 
 ### Classes
 
-| [`ComputationHandle`](_autosummary/au.html.md#au.ComputationHandle)(key, store[, backend])          | Handle to check status and retrieve results of async computation.        |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [`ComputationStore`](_autosummary/au.html.md#au.ComputationStore)(\*[, ttl_seconds])               | Abstract base for storing computation results with TTL support.          |
-| [`ComputationResult`](_autosummary/au.html.md#au.ComputationResult)(value, status[, error, ...])    | Result of a computation with metadata.                                   |
-| [`ComputationStatus`](_autosummary/au.html.md#au.ComputationStatus)(\*values)                       | Status of a computation task.                                            |
-| [`SerializationFormat`](_autosummary/au.html.md#au.SerializationFormat)(\*values)                     | Supported serialization formats.                                         |
-| [`FileSystemStore`](_autosummary/au.html.md#au.FileSystemStore)(base_path, \*[, suffix, ...])     | Store computation results in the filesystem with automatic cleanup.      |
-| [`ProcessBackend`](_autosummary/au.html.md#au.ProcessBackend)([store, middleware])               | Execute computations in separate processes with middleware support.      |
-| [`ThreadBackend`](_autosummary/au.html.md#au.ThreadBackend)([store, middleware])                | Execute computations in separate threads (good for I/O-bound tasks).     |
-| [`StdLibQueueBackend`](_autosummary/au.html.md#au.StdLibQueueBackend)([store, max_workers, ...])     | Execute computations using Python's standard library concurrent.futures. |
-| [`Middleware`](_autosummary/au.html.md#au.Middleware)()                                      | Base class for middleware components.                                    |
-| [`LoggingMiddleware`](_autosummary/au.html.md#au.LoggingMiddleware)(\*[, level, logger_name])       | Middleware for logging computation lifecycle.                            |
-| [`MetricsMiddleware`](_autosummary/au.html.md#au.MetricsMiddleware)()                               | Middleware for collecting computation metrics.                           |
-| [`AUConfig`](_autosummary/au.html.md#au.AUConfig)([backend, redis_url, supabase_url, ...]) | Configuration for AU with smart defaults.                                |
-| [`RetryPolicy`](_autosummary/au.html.md#au.RetryPolicy)([max_attempts, backoff, ...])         | Configuration for retry behavior.                                        |
-| [`BackoffStrategy`](_autosummary/au.html.md#au.BackoffStrategy)(\*values)                         | Backoff strategy for retries.                                            |
-| [`RetryState`](_autosummary/au.html.md#au.RetryState)([attempt_count, last_error, ...])      | State tracking for retries.                                              |
-| [`InMemoryStore`](_autosummary/au.html.md#au.InMemoryStore)([ttl_seconds])                      | In-memory store for testing.                                             |
-| [`SyncTestBackend`](_autosummary/au.html.md#au.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately.                      |
-| [`TrackingTestBackend`](_autosummary/au.html.md#au.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.                                 |
-| [`MockTaskTracker`](_autosummary/au.html.md#au.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                                      |
-| [`TaskGraph`](_autosummary/au.html.md#au.TaskGraph)([backend, store])                       | Directed Acyclic Graph (DAG) for task execution.                         |
-| [`WorkflowTask`](_autosummary/au.html.md#au.WorkflowTask)(func[, args, kwargs, ...])           | A task in a workflow with dependencies.                                  |
-| [`WorkflowBuilder`](_autosummary/au.html.md#au.WorkflowBuilder)([backend, store])                 | Fluent interface for building workflows.                                 |
-| [`TaskState`](_autosummary/au.html.md#au.TaskState)(\*values)                               | State of a task in a workflow.                                           |
-| [`HooksMiddleware`](_autosummary/au.html.md#au.HooksMiddleware)([on_start, on_complete, ...])     | Middleware that provides lifecycle hooks.                                |
-| [`TracingMiddleware`](_autosummary/au.html.md#au.TracingMiddleware)([service_name, trace_backend])  | Middleware for distributed tracing (OpenTelemetry compatible).           |
-| [`MetricsCollectorMiddleware`](_autosummary/au.html.md#au.MetricsCollectorMiddleware)([metrics_backend])     | Enhanced metrics middleware with histogram support.                      |
-| [`CompositeMiddleware`](_autosummary/au.html.md#au.CompositeMiddleware)(middlewares)                  | Combines multiple middleware into one.                                   |
-| [`TaskEvent`](_autosummary/au.html.md#au.TaskEvent)(task_id, event_type[, timestamp, data]) | Event fired during task lifecycle.                                       |
+| [`ComputationHandle`](_autosummary/au.html.md#au.ComputationHandle)(key, store[, backend])          | Handle to check status and retrieve results of async computation.                     |
+|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`ComputationStore`](_autosummary/au.html.md#au.ComputationStore)(\*[, ttl_seconds])               | Abstract base for storing computation results with TTL support.                       |
+| [`ComputationResult`](_autosummary/au.html.md#au.ComputationResult)(value, status[, error, ...])    | Result of a computation with metadata.                                                |
+| [`ComputationStatus`](_autosummary/au.html.md#au.ComputationStatus)(\*values)                       | Status of a computation task.                                                         |
+| [`SerializationFormat`](_autosummary/au.html.md#au.SerializationFormat)(\*values)                     | Supported serialization formats.                                                      |
+| [`FileSystemStore`](_autosummary/au.html.md#au.FileSystemStore)(base_path, \*[, suffix, ...])     | Store computation results in the filesystem with automatic cleanup.                   |
+| [`ProcessBackend`](_autosummary/au.html.md#au.ProcessBackend)([store, middleware])               | Execute computations in separate processes with middleware support.                   |
+| [`ThreadBackend`](_autosummary/au.html.md#au.ThreadBackend)([store, middleware])                | Execute computations in separate threads (good for I/O-bound tasks).                  |
+| [`StdLibQueueBackend`](_autosummary/au.html.md#au.StdLibQueueBackend)([store, max_workers, ...])     | Execute computations using Python's standard library concurrent.futures.              |
+| [`Middleware`](_autosummary/au.html.md#au.Middleware)()                                      | Base class for middleware components.                                                 |
+| [`LoggingMiddleware`](_autosummary/au.html.md#au.LoggingMiddleware)(\*[, level, logger_name])       | Middleware for logging computation lifecycle.                                         |
+| [`MetricsMiddleware`](_autosummary/au.html.md#au.MetricsMiddleware)()                               | Middleware for collecting computation metrics, in the copy that runs the computation. |
+| [`AUConfig`](_autosummary/au.html.md#au.AUConfig)([backend, redis_url, supabase_url, ...]) | Configuration for AU with smart defaults.                                             |
+| [`RetryPolicy`](_autosummary/au.html.md#au.RetryPolicy)([max_attempts, backoff, ...])         | Configuration for retry behavior.                                                     |
+| [`BackoffStrategy`](_autosummary/au.html.md#au.BackoffStrategy)(\*values)                         | Backoff strategy for retries.                                                         |
+| [`RetryState`](_autosummary/au.html.md#au.RetryState)([attempt_count, last_error, ...])      | State tracking for retries.                                                           |
+| [`InMemoryStore`](_autosummary/au.html.md#au.InMemoryStore)([ttl_seconds])                      | In-memory store for testing.                                                          |
+| [`SyncTestBackend`](_autosummary/au.html.md#au.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately.                                   |
+| [`TrackingTestBackend`](_autosummary/au.html.md#au.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.                                              |
+| [`MockTaskTracker`](_autosummary/au.html.md#au.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                                                   |
+| [`TaskGraph`](_autosummary/au.html.md#au.TaskGraph)([backend, store])                       | Directed Acyclic Graph (DAG) for task execution.                                      |
+| [`WorkflowTask`](_autosummary/au.html.md#au.WorkflowTask)(func[, args, kwargs, ...])           | A task in a workflow with dependencies.                                               |
+| [`WorkflowBuilder`](_autosummary/au.html.md#au.WorkflowBuilder)([backend, store])                 | Fluent interface for building workflows.                                              |
+| [`TaskState`](_autosummary/au.html.md#au.TaskState)(\*values)                               | State of a task in a workflow.                                                        |
+| [`HooksMiddleware`](_autosummary/au.html.md#au.HooksMiddleware)([on_start, on_complete, ...])     | Middleware that provides lifecycle hooks.                                             |
+| [`TracingMiddleware`](_autosummary/au.html.md#au.TracingMiddleware)([service_name, trace_backend])  | Middleware for distributed tracing (OpenTelemetry compatible).                        |
+| [`MetricsCollectorMiddleware`](_autosummary/au.html.md#au.MetricsCollectorMiddleware)([metrics_backend])     | Enhanced metrics middleware with histogram support.                                   |
+| [`CompositeMiddleware`](_autosummary/au.html.md#au.CompositeMiddleware)(middlewares)                  | Combines multiple middleware into one.                                                |
+| [`TaskEvent`](_autosummary/au.html.md#au.TaskEvent)(task_id, event_type[, timestamp, data]) | Event fired during task lifecycle.                                                    |
 
 ### Exceptions
 
@@ -2278,7 +2297,13 @@ Record error metrics (base.Middleware protocol).
 
 Bases: [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)
 
-Middleware for collecting computation metrics.
+Middleware for collecting computation metrics, in the copy that runs the
+computation.
+
+Every backend but ThreadBackend runs a copy (a child process’s, or one a
+queue worker unpickled), so there the instance you hold counts nothing. Use
+`SharedMetricsMiddleware` with ProcessBackend to count across
+processes.
 
 ```pycon
 >>> metrics = MetricsMiddleware()
@@ -2425,6 +2450,11 @@ Execute computations in separate processes with middleware support.
 #### launch(func, args, kwargs, key, store=None)
 
 Launch computation in a new process.
+
+The middleware goes to the child with the work and runs there only, so
+each `before_compute` is released by an `after_compute` or
+`on_error` in the same process (i2mint/au#14). Count across processes
+with `SharedMetricsMiddleware`; a plain one counts in the child.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -2967,12 +2997,18 @@ Decorator to make functions asynchronous with status tracking.
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)
 
+The default backend runs each call with a copy of its middleware, in a
+child process: a plain [`MetricsMiddleware`](_autosummary/au.html.md#au.MetricsMiddleware) counts there, not in the
+instance you hold. Use `SharedMetricsMiddleware` to count across
+processes.
+
 ### Example
 
 ```pycon
+>>> metrics = SharedMetricsMiddleware()
 >>> @async_compute(
 ...     ttl_seconds=7200,
-...     middleware=[LoggingMiddleware(), MetricsMiddleware()]
+...     middleware=[LoggingMiddleware(), metrics]
 ... )
 ... def slow_computation(x: int) -> int:
 ...     return x * x
@@ -4278,18 +4314,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 13:06 UTC** from commit <a href="https://github.com/i2mint/au/commit/3b4f8fef51891af1558d395d52dac5d5eb0b1d14"><code>3b4f8fe</code></a> on branch <code>master</code>, for **au 0.1.4** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 13:31 UTC** from commit <a href="https://github.com/i2mint/au/commit/2cdeefe3573737a7eb27084b156da4ee505cc484"><code>2cdeefe</code></a> on branch <code>master</code>, for **au 0.1.5** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.5) is ahead of the latest release on PyPI (0.1.4): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/3b4f8fef51891af1558d395d52dac5d5eb0b1d14"><code>3b4f8fef51891af1558d395d52dac5d5eb0b1d14</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/2cdeefe3573737a7eb27084b156da4ee505cc484"><code>2cdeefe3573737a7eb27084b156da4ee505cc484</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.4</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.5</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4298,9 +4336,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40508928609">40508928609</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40512447211">40512447211</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>dafeed2a83b2487049daa9b1a9d438af5ddba2cf</code> (in the history of the built commit) |
+| Event commit | <code>657558c4cdf307fc0e89c4fe0c20b319278dce51</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4325,13 +4363,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.4/">0.1.4</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.4/">0.1.4</a>, older than the documented version (0.1.5).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 3b4f8fef51891af1558d395d52dac5d5eb0b1d14
+git checkout 2cdeefe3573737a7eb27084b156da4ee505cc484
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -19,7 +19,7 @@
 - [au.retry](_autosummary/au.retry.html.md): Retry policies and error handling for AU.
 - [au.testing](_autosummary/au.testing.html.md): Testing utilities for AU.
 - [au.workflow](_autosummary/au.workflow.html.md): Workflow and task dependency management for AU.
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-27 13:06 UTC&#42;&#42; from commit &lt;a href="https://github.com/i2m...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-10-27 13:31 UTC&#42;&#42; from commit &lt;a href="https://github.com/i2m...
 
 ## Optional
 

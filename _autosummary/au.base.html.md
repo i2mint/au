@@ -65,22 +65,22 @@ True
 
 ### Classes
 
-| [`ComputationBackend`](#au.base.ComputationBackend)([middleware])               | Abstract base for computation execution backends.                        |
-|-------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [`ComputationHandle`](#au.base.ComputationHandle)(key, store[, backend])       | Handle to check status and retrieve results of async computation.        |
-| [`ComputationResult`](#au.base.ComputationResult)(value, status[, error, ...]) | Result of a computation with metadata.                                   |
-| [`ComputationStatus`](#au.base.ComputationStatus)(\*values)                    | Status of a computation task.                                            |
-| [`ComputationStore`](#au.base.ComputationStore)(\*[, ttl_seconds])            | Abstract base for storing computation results with TTL support.          |
-| [`FileSystemStore`](#au.base.FileSystemStore)(base_path, \*[, suffix, ...])  | Store computation results in the filesystem with automatic cleanup.      |
-| [`LoggingMiddleware`](#au.base.LoggingMiddleware)(\*[, level, logger_name])    | Middleware for logging computation lifecycle.                            |
-| [`MetricsMiddleware`](#au.base.MetricsMiddleware)()                            | Middleware for collecting computation metrics.                           |
-| [`Middleware`](#au.base.Middleware)()                                   | Base class for middleware components.                                    |
-| [`ProcessBackend`](#au.base.ProcessBackend)([store, middleware])            | Execute computations in separate processes with middleware support.      |
-| [`RemoteAPIBackend`](#au.base.RemoteAPIBackend)(store, \*, api_url[, ...])    | Example backend for remote computation services.                         |
-| [`SerializationFormat`](#au.base.SerializationFormat)(\*values)                  | Supported serialization formats.                                         |
-| [`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware)([...])                 | Metrics middleware using shared memory for multiprocessing.              |
-| [`StdLibQueueBackend`](#au.base.StdLibQueueBackend)([store, max_workers, ...])  | Execute computations using Python's standard library concurrent.futures. |
-| [`ThreadBackend`](#au.base.ThreadBackend)([store, middleware])             | Execute computations in separate threads (good for I/O-bound tasks).     |
+| [`ComputationBackend`](#au.base.ComputationBackend)([middleware])               | Abstract base for computation execution backends.                                     |
+|-------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [`ComputationHandle`](#au.base.ComputationHandle)(key, store[, backend])       | Handle to check status and retrieve results of async computation.                     |
+| [`ComputationResult`](#au.base.ComputationResult)(value, status[, error, ...]) | Result of a computation with metadata.                                                |
+| [`ComputationStatus`](#au.base.ComputationStatus)(\*values)                    | Status of a computation task.                                                         |
+| [`ComputationStore`](#au.base.ComputationStore)(\*[, ttl_seconds])            | Abstract base for storing computation results with TTL support.                       |
+| [`FileSystemStore`](#au.base.FileSystemStore)(base_path, \*[, suffix, ...])  | Store computation results in the filesystem with automatic cleanup.                   |
+| [`LoggingMiddleware`](#au.base.LoggingMiddleware)(\*[, level, logger_name])    | Middleware for logging computation lifecycle.                                         |
+| [`MetricsMiddleware`](#au.base.MetricsMiddleware)()                            | Middleware for collecting computation metrics, in the copy that runs the computation. |
+| [`Middleware`](#au.base.Middleware)()                                   | Base class for middleware components.                                                 |
+| [`ProcessBackend`](#au.base.ProcessBackend)([store, middleware])            | Execute computations in separate processes with middleware support.                   |
+| [`RemoteAPIBackend`](#au.base.RemoteAPIBackend)(store, \*, api_url[, ...])    | Example backend for remote computation services.                                      |
+| [`SerializationFormat`](#au.base.SerializationFormat)(\*values)                  | Supported serialization formats.                                                      |
+| [`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware)([...])                 | Metrics middleware using shared memory for multiprocessing.                           |
+| [`StdLibQueueBackend`](#au.base.StdLibQueueBackend)([store, max_workers, ...])  | Execute computations using Python's standard library concurrent.futures.              |
+| [`ThreadBackend`](#au.base.ThreadBackend)([store, middleware])             | Execute computations in separate threads (good for I/O-bound tasks).                  |
 
 ### Exceptions
 
@@ -323,7 +323,13 @@ Log computation error.
 
 Bases: [`Middleware`](#au.base.Middleware)
 
-Middleware for collecting computation metrics.
+Middleware for collecting computation metrics, in the copy that runs the
+computation.
+
+Every backend but ThreadBackend runs a copy (a child process’s, or one a
+queue worker unpickled), so there the instance you hold counts nothing. Use
+[`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware) with ProcessBackend to count across
+processes.
 
 ```pycon
 >>> metrics = MetricsMiddleware()
@@ -395,6 +401,11 @@ Execute computations in separate processes with middleware support.
 #### launch(func, args, kwargs, key, store=None)
 
 Launch computation in a new process.
+
+The middleware goes to the child with the work and runs there only, so
+each `before_compute` is released by an `after_compute` or
+`on_error` in the same process (i2mint/au#14). Count across processes
+with [`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware); a plain one counts in the child.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -516,12 +527,18 @@ Decorator to make functions asynchronous with status tracking.
 * **Return type:**
   [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)
 
+The default backend runs each call with a copy of its middleware, in a
+child process: a plain [`MetricsMiddleware`](#au.base.MetricsMiddleware) counts there, not in the
+instance you hold. Use [`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware) to count across
+processes.
+
 ### Example
 
 ```pycon
+>>> metrics = SharedMetricsMiddleware()
 >>> @async_compute(
 ...     ttl_seconds=7200,
-...     middleware=[LoggingMiddleware(), MetricsMiddleware()]
+...     middleware=[LoggingMiddleware(), metrics]
 ... )
 ... def slow_computation(x: int) -> int:
 ...     return x * x

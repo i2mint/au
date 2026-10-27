@@ -300,6 +300,8 @@ def monitored_task(x):
     return x * 2
 ```
 
+`MetricsMiddleware` counts in the process that runs the task. With the default backend each call runs in a child process, so the instance you hold counts nothing: use `SharedMetricsMiddleware` (from `au.base`) to count across processes.
+
 ### Custom Hooks
 
 ```python

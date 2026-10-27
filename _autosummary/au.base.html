@@ -307,7 +307,7 @@ and retrieve results later.</p>
 <td><p>Middleware for logging computation lifecycle.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#au.base.MetricsMiddleware" title="au.base.MetricsMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a>()</p></td>
-<td><p>Middleware for collecting computation metrics.</p></td>
+<td><p>Middleware for collecting computation metrics, in the copy that runs the computation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Middleware</span></code></a>()</p></td>
 <td><p>Base class for middleware components.</p></td>
@@ -669,7 +669,12 @@ write can still overwrite it (no compare-and-set).</p>
 <dt class="sig sig-object py" id="au.base.MetricsMiddleware">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">MetricsMiddleware</span></span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
-<p>Middleware for collecting computation metrics.</p>
+<p>Middleware for collecting computation metrics, in the copy that runs the
+computation.</p>
+<p>Every backend but ThreadBackend runs a copy (a child process’s, or one a
+queue worker unpickled), so there the instance you hold counts nothing. Use
+<a class="reference internal" href="#au.base.SharedMetricsMiddleware" title="au.base.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a> with ProcessBackend to count across
+processes.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsMiddleware</span><span class="p">()</span>
 </span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
 </span><span data-line="3"><span class="go">{'total': 0, 'completed': 0, 'failed': 0, 'avg_duration': 0.0}</span>
@@ -772,6 +777,10 @@ write can still overwrite it (no compare-and-set).</p>
 <dt class="sig sig-object py" id="au.base.ProcessBackend.launch">
 <span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ProcessBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ProcessBackend.launch" title="Link to this definition">#</a></dt>
 <dd><p>Launch computation in a new process.</p>
+<p>The middleware goes to the child with the work and runs there only, so
+each <code class="docutils literal notranslate"><span class="pre">before_compute</span></code> is released by an <code class="docutils literal notranslate"><span class="pre">after_compute</span></code> or
+<code class="docutils literal notranslate"><span class="pre">on_error</span></code> in the same process (i2mint/au#14). Count across processes
+with <a class="reference internal" href="#au.base.SharedMetricsMiddleware" title="au.base.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a>; a plain one counts in the child.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -941,15 +950,20 @@ task queuing. Not persistent across application restarts.</p>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
 </dd>
 </dl>
+<p>The default backend runs each call with a copy of its middleware, in a
+child process: a plain <a class="reference internal" href="#au.base.MetricsMiddleware" title="au.base.MetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a> counts there, not in the
+instance you hold. Use <a class="reference internal" href="#au.base.SharedMetricsMiddleware" title="au.base.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a> to count across
+processes.</p>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span><span class="p">(</span>
-</span><span data-line="2"><span class="gp">... </span>    <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
-</span><span data-line="3"><span class="gp">... </span>    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">LoggingMiddleware</span><span class="p">(),</span> <span class="n">MetricsMiddleware</span><span class="p">()]</span>
-</span><span data-line="4"><span class="gp">... </span><span class="p">)</span>
-</span><span data-line="5"><span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">slow_computation</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="6"><span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
-</span><span data-line="7"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">slow_computation</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Returns immediately</span>
-</span><span data-line="8"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">SharedMetricsMiddleware</span><span class="p">()</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span><span class="p">(</span>
+</span><span data-line="3"><span class="gp">... </span>    <span class="n">ttl_seconds</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
+</span><span data-line="4"><span class="gp">... </span>    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span><span class="n">LoggingMiddleware</span><span class="p">(),</span> <span class="n">metrics</span><span class="p">]</span>
+</span><span data-line="5"><span class="gp">... </span><span class="p">)</span>
+</span><span data-line="6"><span class="gp">... </span><span class="k">def</span><span class="w"> </span><span class="nf">slow_computation</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="7"><span class="gp">... </span>    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+</span><span data-line="8"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">slow_computation</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Returns immediately</span>
+</span><span data-line="9"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </span></pre></div>
 </div>
 </dd></dl>
@@ -1011,7 +1025,7 @@ task queuing. Not persistent across application restarts.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=fd825880"></script>
+      <script src="../_static/documentation_options.js?v=59fadc99"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
