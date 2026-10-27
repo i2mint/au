@@ -506,7 +506,7 @@ Called before computation starts.
 
 #### *abstractmethod* on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -804,6 +804,10 @@ Get recorded execution for a key.
 #### launch(func, args, kwargs, key, store=None)
 
 Execute function synchronously and store result immediately.
+
+Runs the body every au worker runs, so it records results as they do:
+`result.error` is the exception itself, and a `BaseException` is
+recorded FAILED, then re-raised to the caller.
 
 * **Parameters:**
   * **func** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – Function to execute

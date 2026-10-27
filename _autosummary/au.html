@@ -1129,7 +1129,7 @@ processes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.Middleware.on_error">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#Middleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.Middleware.on_error" title="Link to this definition">#</a></dt>
-<dd><p>Called when computation fails.</p>
+<dd><p>Called when computation fails (<code class="docutils literal notranslate"><span class="pre">error</span></code> may be a BaseException).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -1579,6 +1579,9 @@ making it ideal for testing without the complexity of actual async execution.</p
 <dt class="sig sig-object py" id="au.SyncTestBackend.launch">
 <span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#SyncTestBackend.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SyncTestBackend.launch" title="Link to this definition">#</a></dt>
 <dd><p>Execute function synchronously and store result immediately.</p>
+<p>Runs the body every au worker runs, so it records results as they do:
+<code class="docutils literal notranslate"><span class="pre">result.error</span></code> is the exception itself, and a <code class="docutils literal notranslate"><span class="pre">BaseException</span></code> is
+recorded FAILED, then re-raised to the caller.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2760,7 +2763,7 @@ key re-runs.</p></li>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=59fadc99"></script>
+      <script src="../_static/documentation_options.js?v=6e0256f3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

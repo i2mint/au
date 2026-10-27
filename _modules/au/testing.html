@@ -144,405 +144,386 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="17">    <span class="n">ComputationResult</span><span class="p">,</span>
 </span><span data-line="18">    <span class="n">ComputationStatus</span><span class="p">,</span>
 </span><span data-line="19">    <span class="n">Middleware</span><span class="p">,</span>
-</span><span data-line="20"><span class="p">)</span>
-</span><span data-line="21">
+</span><span data-line="20">    <span class="n">compute_and_record</span><span class="p">,</span>
+</span><span data-line="21"><span class="p">)</span>
 </span><span data-line="22">
+</span><span data-line="23">
 <div class="viewcode-block" id="InMemoryStore">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.InMemoryStore">[docs]</a>
-</span><span data-line="23"><span class="k">class</span><span class="w"> </span><span class="nc">InMemoryStore</span><span class="p">(</span><span class="n">ComputationStore</span><span class="p">):</span>
-</span><span data-line="24"><span class="w">    </span><span class="sd">"""In-memory store for testing.</span>
-</span><span data-line="25">
-</span><span data-line="26"><span class="sd">    Stores results in a dictionary without any persistence.</span>
-</span><span data-line="27"><span class="sd">    Useful for testing without filesystem dependencies.</span>
-</span><span data-line="28"><span class="sd">    """</span>
-</span><span data-line="29">
-</span><span data-line="30">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">):</span>
-</span><span data-line="31"><span class="w">        </span><span class="sd">"""Initialize in-memory store.</span>
-</span><span data-line="32">
-</span><span data-line="33"><span class="sd">        Args:</span>
-</span><span data-line="34"><span class="sd">            ttl_seconds: Time-to-live for results (not enforced in memory)</span>
-</span><span data-line="35"><span class="sd">        """</span>
-</span><span data-line="36">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">)</span>
-</span><span data-line="37">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ComputationResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span data-line="38">
+</span><span data-line="24"><span class="k">class</span><span class="w"> </span><span class="nc">InMemoryStore</span><span class="p">(</span><span class="n">ComputationStore</span><span class="p">):</span>
+</span><span data-line="25"><span class="w">    </span><span class="sd">"""In-memory store for testing.</span>
+</span><span data-line="26">
+</span><span data-line="27"><span class="sd">    Stores results in a dictionary without any persistence.</span>
+</span><span data-line="28"><span class="sd">    Useful for testing without filesystem dependencies.</span>
+</span><span data-line="29"><span class="sd">    """</span>
+</span><span data-line="30">
+</span><span data-line="31">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">):</span>
+</span><span data-line="32"><span class="w">        </span><span class="sd">"""Initialize in-memory store.</span>
+</span><span data-line="33">
+</span><span data-line="34"><span class="sd">        Args:</span>
+</span><span data-line="35"><span class="sd">            ttl_seconds: Time-to-live for results (not enforced in memory)</span>
+</span><span data-line="36"><span class="sd">        """</span>
+</span><span data-line="37">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">)</span>
+</span><span data-line="38">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ComputationResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="39">
 <div class="viewcode-block" id="InMemoryStore.create_key">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.InMemoryStore.create_key">[docs]</a>
-</span><span data-line="39">    <span class="k">def</span><span class="w"> </span><span class="nf">create_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="40"><span class="w">        </span><span class="sd">"""Create a unique key for a computation."""</span>
-</span><span data-line="41">        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
+</span><span data-line="40">    <span class="k">def</span><span class="w"> </span><span class="nf">create_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="41"><span class="w">        </span><span class="sd">"""Create a unique key for a computation."""</span>
+</span><span data-line="42">        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
 
-</span><span data-line="42">
-</span><span data-line="43">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationResult</span><span class="p">:</span>
-</span><span data-line="44"><span class="w">        </span><span class="sd">"""Get result by key."""</span>
-</span><span data-line="45">        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
-</span><span data-line="46">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No result found for key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="47">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-</span><span data-line="48">
-</span><span data-line="49">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ComputationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="50"><span class="w">        </span><span class="sd">"""Store result by key."""</span>
-</span><span data-line="51">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-</span><span data-line="52">
-</span><span data-line="53">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="54"><span class="w">        </span><span class="sd">"""Delete result by key."""</span>
-</span><span data-line="55">        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-</span><span data-line="56">
-</span><span data-line="57">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span data-line="58"><span class="w">        </span><span class="sd">"""Iterate over keys."""</span>
-</span><span data-line="59">        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
-</span><span data-line="60">
-</span><span data-line="61">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="62"><span class="w">        </span><span class="sd">"""Return number of stored results."""</span>
-</span><span data-line="63">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
-</span><span data-line="64">
+</span><span data-line="43">
+</span><span data-line="44">    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputationResult</span><span class="p">:</span>
+</span><span data-line="45"><span class="w">        </span><span class="sd">"""Get result by key."""</span>
+</span><span data-line="46">        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+</span><span data-line="47">            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No result found for key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span data-line="48">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span data-line="49">
+</span><span data-line="50">    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ComputationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="51"><span class="w">        </span><span class="sd">"""Store result by key."""</span>
+</span><span data-line="52">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span data-line="53">
+</span><span data-line="54">    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="55"><span class="w">        </span><span class="sd">"""Delete result by key."""</span>
+</span><span data-line="56">        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span data-line="57">
+</span><span data-line="58">    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span data-line="59"><span class="w">        </span><span class="sd">"""Iterate over keys."""</span>
+</span><span data-line="60">        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+</span><span data-line="61">
+</span><span data-line="62">    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="63"><span class="w">        </span><span class="sd">"""Return number of stored results."""</span>
+</span><span data-line="64">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+</span><span data-line="65">
 <div class="viewcode-block" id="InMemoryStore.cleanup_expired">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.InMemoryStore.cleanup_expired">[docs]</a>
-</span><span data-line="65">    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="66"><span class="w">        </span><span class="sd">"""No-op for in-memory store (no automatic expiration).</span>
-</span><span data-line="67">
-</span><span data-line="68"><span class="sd">        Returns:</span>
-</span><span data-line="69"><span class="sd">            0 (nothing cleaned up)</span>
-</span><span data-line="70"><span class="sd">        """</span>
-</span><span data-line="71">        <span class="k">return</span> <span class="mi">0</span></div>
+</span><span data-line="66">    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="67"><span class="w">        </span><span class="sd">"""No-op for in-memory store (no automatic expiration).</span>
+</span><span data-line="68">
+</span><span data-line="69"><span class="sd">        Returns:</span>
+</span><span data-line="70"><span class="sd">            0 (nothing cleaned up)</span>
+</span><span data-line="71"><span class="sd">        """</span>
+</span><span data-line="72">        <span class="k">return</span> <span class="mi">0</span></div>
 
-</span><span data-line="72">
+</span><span data-line="73">
 <div class="viewcode-block" id="InMemoryStore.get_reconstruction_info">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.InMemoryStore.get_reconstruction_info">[docs]</a>
-</span><span data-line="73">    <span class="k">def</span><span class="w"> </span><span class="nf">get_reconstruction_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span data-line="74"><span class="w">        </span><span class="sd">"""Get info needed to reconstruct this store.</span>
-</span><span data-line="75">
-</span><span data-line="76"><span class="sd">        Returns:</span>
-</span><span data-line="77"><span class="sd">            Dictionary with store type and parameters</span>
-</span><span data-line="78"><span class="sd">        """</span>
-</span><span data-line="79">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="80">            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"in_memory"</span><span class="p">,</span>
-</span><span data-line="81">            <span class="s2">"ttl_seconds"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttl_seconds</span><span class="p">,</span>
-</span><span data-line="82">        <span class="p">}</span></div>
+</span><span data-line="74">    <span class="k">def</span><span class="w"> </span><span class="nf">get_reconstruction_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span data-line="75"><span class="w">        </span><span class="sd">"""Get info needed to reconstruct this store.</span>
+</span><span data-line="76">
+</span><span data-line="77"><span class="sd">        Returns:</span>
+</span><span data-line="78"><span class="sd">            Dictionary with store type and parameters</span>
+</span><span data-line="79"><span class="sd">        """</span>
+</span><span data-line="80">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="81">            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"in_memory"</span><span class="p">,</span>
+</span><span data-line="82">            <span class="s2">"ttl_seconds"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttl_seconds</span><span class="p">,</span>
+</span><span data-line="83">        <span class="p">}</span></div>
 
-</span><span data-line="83">
+</span><span data-line="84">
 <div class="viewcode-block" id="InMemoryStore.clear">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.InMemoryStore.clear">[docs]</a>
-</span><span data-line="84">    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="85"><span class="w">        </span><span class="sd">"""Clear all stored results."""</span>
-</span><span data-line="86">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+</span><span data-line="85">    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="86"><span class="w">        </span><span class="sd">"""Clear all stored results."""</span>
+</span><span data-line="87">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 </div>
 
-</span><span data-line="87">
 </span><span data-line="88">
+</span><span data-line="89">
 <div class="viewcode-block" id="SyncTestBackend">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.SyncTestBackend">[docs]</a>
-</span><span data-line="89"><span class="k">class</span><span class="w"> </span><span class="nc">SyncTestBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
-</span><span data-line="90"><span class="w">    </span><span class="sd">"""Synchronous test backend that executes immediately.</span>
-</span><span data-line="91">
-</span><span data-line="92"><span class="sd">    This backend runs computations synchronously in the current process/thread,</span>
-</span><span data-line="93"><span class="sd">    making it ideal for testing without the complexity of actual async execution.</span>
-</span><span data-line="94"><span class="sd">    """</span>
-</span><span data-line="95">
-</span><span data-line="96">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="97"><span class="w">        </span><span class="sd">"""Initialize synchronous test backend.</span>
-</span><span data-line="98">
-</span><span data-line="99"><span class="sd">        Args:</span>
-</span><span data-line="100"><span class="sd">            middleware: Optional list of middleware</span>
-</span><span data-line="101"><span class="sd">        """</span>
-</span><span data-line="102">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="103">        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span data-line="104">
+</span><span data-line="90"><span class="k">class</span><span class="w"> </span><span class="nc">SyncTestBackend</span><span class="p">(</span><span class="n">ComputationBackend</span><span class="p">):</span>
+</span><span data-line="91"><span class="w">    </span><span class="sd">"""Synchronous test backend that executes immediately.</span>
+</span><span data-line="92">
+</span><span data-line="93"><span class="sd">    This backend runs computations synchronously in the current process/thread,</span>
+</span><span data-line="94"><span class="sd">    making it ideal for testing without the complexity of actual async execution.</span>
+</span><span data-line="95"><span class="sd">    """</span>
+</span><span data-line="96">
+</span><span data-line="97">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="98"><span class="w">        </span><span class="sd">"""Initialize synchronous test backend.</span>
+</span><span data-line="99">
+</span><span data-line="100"><span class="sd">        Args:</span>
+</span><span data-line="101"><span class="sd">            middleware: Optional list of middleware</span>
+</span><span data-line="102"><span class="sd">        """</span>
+</span><span data-line="103">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="104">        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="105">
 <div class="viewcode-block" id="SyncTestBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.SyncTestBackend.launch">[docs]</a>
-</span><span data-line="105">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="106">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="107">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="108">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="109">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="110">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="111">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="112">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="113"><span class="w">        </span><span class="sd">"""Execute function synchronously and store result immediately.</span>
-</span><span data-line="114">
-</span><span data-line="115"><span class="sd">        Args:</span>
-</span><span data-line="116"><span class="sd">            func: Function to execute</span>
-</span><span data-line="117"><span class="sd">            args: Positional arguments</span>
-</span><span data-line="118"><span class="sd">            kwargs: Keyword arguments</span>
-</span><span data-line="119"><span class="sd">            key: Result key</span>
-</span><span data-line="120"><span class="sd">            store: Store for results (falls back to the backend's own store)</span>
-</span><span data-line="121"><span class="sd">        """</span>
-</span><span data-line="122">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="123">
-</span><span data-line="124">        <span class="c1"># Track execution</span>
-</span><span data-line="125">        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="126">
-</span><span data-line="127">        <span class="c1"># Execute with middleware (base.Middleware protocol:</span>
-</span><span data-line="128">        <span class="c1"># before_compute(func, args, kwargs, key) / after_compute(key, result) /</span>
-</span><span data-line="129">        <span class="c1"># on_error(key, error) — driven via the _run_middleware_* helpers).</span>
-</span><span data-line="130">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="131">            <span class="c1"># Before middleware</span>
-</span><span data-line="132">            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_before</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-</span><span data-line="133">
-</span><span data-line="134">            <span class="c1"># Execute function</span>
-</span><span data-line="135">            <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="136">
-</span><span data-line="137">            <span class="c1"># Store successful result, then run after middleware with it</span>
-</span><span data-line="138">            <span class="n">result</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
-</span><span data-line="139">                <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
-</span><span data-line="140">                <span class="n">status</span><span class="o">=</span><span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
-</span><span data-line="141">                <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span data-line="142">                <span class="n">completed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-</span><span data-line="143">            <span class="p">)</span>
-</span><span data-line="144">            <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
-</span><span data-line="145">            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_after</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
-</span><span data-line="146">
-</span><span data-line="147">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span data-line="148">            <span class="c1"># Store failed result, then run error middleware</span>
-</span><span data-line="149">            <span class="n">store</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span>
-</span><span data-line="150">                <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span data-line="151">                <span class="n">status</span><span class="o">=</span><span class="n">ComputationStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
-</span><span data-line="152">                <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
-</span><span data-line="153">                <span class="n">completed_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-</span><span data-line="154">            <span class="p">)</span>
-</span><span data-line="155">            <span class="bp">self</span><span class="o">.</span><span class="n">_run_middleware_error</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+</span><span data-line="106">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="107">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="108">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="109">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="110">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="111">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="112">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="113">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="114"><span class="w">        </span><span class="sd">"""Execute function synchronously and store result immediately.</span>
+</span><span data-line="115">
+</span><span data-line="116"><span class="sd">        Runs the body every au worker runs, so it records results as they do:</span>
+</span><span data-line="117"><span class="sd">        ``result.error`` is the exception itself, and a ``BaseException`` is</span>
+</span><span data-line="118"><span class="sd">        recorded FAILED, then re-raised to the caller.</span>
+</span><span data-line="119">
+</span><span data-line="120"><span class="sd">        Args:</span>
+</span><span data-line="121"><span class="sd">            func: Function to execute</span>
+</span><span data-line="122"><span class="sd">            args: Positional arguments</span>
+</span><span data-line="123"><span class="sd">            kwargs: Keyword arguments</span>
+</span><span data-line="124"><span class="sd">            key: Result key</span>
+</span><span data-line="125"><span class="sd">            store: Store for results (falls back to the backend's own store)</span>
+</span><span data-line="126"><span class="sd">        """</span>
+</span><span data-line="127">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="128">
+</span><span data-line="129">        <span class="c1"># Track execution</span>
+</span><span data-line="130">        <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="131">
+</span><span data-line="132">        <span class="c1"># The body every au worker runs: the same recording, middleware</span>
+</span><span data-line="133">        <span class="c1"># lifecycle and BaseException handling as the real backends.</span>
+</span><span data-line="134">        <span class="n">compute_and_record</span><span class="p">(</span>
+</span><span data-line="135">            <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
+</span><span data-line="136">        <span class="p">)</span></div>
 
-</span><span data-line="156">
+</span><span data-line="137">
 <div class="viewcode-block" id="SyncTestBackend.terminate">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.SyncTestBackend.terminate">[docs]</a>
-</span><span data-line="157">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="158"><span class="w">        </span><span class="sd">"""No-op for synchronous backend (already completed).</span>
-</span><span data-line="159">
-</span><span data-line="160"><span class="sd">        Args:</span>
-</span><span data-line="161"><span class="sd">            key: Computation key</span>
-</span><span data-line="162"><span class="sd">        """</span>
-</span><span data-line="163">        <span class="k">pass</span></div>
+</span><span data-line="138">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="139"><span class="w">        </span><span class="sd">"""No-op for synchronous backend (already completed).</span>
+</span><span data-line="140">
+</span><span data-line="141"><span class="sd">        Args:</span>
+</span><span data-line="142"><span class="sd">            key: Computation key</span>
+</span><span data-line="143"><span class="sd">        """</span>
+</span><span data-line="144">        <span class="k">pass</span></div>
 
-</span><span data-line="164">
+</span><span data-line="145">
 <div class="viewcode-block" id="SyncTestBackend.get_execution">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.SyncTestBackend.get_execution">[docs]</a>
-</span><span data-line="165">    <span class="k">def</span><span class="w"> </span><span class="nf">get_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
-</span><span data-line="166"><span class="w">        </span><span class="sd">"""Get recorded execution for a key.</span>
-</span><span data-line="167">
-</span><span data-line="168"><span class="sd">        Args:</span>
-</span><span data-line="169"><span class="sd">            key: Computation key</span>
-</span><span data-line="170">
-</span><span data-line="171"><span class="sd">        Returns:</span>
-</span><span data-line="172"><span class="sd">            Tuple of (function, args, kwargs) or None</span>
-</span><span data-line="173"><span class="sd">        """</span>
-</span><span data-line="174">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+</span><span data-line="146">    <span class="k">def</span><span class="w"> </span><span class="nf">get_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+</span><span data-line="147"><span class="w">        </span><span class="sd">"""Get recorded execution for a key.</span>
+</span><span data-line="148">
+</span><span data-line="149"><span class="sd">        Args:</span>
+</span><span data-line="150"><span class="sd">            key: Computation key</span>
+</span><span data-line="151">
+</span><span data-line="152"><span class="sd">        Returns:</span>
+</span><span data-line="153"><span class="sd">            Tuple of (function, args, kwargs) or None</span>
+</span><span data-line="154"><span class="sd">        """</span>
+</span><span data-line="155">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 </div>
 
-</span><span data-line="175">
-</span><span data-line="176">
+</span><span data-line="156">
+</span><span data-line="157">
 <div class="viewcode-block" id="TaskCallRecord">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.TaskCallRecord">[docs]</a>
-</span><span data-line="177"><span class="nd">@dataclass</span>
-</span><span data-line="178"><span class="k">class</span><span class="w"> </span><span class="nc">TaskCallRecord</span><span class="p">:</span>
-</span><span data-line="179"><span class="w">    </span><span class="sd">"""Record of a task call for testing/mocking."""</span>
-</span><span data-line="180">
-</span><span data-line="181">    <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="182">    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span>
-</span><span data-line="183">    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span>
-</span><span data-line="184">    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
+</span><span data-line="158"><span class="nd">@dataclass</span>
+</span><span data-line="159"><span class="k">class</span><span class="w"> </span><span class="nc">TaskCallRecord</span><span class="p">:</span>
+</span><span data-line="160"><span class="w">    </span><span class="sd">"""Record of a task call for testing/mocking."""</span>
+</span><span data-line="161">
+</span><span data-line="162">    <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="163">    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span>
+</span><span data-line="164">    <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span>
+</span><span data-line="165">    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span></div>
 
-</span><span data-line="185">
-</span><span data-line="186">
+</span><span data-line="166">
+</span><span data-line="167">
 <div class="viewcode-block" id="MockTaskTracker">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker">[docs]</a>
-</span><span data-line="187"><span class="nd">@dataclass</span>
-</span><span data-line="188"><span class="k">class</span><span class="w"> </span><span class="nc">MockTaskTracker</span><span class="p">:</span>
-</span><span data-line="189"><span class="w">    </span><span class="sd">"""Tracks task executions for testing.</span>
-</span><span data-line="190">
-</span><span data-line="191"><span class="sd">    Attributes:</span>
-</span><span data-line="192"><span class="sd">        task_count: Total number of tasks executed</span>
-</span><span data-line="193"><span class="sd">        tasks_by_name: Dictionary mapping function names to call records</span>
-</span><span data-line="194"><span class="sd">        all_tasks: List of all task call records</span>
-</span><span data-line="195"><span class="sd">    """</span>
-</span><span data-line="196">
-</span><span data-line="197">    <span class="n">task_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span data-line="198">    <span class="n">tasks_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-</span><span data-line="199">    <span class="n">all_tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-</span><span data-line="200">
+</span><span data-line="168"><span class="nd">@dataclass</span>
+</span><span data-line="169"><span class="k">class</span><span class="w"> </span><span class="nc">MockTaskTracker</span><span class="p">:</span>
+</span><span data-line="170"><span class="w">    </span><span class="sd">"""Tracks task executions for testing.</span>
+</span><span data-line="171">
+</span><span data-line="172"><span class="sd">    Attributes:</span>
+</span><span data-line="173"><span class="sd">        task_count: Total number of tasks executed</span>
+</span><span data-line="174"><span class="sd">        tasks_by_name: Dictionary mapping function names to call records</span>
+</span><span data-line="175"><span class="sd">        all_tasks: List of all task call records</span>
+</span><span data-line="176"><span class="sd">    """</span>
+</span><span data-line="177">
+</span><span data-line="178">    <span class="n">task_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span data-line="179">    <span class="n">tasks_by_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+</span><span data-line="180">    <span class="n">all_tasks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+</span><span data-line="181">
 <div class="viewcode-block" id="MockTaskTracker.record_call">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker.record_call">[docs]</a>
-</span><span data-line="201">    <span class="k">def</span><span class="w"> </span><span class="nf">record_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span data-line="202"><span class="w">        </span><span class="sd">"""Record a task call.</span>
-</span><span data-line="203">
-</span><span data-line="204"><span class="sd">        Args:</span>
-</span><span data-line="205"><span class="sd">            func_name: Name of the function</span>
-</span><span data-line="206"><span class="sd">            args: Positional arguments</span>
-</span><span data-line="207"><span class="sd">            kwargs: Keyword arguments</span>
-</span><span data-line="208"><span class="sd">        """</span>
-</span><span data-line="209">        <span class="n">record</span> <span class="o">=</span> <span class="n">TaskCallRecord</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="210">        <span class="bp">self</span><span class="o">.</span><span class="n">task_count</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span data-line="211">        <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-</span><span data-line="212">
-</span><span data-line="213">        <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">:</span>
-</span><span data-line="214">            <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="215">        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+</span><span data-line="182">    <span class="k">def</span><span class="w"> </span><span class="nf">record_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span data-line="183"><span class="w">        </span><span class="sd">"""Record a task call.</span>
+</span><span data-line="184">
+</span><span data-line="185"><span class="sd">        Args:</span>
+</span><span data-line="186"><span class="sd">            func_name: Name of the function</span>
+</span><span data-line="187"><span class="sd">            args: Positional arguments</span>
+</span><span data-line="188"><span class="sd">            kwargs: Keyword arguments</span>
+</span><span data-line="189"><span class="sd">        """</span>
+</span><span data-line="190">        <span class="n">record</span> <span class="o">=</span> <span class="n">TaskCallRecord</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="191">        <span class="bp">self</span><span class="o">.</span><span class="n">task_count</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span data-line="192">        <span class="bp">self</span><span class="o">.</span><span class="n">all_tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</span><span data-line="193">
+</span><span data-line="194">        <span class="k">if</span> <span class="n">func_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">:</span>
+</span><span data-line="195">            <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="196">        <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
 
-</span><span data-line="216">
+</span><span data-line="197">
 <div class="viewcode-block" id="MockTaskTracker.get_calls">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker.get_calls">[docs]</a>
-</span><span data-line="217">    <span class="k">def</span><span class="w"> </span><span class="nf">get_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
-</span><span data-line="218"><span class="w">        </span><span class="sd">"""Get all calls for a specific function.</span>
-</span><span data-line="219">
-</span><span data-line="220"><span class="sd">        Args:</span>
-</span><span data-line="221"><span class="sd">            func_name: Name of the function</span>
-</span><span data-line="222">
-</span><span data-line="223"><span class="sd">        Returns:</span>
-</span><span data-line="224"><span class="sd">            List of call records</span>
-</span><span data-line="225"><span class="sd">        """</span>
-</span><span data-line="226">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">[])</span></div>
+</span><span data-line="198">    <span class="k">def</span><span class="w"> </span><span class="nf">get_calls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
+</span><span data-line="199"><span class="w">        </span><span class="sd">"""Get all calls for a specific function.</span>
+</span><span data-line="200">
+</span><span data-line="201"><span class="sd">        Args:</span>
+</span><span data-line="202"><span class="sd">            func_name: Name of the function</span>
+</span><span data-line="203">
+</span><span data-line="204"><span class="sd">        Returns:</span>
+</span><span data-line="205"><span class="sd">            List of call records</span>
+</span><span data-line="206"><span class="sd">        """</span>
+</span><span data-line="207">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="p">[])</span></div>
 
-</span><span data-line="227">
+</span><span data-line="208">
 <div class="viewcode-block" id="MockTaskTracker.call_count">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker.call_count">[docs]</a>
-</span><span data-line="228">    <span class="k">def</span><span class="w"> </span><span class="nf">call_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="229"><span class="w">        </span><span class="sd">"""Get call count for a specific function.</span>
-</span><span data-line="230">
-</span><span data-line="231"><span class="sd">        Args:</span>
-</span><span data-line="232"><span class="sd">            func_name: Name of the function</span>
-</span><span data-line="233">
-</span><span data-line="234"><span class="sd">        Returns:</span>
-</span><span data-line="235"><span class="sd">            Number of calls</span>
-</span><span data-line="236"><span class="sd">        """</span>
-</span><span data-line="237">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">))</span></div>
+</span><span data-line="209">    <span class="k">def</span><span class="w"> </span><span class="nf">call_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span data-line="210"><span class="w">        </span><span class="sd">"""Get call count for a specific function.</span>
+</span><span data-line="211">
+</span><span data-line="212"><span class="sd">        Args:</span>
+</span><span data-line="213"><span class="sd">            func_name: Name of the function</span>
+</span><span data-line="214">
+</span><span data-line="215"><span class="sd">        Returns:</span>
+</span><span data-line="216"><span class="sd">            Number of calls</span>
+</span><span data-line="217"><span class="sd">        """</span>
+</span><span data-line="218">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">))</span></div>
 
-</span><span data-line="238">
+</span><span data-line="219">
 <div class="viewcode-block" id="MockTaskTracker.last_call">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker.last_call">[docs]</a>
-</span><span data-line="239">    <span class="k">def</span><span class="w"> </span><span class="nf">last_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
-</span><span data-line="240"><span class="w">        </span><span class="sd">"""Get last call for a specific function.</span>
-</span><span data-line="241">
-</span><span data-line="242"><span class="sd">        Args:</span>
-</span><span data-line="243"><span class="sd">            func_name: Name of the function</span>
-</span><span data-line="244">
-</span><span data-line="245"><span class="sd">        Returns:</span>
-</span><span data-line="246"><span class="sd">            Last call record or None</span>
-</span><span data-line="247"><span class="sd">        """</span>
-</span><span data-line="248">        <span class="n">calls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
-</span><span data-line="249">        <span class="k">return</span> <span class="n">calls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="kc">None</span></div>
+</span><span data-line="220">    <span class="k">def</span><span class="w"> </span><span class="nf">last_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskCallRecord</span><span class="p">]:</span>
+</span><span data-line="221"><span class="w">        </span><span class="sd">"""Get last call for a specific function.</span>
+</span><span data-line="222">
+</span><span data-line="223"><span class="sd">        Args:</span>
+</span><span data-line="224"><span class="sd">            func_name: Name of the function</span>
+</span><span data-line="225">
+</span><span data-line="226"><span class="sd">        Returns:</span>
+</span><span data-line="227"><span class="sd">            Last call record or None</span>
+</span><span data-line="228"><span class="sd">        """</span>
+</span><span data-line="229">        <span class="n">calls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_calls</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
+</span><span data-line="230">        <span class="k">return</span> <span class="n">calls</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">calls</span> <span class="k">else</span> <span class="kc">None</span></div>
 </div>
 
-</span><span data-line="250">
-</span><span data-line="251">
+</span><span data-line="231">
+</span><span data-line="232">
 <div class="viewcode-block" id="TrackingTestBackend">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.TrackingTestBackend">[docs]</a>
-</span><span data-line="252"><span class="k">class</span><span class="w"> </span><span class="nc">TrackingTestBackend</span><span class="p">(</span><span class="n">SyncTestBackend</span><span class="p">):</span>
-</span><span data-line="253"><span class="w">    </span><span class="sd">"""Test backend that tracks all executions.</span>
-</span><span data-line="254">
-</span><span data-line="255"><span class="sd">    Extends SyncTestBackend with detailed tracking for testing/debugging.</span>
-</span><span data-line="256"><span class="sd">    """</span>
-</span><span data-line="257">
-</span><span data-line="258">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="259"><span class="w">        </span><span class="sd">"""Initialize tracking test backend.</span>
-</span><span data-line="260">
-</span><span data-line="261"><span class="sd">        Args:</span>
-</span><span data-line="262"><span class="sd">            middleware: Optional list of middleware</span>
-</span><span data-line="263"><span class="sd">        """</span>
-</span><span data-line="264">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="265">        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span> <span class="o">=</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
-</span><span data-line="266">
+</span><span data-line="233"><span class="k">class</span><span class="w"> </span><span class="nc">TrackingTestBackend</span><span class="p">(</span><span class="n">SyncTestBackend</span><span class="p">):</span>
+</span><span data-line="234"><span class="w">    </span><span class="sd">"""Test backend that tracks all executions.</span>
+</span><span data-line="235">
+</span><span data-line="236"><span class="sd">    Extends SyncTestBackend with detailed tracking for testing/debugging.</span>
+</span><span data-line="237"><span class="sd">    """</span>
+</span><span data-line="238">
+</span><span data-line="239">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="240"><span class="w">        </span><span class="sd">"""Initialize tracking test backend.</span>
+</span><span data-line="241">
+</span><span data-line="242"><span class="sd">        Args:</span>
+</span><span data-line="243"><span class="sd">            middleware: Optional list of middleware</span>
+</span><span data-line="244"><span class="sd">        """</span>
+</span><span data-line="245">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="246">        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span> <span class="o">=</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
+</span><span data-line="247">
 <div class="viewcode-block" id="TrackingTestBackend.launch">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.TrackingTestBackend.launch">[docs]</a>
-</span><span data-line="267">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="268">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="269">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="270">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="271">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="272">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="273">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="274">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="275"><span class="w">        </span><span class="sd">"""Execute and track function call.</span>
-</span><span data-line="276">
-</span><span data-line="277"><span class="sd">        Args:</span>
-</span><span data-line="278"><span class="sd">            func: Function to execute</span>
-</span><span data-line="279"><span class="sd">            args: Positional arguments</span>
-</span><span data-line="280"><span class="sd">            kwargs: Keyword arguments</span>
-</span><span data-line="281"><span class="sd">            key: Result key</span>
-</span><span data-line="282"><span class="sd">            store: Store for results (falls back to the backend's own store)</span>
-</span><span data-line="283"><span class="sd">        """</span>
-</span><span data-line="284">        <span class="c1"># Record the call</span>
-</span><span data-line="285">        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">record_call</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-</span><span data-line="286">
-</span><span data-line="287">        <span class="c1"># Execute normally</span>
-</span><span data-line="288">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span></div>
+</span><span data-line="248">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="249">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="250">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="251">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="252">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="253">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="254">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="255">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="256"><span class="w">        </span><span class="sd">"""Execute and track function call.</span>
+</span><span data-line="257">
+</span><span data-line="258"><span class="sd">        Args:</span>
+</span><span data-line="259"><span class="sd">            func: Function to execute</span>
+</span><span data-line="260"><span class="sd">            args: Positional arguments</span>
+</span><span data-line="261"><span class="sd">            kwargs: Keyword arguments</span>
+</span><span data-line="262"><span class="sd">            key: Result key</span>
+</span><span data-line="263"><span class="sd">            store: Store for results (falls back to the backend's own store)</span>
+</span><span data-line="264"><span class="sd">        """</span>
+</span><span data-line="265">        <span class="c1"># Record the call</span>
+</span><span data-line="266">        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">record_call</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+</span><span data-line="267">
+</span><span data-line="268">        <span class="c1"># Execute normally</span>
+</span><span data-line="269">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span></div>
 </div>
 
-</span><span data-line="289">
-</span><span data-line="290">
+</span><span data-line="270">
+</span><span data-line="271">
 <div class="viewcode-block" id="mock_async">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.mock_async">[docs]</a>
-</span><span data-line="291"><span class="nd">@contextmanager</span>
-</span><span data-line="292"><span class="k">def</span><span class="w"> </span><span class="nf">mock_async</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="293"><span class="w">    </span><span class="sd">"""Context manager for mocking async execution.</span>
+</span><span data-line="272"><span class="nd">@contextmanager</span>
+</span><span data-line="273"><span class="k">def</span><span class="w"> </span><span class="nf">mock_async</span><span class="p">(</span><span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputationBackend</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="274"><span class="w">    </span><span class="sd">"""Context manager for mocking async execution.</span>
+</span><span data-line="275">
+</span><span data-line="276"><span class="sd">    Usage:</span>
+</span><span data-line="277"><span class="sd">        with mock_async() as mock:</span>
+</span><span data-line="278"><span class="sd">            @async_compute</span>
+</span><span data-line="279"><span class="sd">            def my_func(n: int) -&gt; int:</span>
+</span><span data-line="280"><span class="sd">                return n * 2</span>
+</span><span data-line="281">
+</span><span data-line="282"><span class="sd">            handle = my_func.async_run(n=5)</span>
+</span><span data-line="283"><span class="sd">            assert mock.task_count == 1</span>
+</span><span data-line="284"><span class="sd">            assert handle.get_result() == 10</span>
+</span><span data-line="285">
+</span><span data-line="286"><span class="sd">    Args:</span>
+</span><span data-line="287"><span class="sd">        backend: Optional custom backend (defaults to TrackingTestBackend)</span>
+</span><span data-line="288">
+</span><span data-line="289"><span class="sd">    Yields:</span>
+</span><span data-line="290"><span class="sd">        MockTaskTracker instance</span>
+</span><span data-line="291"><span class="sd">    """</span>
+</span><span data-line="292">    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="293">        <span class="n">backend</span> <span class="o">=</span> <span class="n">TrackingTestBackend</span><span class="p">()</span>
 </span><span data-line="294">
-</span><span data-line="295"><span class="sd">    Usage:</span>
-</span><span data-line="296"><span class="sd">        with mock_async() as mock:</span>
-</span><span data-line="297"><span class="sd">            @async_compute</span>
-</span><span data-line="298"><span class="sd">            def my_func(n: int) -&gt; int:</span>
-</span><span data-line="299"><span class="sd">                return n * 2</span>
+</span><span data-line="295">    <span class="c1"># Import here to avoid circular dependency</span>
+</span><span data-line="296">    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
+</span><span data-line="297">
+</span><span data-line="298">    <span class="c1"># Store original defaults</span>
+</span><span data-line="299">    <span class="n">original_backend</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 </span><span data-line="300">
-</span><span data-line="301"><span class="sd">            handle = my_func.async_run(n=5)</span>
-</span><span data-line="302"><span class="sd">            assert mock.task_count == 1</span>
-</span><span data-line="303"><span class="sd">            assert handle.get_result() == 10</span>
-</span><span data-line="304">
-</span><span data-line="305"><span class="sd">    Args:</span>
-</span><span data-line="306"><span class="sd">        backend: Optional custom backend (defaults to TrackingTestBackend)</span>
-</span><span data-line="307">
-</span><span data-line="308"><span class="sd">    Yields:</span>
-</span><span data-line="309"><span class="sd">        MockTaskTracker instance</span>
-</span><span data-line="310"><span class="sd">    """</span>
-</span><span data-line="311">    <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="312">        <span class="n">backend</span> <span class="o">=</span> <span class="n">TrackingTestBackend</span><span class="p">()</span>
-</span><span data-line="313">
-</span><span data-line="314">    <span class="c1"># Import here to avoid circular dependency</span>
-</span><span data-line="315">    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">async_compute</span>
-</span><span data-line="316">
-</span><span data-line="317">    <span class="c1"># Store original defaults</span>
-</span><span data-line="318">    <span class="n">original_backend</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-</span><span data-line="319">
-</span><span data-line="320">    <span class="c1"># Set test backend as default</span>
-</span><span data-line="321">    <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">backend</span>
-</span><span data-line="322">
-</span><span data-line="323">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="324">        <span class="c1"># Yield tracker if backend has one</span>
-</span><span data-line="325">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">TrackingTestBackend</span><span class="p">):</span>
-</span><span data-line="326">            <span class="k">yield</span> <span class="n">backend</span><span class="o">.</span><span class="n">tracker</span>
-</span><span data-line="327">        <span class="k">else</span><span class="p">:</span>
-</span><span data-line="328">            <span class="k">yield</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
-</span><span data-line="329">
-</span><span data-line="330">    <span class="k">finally</span><span class="p">:</span>
-</span><span data-line="331">        <span class="c1"># Restore original backend</span>
-</span><span data-line="332">        <span class="k">if</span> <span class="n">original_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="333">            <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">original_backend</span>
-</span><span data-line="334">        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">):</span>
-</span><span data-line="335">            <span class="nb">delattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">)</span></div>
+</span><span data-line="301">    <span class="c1"># Set test backend as default</span>
+</span><span data-line="302">    <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">backend</span>
+</span><span data-line="303">
+</span><span data-line="304">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="305">        <span class="c1"># Yield tracker if backend has one</span>
+</span><span data-line="306">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">TrackingTestBackend</span><span class="p">):</span>
+</span><span data-line="307">            <span class="k">yield</span> <span class="n">backend</span><span class="o">.</span><span class="n">tracker</span>
+</span><span data-line="308">        <span class="k">else</span><span class="p">:</span>
+</span><span data-line="309">            <span class="k">yield</span> <span class="n">MockTaskTracker</span><span class="p">()</span>
+</span><span data-line="310">
+</span><span data-line="311">    <span class="k">finally</span><span class="p">:</span>
+</span><span data-line="312">        <span class="c1"># Restore original backend</span>
+</span><span data-line="313">        <span class="k">if</span> <span class="n">original_backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="314">            <span class="n">async_compute</span><span class="o">.</span><span class="n">_default_backend</span> <span class="o">=</span> <span class="n">original_backend</span>
+</span><span data-line="315">        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">):</span>
+</span><span data-line="316">            <span class="nb">delattr</span><span class="p">(</span><span class="n">async_compute</span><span class="p">,</span> <span class="s2">"_default_backend"</span><span class="p">)</span></div>
 
-</span><span data-line="336">
-</span><span data-line="337">
+</span><span data-line="317">
+</span><span data-line="318">
 <div class="viewcode-block" id="create_test_backend">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.create_test_backend">[docs]</a>
-</span><span data-line="338"><span class="k">def</span><span class="w"> </span><span class="nf">create_test_backend</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SyncTestBackend</span><span class="p">:</span>
-</span><span data-line="339"><span class="w">    </span><span class="sd">"""Create a test backend with optional configuration.</span>
-</span><span data-line="340">
-</span><span data-line="341"><span class="sd">    Args:</span>
-</span><span data-line="342"><span class="sd">        **kwargs: Configuration options (currently accepts 'middleware')</span>
-</span><span data-line="343">
-</span><span data-line="344"><span class="sd">    Returns:</span>
-</span><span data-line="345"><span class="sd">        SyncTestBackend instance</span>
-</span><span data-line="346"><span class="sd">    """</span>
-</span><span data-line="347">    <span class="k">return</span> <span class="n">SyncTestBackend</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"middleware"</span><span class="p">))</span></div>
+</span><span data-line="319"><span class="k">def</span><span class="w"> </span><span class="nf">create_test_backend</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SyncTestBackend</span><span class="p">:</span>
+</span><span data-line="320"><span class="w">    </span><span class="sd">"""Create a test backend with optional configuration.</span>
+</span><span data-line="321">
+</span><span data-line="322"><span class="sd">    Args:</span>
+</span><span data-line="323"><span class="sd">        **kwargs: Configuration options (currently accepts 'middleware')</span>
+</span><span data-line="324">
+</span><span data-line="325"><span class="sd">    Returns:</span>
+</span><span data-line="326"><span class="sd">        SyncTestBackend instance</span>
+</span><span data-line="327"><span class="sd">    """</span>
+</span><span data-line="328">    <span class="k">return</span> <span class="n">SyncTestBackend</span><span class="p">(</span><span class="n">middleware</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"middleware"</span><span class="p">))</span></div>
 
-</span><span data-line="348">
-</span><span data-line="349">
+</span><span data-line="329">
+</span><span data-line="330">
 <div class="viewcode-block" id="create_test_store">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.create_test_store">[docs]</a>
-</span><span data-line="350"><span class="k">def</span><span class="w"> </span><span class="nf">create_test_store</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InMemoryStore</span><span class="p">:</span>
-</span><span data-line="351"><span class="w">    </span><span class="sd">"""Create a test store with optional configuration.</span>
-</span><span data-line="352">
-</span><span data-line="353"><span class="sd">    Args:</span>
-</span><span data-line="354"><span class="sd">        **kwargs: Configuration options (accepts 'ttl_seconds')</span>
-</span><span data-line="355">
-</span><span data-line="356"><span class="sd">    Returns:</span>
-</span><span data-line="357"><span class="sd">        InMemoryStore instance</span>
-</span><span data-line="358"><span class="sd">    """</span>
-</span><span data-line="359">    <span class="k">return</span> <span class="n">InMemoryStore</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ttl_seconds"</span><span class="p">,</span> <span class="mi">3600</span><span class="p">))</span></div>
+</span><span data-line="331"><span class="k">def</span><span class="w"> </span><span class="nf">create_test_store</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InMemoryStore</span><span class="p">:</span>
+</span><span data-line="332"><span class="w">    </span><span class="sd">"""Create a test store with optional configuration.</span>
+</span><span data-line="333">
+</span><span data-line="334"><span class="sd">    Args:</span>
+</span><span data-line="335"><span class="sd">        **kwargs: Configuration options (accepts 'ttl_seconds')</span>
+</span><span data-line="336">
+</span><span data-line="337"><span class="sd">    Returns:</span>
+</span><span data-line="338"><span class="sd">        InMemoryStore instance</span>
+</span><span data-line="339"><span class="sd">    """</span>
+</span><span data-line="340">    <span class="k">return</span> <span class="n">InMemoryStore</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ttl_seconds"</span><span class="p">,</span> <span class="mi">3600</span><span class="p">))</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -571,7 +552,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=59fadc99"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

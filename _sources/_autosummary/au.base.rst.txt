@@ -9,6 +9,8 @@ au.base
    .. autosummary::
    
       async_compute
+      call_hooks
+      compute_and_record
       temporary_async_compute
    
    .. rubric:: Classes

@@ -176,6 +176,8 @@ data-aria-dark="Switch to auto color mode">
 </ul>
 </li>
 <li><a class="reference internal" href="#au.base.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.call_hooks"><code class="docutils literal notranslate"><span class="pre">call_hooks()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.compute_and_record"><code class="docutils literal notranslate"><span class="pre">compute_and_record()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
@@ -274,6 +276,12 @@ and retrieve results later.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.base.async_compute" title="au.base.async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">async_compute</span></code></a>([backend, store, base_path, ...])</p></td>
 <td><p>Decorator to make functions asynchronous with status tracking.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.call_hooks" title="au.base.call_hooks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call_hooks</span></code></a>(middleware, hook, *args)</p></td>
+<td><p>Call <code class="docutils literal notranslate"><span class="pre">hook</span></code> on every middleware, whatever the others raise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.compute_and_record" title="au.base.compute_and_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_and_record</span></code></a>(func, args, kwargs, *, ...)</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">func</span></code>, record its outcome under <code class="docutils literal notranslate"><span class="pre">key</span></code>, and drive the middleware.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#au.base.temporary_async_compute" title="au.base.temporary_async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">temporary_async_compute</span></code></a>(**kwargs)</p></td>
 <td><p>Context manager for temporary async computations with automatic cleanup.</p></td>
@@ -756,7 +764,7 @@ processes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.Middleware.on_error">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#Middleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.Middleware.on_error" title="Link to this definition">#</a></dt>
-<dd><p>Called when computation fails.</p>
+<dd><p>Called when computation fails (<code class="docutils literal notranslate"><span class="pre">error</span></code> may be a BaseException).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -857,7 +865,7 @@ job tracking mechanisms.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.on_error">
 <span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
-<dd><p>Called when computation fails.</p>
+<dd><p>Called when computation fails (<code class="docutils literal notranslate"><span class="pre">error</span></code> may be a BaseException).</p>
 </dd></dl>
 
 </dd></dl>
@@ -969,6 +977,37 @@ processes.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="au.base.call_hooks">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">call_hooks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#call_hooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.call_hooks" title="Link to this definition">#</a></dt>
+<dd><p>Call <code class="docutils literal notranslate"><span class="pre">hook</span></code> on every middleware, whatever the others raise.</p>
+<p>A failing hook is logged. A <code class="docutils literal notranslate"><span class="pre">BaseException</span></code> from one is re-raised once all
+have run, so one hook cannot leave another middleware’s key registered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.base.compute_and_record">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">compute_and_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#compute_and_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.compute_and_record" title="Link to this definition">#</a></dt>
+<dd><p>Run <code class="docutils literal notranslate"><span class="pre">func</span></code>, record its outcome under <code class="docutils literal notranslate"><span class="pre">key</span></code>, and drive the middleware.</p>
+<p>The body the thread and queue workers run, and ProcessBackend’s child. Once
+<code class="docutils literal notranslate"><span class="pre">before_compute</span></code> has run, exactly one of <code class="docutils literal notranslate"><span class="pre">after_compute</span></code> / <code class="docutils literal notranslate"><span class="pre">on_error</span></code>
+runs too, whatever fails (a hook, the RUNNING write, the COMPLETED write, the
+FAILED write), so middleware that registers a key in one can always release
+it in the other. A <code class="docutils literal notranslate"><span class="pre">BaseException</span></code> (<code class="docutils literal notranslate"><span class="pre">asyncio.CancelledError</span></code>,
+<code class="docutils literal notranslate"><span class="pre">SystemExit</span></code>, even <code class="docutils literal notranslate"><span class="pre">sys.exit(0)</span></code>) is recorded as FAILED like any error,
+then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="au.base.temporary_async_compute">
 <span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">temporary_async_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#temporary_async_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.temporary_async_compute" title="Link to this definition">#</a></dt>
 <dd><p>Context manager for temporary async computations with automatic cleanup.</p>
@@ -1025,7 +1064,7 @@ processes.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=59fadc99"></script>
+      <script src="../_static/documentation_options.js?v=6e0256f3"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

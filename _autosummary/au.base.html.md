@@ -61,6 +61,8 @@ True
 
 | [`async_compute`](#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
 |----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [`call_hooks`](#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.              |
+| [`compute_and_record`](#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.    |
 | [`temporary_async_compute`](#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup. |
 
 ### Classes
@@ -387,7 +389,7 @@ Called before computation starts.
 
 #### *abstractmethod* on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -462,7 +464,7 @@ Called before computation starts.
 
 #### on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -545,6 +547,31 @@ processes.
 >>> handle = slow_computation(5)  # Returns immediately
 >>> result = handle.get_result(timeout=10)
 ```
+
+### au.base.call_hooks(middleware, hook, \*args)
+
+Call `hook` on every middleware, whatever the others raise.
+
+A failing hook is logged. A `BaseException` from one is re-raised once all
+have run, so one hook cannot leave another middleware’s key registered.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.base.compute_and_record(func, args, kwargs, , key, store, middleware)
+
+Run `func`, record its outcome under `key`, and drive the middleware.
+
+The body the thread and queue workers run, and ProcessBackend’s child. Once
+`before_compute` has run, exactly one of `after_compute` / `on_error`
+runs too, whatever fails (a hook, the RUNNING write, the COMPLETED write, the
+FAILED write), so middleware that registers a key in one can always release
+it in the other. A `BaseException` (`asyncio.CancelledError`,
+`SystemExit`, even `sys.exit(0)`) is recorded as FAILED like any error,
+then re-raised (i2mint/au#12). A cancellation already recorded is final.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### au.base.temporary_async_compute(\*\*kwargs)
 

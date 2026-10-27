@@ -137,7 +137,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="10"><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 </span><span data-line="11"><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 </span><span data-line="12">
-</span><span data-line="13"><span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span><span class="p">,</span> <span class="n">ComputationResult</span>
+</span><span data-line="13"><span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span><span class="p">,</span> <span class="n">ComputationResult</span><span class="p">,</span> <span class="n">call_hooks</span>
 </span><span data-line="14">
 </span><span data-line="15">
 </span><span data-line="16"><span class="k">def</span><span class="w"> </span><span class="nf">_func_name</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -274,7 +274,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="133">
 <div class="viewcode-block" id="HooksMiddleware.on_error">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.HooksMiddleware.on_error">[docs]</a>
-</span><span data-line="134">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="134">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="135"><span class="w">        </span><span class="sd">"""Called when computation fails (base.Middleware protocol)."""</span>
 </span><span data-line="136">        <span class="n">event</span> <span class="o">=</span> <span class="n">TaskEvent</span><span class="p">(</span>
 </span><span data-line="137">            <span class="n">task_id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
@@ -368,7 +368,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="212">
 <div class="viewcode-block" id="TracingMiddleware.on_error">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.TracingMiddleware.on_error">[docs]</a>
-</span><span data-line="213">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="213">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="214"><span class="w">        </span><span class="sd">"""Mark span as failed (base.Middleware protocol)."""</span>
 </span><span data-line="215">        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spans</span><span class="p">:</span>
 </span><span data-line="216">            <span class="n">span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spans</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -427,7 +427,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="259">
 <div class="viewcode-block" id="MetricsCollectorMiddleware.on_error">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.MetricsCollectorMiddleware.on_error">[docs]</a>
-</span><span data-line="260">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="260">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="261"><span class="w">        </span><span class="sd">"""Record error metrics (base.Middleware protocol)."""</span>
 </span><span data-line="262">        <span class="bp">self</span><span class="o">.</span><span class="n">_status_counts</span><span class="p">[</span><span class="s2">"error"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
@@ -483,90 +483,87 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="304">        <span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="305">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="306"><span class="w">        </span><span class="sd">"""Call before_compute on all middleware (base.Middleware protocol)."""</span>
-</span><span data-line="307">        <span class="k">for</span> <span class="n">middleware</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">:</span>
-</span><span data-line="308">            <span class="n">middleware</span><span class="o">.</span><span class="n">before_compute</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+</span><span data-line="307">        <span class="n">call_hooks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">,</span> <span class="s2">"before_compute"</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
-</span><span data-line="309">
+</span><span data-line="308">
 <div class="viewcode-block" id="CompositeMiddleware.after_compute">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.CompositeMiddleware.after_compute">[docs]</a>
-</span><span data-line="310">    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="s2">"ComputationResult"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="311"><span class="w">        </span><span class="sd">"""Call after_compute on all middleware (base.Middleware protocol)."""</span>
-</span><span data-line="312">        <span class="k">for</span> <span class="n">middleware</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">:</span>
-</span><span data-line="313">            <span class="n">middleware</span><span class="o">.</span><span class="n">after_compute</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
+</span><span data-line="309">    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="s2">"ComputationResult"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="310"><span class="w">        </span><span class="sd">"""Call after_compute on all middleware (base.Middleware protocol)."""</span>
+</span><span data-line="311">        <span class="n">call_hooks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">,</span> <span class="s2">"after_compute"</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span></div>
 
-</span><span data-line="314">
+</span><span data-line="312">
 <div class="viewcode-block" id="CompositeMiddleware.on_error">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.CompositeMiddleware.on_error">[docs]</a>
-</span><span data-line="315">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="316"><span class="w">        </span><span class="sd">"""Call on_error on all middleware (base.Middleware protocol)."""</span>
-</span><span data-line="317">        <span class="k">for</span> <span class="n">middleware</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">:</span>
-</span><span data-line="318">            <span class="n">middleware</span><span class="o">.</span><span class="n">on_error</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span></div>
+</span><span data-line="313">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="314"><span class="w">        </span><span class="sd">"""Call on_error on all middleware (base.Middleware protocol)."""</span>
+</span><span data-line="315">        <span class="n">call_hooks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">middlewares</span><span class="p">,</span> <span class="s2">"on_error"</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span></div>
 </div>
 
+</span><span data-line="316">
+</span><span data-line="317">
+</span><span data-line="318"><span class="c1"># Pre-configured middleware combinations</span>
 </span><span data-line="319">
 </span><span data-line="320">
-</span><span data-line="321"><span class="c1"># Pre-configured middleware combinations</span>
-</span><span data-line="322">
-</span><span data-line="323">
 <div class="viewcode-block" id="create_observability_middleware">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.create_observability_middleware">[docs]</a>
-</span><span data-line="324"><span class="k">def</span><span class="w"> </span><span class="nf">create_observability_middleware</span><span class="p">(</span>
-</span><span data-line="325">    <span class="n">logging_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"INFO"</span><span class="p">,</span>
-</span><span data-line="326">    <span class="n">enable_metrics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span data-line="327">    <span class="n">enable_tracing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span data-line="328">    <span class="n">on_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="329">    <span class="n">on_complete</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="330">    <span class="n">on_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="331"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Middleware</span><span class="p">:</span>
-</span><span data-line="332"><span class="w">    </span><span class="sd">"""Create a complete observability middleware stack.</span>
-</span><span data-line="333">
-</span><span data-line="334"><span class="sd">    Args:</span>
-</span><span data-line="335"><span class="sd">        logging_level: Logging level</span>
-</span><span data-line="336"><span class="sd">        enable_metrics: Enable metrics collection</span>
-</span><span data-line="337"><span class="sd">        enable_tracing: Enable distributed tracing</span>
-</span><span data-line="338"><span class="sd">        on_start: Optional start hook</span>
-</span><span data-line="339"><span class="sd">        on_complete: Optional completion hook</span>
-</span><span data-line="340"><span class="sd">        on_error: Optional error hook</span>
-</span><span data-line="341">
-</span><span data-line="342"><span class="sd">    Returns:</span>
-</span><span data-line="343"><span class="sd">        Composite middleware with all observability features</span>
-</span><span data-line="344"><span class="sd">    """</span>
-</span><span data-line="345">    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingMiddleware</span>
-</span><span data-line="346">
-</span><span data-line="347">    <span class="c1"># LoggingMiddleware.log() needs an int level; accept a level name too.</span>
-</span><span data-line="348">    <span class="n">level</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="349">        <span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span><span data-line="350">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logging_level</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span data-line="351">        <span class="k">else</span> <span class="n">logging_level</span>
-</span><span data-line="352">    <span class="p">)</span>
-</span><span data-line="353">
-</span><span data-line="354">    <span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="321"><span class="k">def</span><span class="w"> </span><span class="nf">create_observability_middleware</span><span class="p">(</span>
+</span><span data-line="322">    <span class="n">logging_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"INFO"</span><span class="p">,</span>
+</span><span data-line="323">    <span class="n">enable_metrics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span data-line="324">    <span class="n">enable_tracing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span data-line="325">    <span class="n">on_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="326">    <span class="n">on_complete</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="327">    <span class="n">on_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="328"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Middleware</span><span class="p">:</span>
+</span><span data-line="329"><span class="w">    </span><span class="sd">"""Create a complete observability middleware stack.</span>
+</span><span data-line="330">
+</span><span data-line="331"><span class="sd">    Args:</span>
+</span><span data-line="332"><span class="sd">        logging_level: Logging level</span>
+</span><span data-line="333"><span class="sd">        enable_metrics: Enable metrics collection</span>
+</span><span data-line="334"><span class="sd">        enable_tracing: Enable distributed tracing</span>
+</span><span data-line="335"><span class="sd">        on_start: Optional start hook</span>
+</span><span data-line="336"><span class="sd">        on_complete: Optional completion hook</span>
+</span><span data-line="337"><span class="sd">        on_error: Optional error hook</span>
+</span><span data-line="338">
+</span><span data-line="339"><span class="sd">    Returns:</span>
+</span><span data-line="340"><span class="sd">        Composite middleware with all observability features</span>
+</span><span data-line="341"><span class="sd">    """</span>
+</span><span data-line="342">    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingMiddleware</span>
+</span><span data-line="343">
+</span><span data-line="344">    <span class="c1"># LoggingMiddleware.log() needs an int level; accept a level name too.</span>
+</span><span data-line="345">    <span class="n">level</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="346">        <span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span><span data-line="347">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logging_level</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+</span><span data-line="348">        <span class="k">else</span> <span class="n">logging_level</span>
+</span><span data-line="349">    <span class="p">)</span>
+</span><span data-line="350">
+</span><span data-line="351">    <span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="352">
+</span><span data-line="353">    <span class="c1"># Add logging</span>
+</span><span data-line="354">    <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">))</span>
 </span><span data-line="355">
-</span><span data-line="356">    <span class="c1"># Add logging</span>
-</span><span data-line="357">    <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">))</span>
-</span><span data-line="358">
-</span><span data-line="359">    <span class="c1"># Add hooks if provided</span>
-</span><span data-line="360">    <span class="k">if</span> <span class="n">on_start</span> <span class="ow">or</span> <span class="n">on_complete</span> <span class="ow">or</span> <span class="n">on_error</span><span class="p">:</span>
-</span><span data-line="361">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span data-line="362">            <span class="n">HooksMiddleware</span><span class="p">(</span>
-</span><span data-line="363">                <span class="n">on_start</span><span class="o">=</span><span class="n">on_start</span><span class="p">,</span>
-</span><span data-line="364">                <span class="n">on_complete</span><span class="o">=</span><span class="n">on_complete</span><span class="p">,</span>
-</span><span data-line="365">                <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span>
-</span><span data-line="366">            <span class="p">)</span>
-</span><span data-line="367">        <span class="p">)</span>
-</span><span data-line="368">
-</span><span data-line="369">    <span class="c1"># Add metrics</span>
-</span><span data-line="370">    <span class="k">if</span> <span class="n">enable_metrics</span><span class="p">:</span>
-</span><span data-line="371">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetricsCollectorMiddleware</span><span class="p">())</span>
-</span><span data-line="372">
-</span><span data-line="373">    <span class="c1"># Add tracing</span>
-</span><span data-line="374">    <span class="k">if</span> <span class="n">enable_tracing</span><span class="p">:</span>
-</span><span data-line="375">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TracingMiddleware</span><span class="p">())</span>
-</span><span data-line="376">
-</span><span data-line="377">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span data-line="378">        <span class="k">return</span> <span class="n">middlewares</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span data-line="379">    <span class="k">else</span><span class="p">:</span>
-</span><span data-line="380">        <span class="k">return</span> <span class="n">CompositeMiddleware</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span></div>
+</span><span data-line="356">    <span class="c1"># Add hooks if provided</span>
+</span><span data-line="357">    <span class="k">if</span> <span class="n">on_start</span> <span class="ow">or</span> <span class="n">on_complete</span> <span class="ow">or</span> <span class="n">on_error</span><span class="p">:</span>
+</span><span data-line="358">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span data-line="359">            <span class="n">HooksMiddleware</span><span class="p">(</span>
+</span><span data-line="360">                <span class="n">on_start</span><span class="o">=</span><span class="n">on_start</span><span class="p">,</span>
+</span><span data-line="361">                <span class="n">on_complete</span><span class="o">=</span><span class="n">on_complete</span><span class="p">,</span>
+</span><span data-line="362">                <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span>
+</span><span data-line="363">            <span class="p">)</span>
+</span><span data-line="364">        <span class="p">)</span>
+</span><span data-line="365">
+</span><span data-line="366">    <span class="c1"># Add metrics</span>
+</span><span data-line="367">    <span class="k">if</span> <span class="n">enable_metrics</span><span class="p">:</span>
+</span><span data-line="368">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetricsCollectorMiddleware</span><span class="p">())</span>
+</span><span data-line="369">
+</span><span data-line="370">    <span class="c1"># Add tracing</span>
+</span><span data-line="371">    <span class="k">if</span> <span class="n">enable_tracing</span><span class="p">:</span>
+</span><span data-line="372">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TracingMiddleware</span><span class="p">())</span>
+</span><span data-line="373">
+</span><span data-line="374">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span data-line="375">        <span class="k">return</span> <span class="n">middlewares</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span data-line="376">    <span class="k">else</span><span class="p">:</span>
+</span><span data-line="377">        <span class="k">return</span> <span class="n">CompositeMiddleware</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -595,7 +592,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=59fadc99"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

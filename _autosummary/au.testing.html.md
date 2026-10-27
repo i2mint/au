@@ -154,6 +154,10 @@ Get recorded execution for a key.
 
 Execute function synchronously and store result immediately.
 
+Runs the body every au worker runs, so it records results as they do:
+`result.error` is the exception itself, and a `BaseException` is
+recorded FAILED, then re-raised to the caller.
+
 * **Parameters:**
   * **func** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – Function to execute
   * **args** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Positional arguments

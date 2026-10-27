@@ -1,4 +1,4 @@
-> built 2026-10-27 13:31 UTC from 2cdeefe (master) · au 0.1.5. Details: build_info.json
+> built 2026-10-27 13:40 UTC from aab8823 (master) · au 0.1.6. Details: build_info.json
 
 # index.html.md
 
@@ -1010,6 +1010,8 @@ True
 
 | [`async_compute`](_autosummary/au.base.html.md#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
 |----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [`call_hooks`](_autosummary/au.base.html.md#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.              |
+| [`compute_and_record`](_autosummary/au.base.html.md#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.    |
 | [`temporary_async_compute`](_autosummary/au.base.html.md#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup. |
 
 ### Classes
@@ -1336,7 +1338,7 @@ Called before computation starts.
 
 #### *abstractmethod* on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -1411,7 +1413,7 @@ Called before computation starts.
 
 #### on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -1494,6 +1496,31 @@ processes.
 >>> handle = slow_computation(5)  # Returns immediately
 >>> result = handle.get_result(timeout=10)
 ```
+
+### au.base.call_hooks(middleware, hook, \*args)
+
+Call `hook` on every middleware, whatever the others raise.
+
+A failing hook is logged. A `BaseException` from one is re-raised once all
+have run, so one hook cannot leave another middleware’s key registered.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.base.compute_and_record(func, args, kwargs, , key, store, middleware)
+
+Run `func`, record its outcome under `key`, and drive the middleware.
+
+The body the thread and queue workers run, and ProcessBackend’s child. Once
+`before_compute` has run, exactly one of `after_compute` / `on_error`
+runs too, whatever fails (a hook, the RUNNING write, the COMPLETED write, the
+FAILED write), so middleware that registers a key in one can always release
+it in the other. A `BaseException` (`asyncio.CancelledError`,
+`SystemExit`, even `sys.exit(0)`) is recorded as FAILED like any error,
+then re-raised (i2mint/au#12). A cancellation already recorded is final.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### au.base.temporary_async_compute(\*\*kwargs)
 
@@ -2361,7 +2388,7 @@ Called before computation starts.
 
 #### *abstractmethod* on_error(key, error)
 
-Called when computation fails.
+Called when computation fails (`error` may be a BaseException).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -2659,6 +2686,10 @@ Get recorded execution for a key.
 #### launch(func, args, kwargs, key, store=None)
 
 Execute function synchronously and store result immediately.
+
+Runs the body every au worker runs, so it records results as they do:
+`result.error` is the exception itself, and a `BaseException` is
+recorded FAILED, then re-raised to the caller.
 
 * **Parameters:**
   * **func** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – Function to execute
@@ -3966,6 +3997,10 @@ Get recorded execution for a key.
 
 Execute function synchronously and store result immediately.
 
+Runs the body every au worker runs, so it records results as they do:
+`result.error` is the exception itself, and a `BaseException` is
+recorded FAILED, then re-raised to the caller.
+
 * **Parameters:**
   * **func** ([`Callable`](https://docs.python.org/3/library/typing.html#typing.Callable)) – Function to execute
   * **args** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Positional arguments
@@ -4314,20 +4349,18 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 13:31 UTC** from commit <a href="https://github.com/i2mint/au/commit/2cdeefe3573737a7eb27084b156da4ee505cc484"><code>2cdeefe</code></a> on branch <code>master</code>, for **au 0.1.5** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 13:40 UTC** from commit <a href="https://github.com/i2mint/au/commit/aab88233c2ae276beff656b7b2d95cd0691c85e6"><code>aab8823</code></a> on branch <code>master</code>, for **au 0.1.6** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.1.5) is ahead of the latest release on PyPI (0.1.4): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/2cdeefe3573737a7eb27084b156da4ee505cc484"><code>2cdeefe3573737a7eb27084b156da4ee505cc484</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/aab88233c2ae276beff656b7b2d95cd0691c85e6"><code>aab88233c2ae276beff656b7b2d95cd0691c85e6</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.5</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.6</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4336,9 +4369,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40512447211">40512447211</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40513885134">40513885134</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>657558c4cdf307fc0e89c4fe0c20b319278dce51</code> (in the history of the built commit) |
+| Event commit | <code>efb4ce6f7fd47552fa7d8a5cc95dc6c10c99e072</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4363,13 +4396,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.4/">0.1.4</a>, older than the documented version (0.1.5).
+Latest release: <a href="https://pypi.org/project/au/0.1.6/">0.1.6</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 2cdeefe3573737a7eb27084b156da4ee505cc484
+git checkout aab88233c2ae276beff656b7b2d95cd0691c85e6
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
