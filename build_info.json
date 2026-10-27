@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-10-27T13:40:49Z",
+  "built_at": "2026-10-27T13:49:19Z",
   "package": {
     "name": "au",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "display_name": "au",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "aab88233c2ae276beff656b7b2d95cd0691c85e6",
-    "short_commit": "aab8823",
+    "commit": "6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
+    "short_commit": "6e4540a",
     "branch": "master",
     "tags": [
-      "0.1.6"
+      "0.1.7"
     ],
     "dirty": false,
     "remote_url": "https://github.com/i2mint/au",
-    "commit_url": "https://github.com/i2mint/au/commit/aab88233c2ae276beff656b7b2d95cd0691c85e6",
+    "commit_url": "https://github.com/i2mint/au/commit/6e4540ace398ffc3525887f4fe73dbd0b3aa6d40",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "i2mint/au",
-    "sha": "efb4ce6f7fd47552fa7d8a5cc95dc6c10c99e072",
+    "sha": "df5af6c3034fd6f5193498901b20c3021b31d8a0",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "40513885134",
-    "run_url": "https://github.com/i2mint/au/actions/runs/40513885134",
+    "run_id": "40515173231",
+    "run_url": "https://github.com/i2mint/au/actions/runs/40515173231",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,15 +58,15 @@
   },
   "site": {
     "modules_documented": 12,
-    "objects_documented": 331
+    "objects_documented": 335
   },
   "pypi": {
     "checked": true,
-    "latest": "0.1.6",
+    "latest": "0.1.7",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout aab88233c2ae276beff656b7b2d95cd0691c85e6\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

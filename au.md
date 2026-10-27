@@ -1,4 +1,4 @@
-> built 2026-10-27 13:40 UTC from aab8823 (master) · au 0.1.6. Details: build_info.json
+> built 2026-10-27 13:49 UTC from 6e4540a (master) · au 0.1.7. Details: build_info.json
 
 # index.html.md
 
@@ -304,7 +304,7 @@ def monitored_task(x):
     return x * 2
 ```
 
-`MetricsMiddleware` counts in the process that runs the task. With the default backend each call runs in a child process, so the instance you hold counts nothing: use `SharedMetricsMiddleware` (from `au.base`) to count across processes.
+`MetricsMiddleware` counts in the process that runs the task. With the default backend each call runs in a child process, so the instance you hold counts nothing: use `SharedMetricsMiddleware` to count across processes.
 
 ### Custom Hooks
 
@@ -1246,7 +1246,10 @@ Bases: [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)
 Middleware for logging computation lifecycle.
 
 ```pycon
->>> middleware = LoggingMiddleware(level=logging.INFO)
+>>> LoggingMiddleware(level=logging.INFO).level
+20
+>>> LoggingMiddleware(level="INFO").level
+20
 ```
 
 #### after_compute(key, result)
@@ -1866,7 +1869,7 @@ Mark span as failed (base.Middleware protocol).
 Create a complete observability middleware stack.
 
 * **Parameters:**
-  * **logging_level** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
+  * **logging_level** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
   * **enable_metrics** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable metrics collection
   * **enable_tracing** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable distributed tracing
   * **on_start** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`TaskEventHandler`](_autosummary/au.hooks.html.md#au.hooks.TaskEventHandler)]) – Optional start hook
@@ -1931,6 +1934,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`Middleware`](_autosummary/au.html.md#au.Middleware)()                                      | Base class for middleware components.                                                 |
 | [`LoggingMiddleware`](_autosummary/au.html.md#au.LoggingMiddleware)(\*[, level, logger_name])       | Middleware for logging computation lifecycle.                                         |
 | [`MetricsMiddleware`](_autosummary/au.html.md#au.MetricsMiddleware)()                               | Middleware for collecting computation metrics, in the copy that runs the computation. |
+| [`SharedMetricsMiddleware`](_autosummary/au.html.md#au.SharedMetricsMiddleware)([...])                    | Metrics middleware using shared memory for multiprocessing.                           |
 | [`AUConfig`](_autosummary/au.html.md#au.AUConfig)([backend, redis_url, supabase_url, ...]) | Configuration for AU with smart defaults.                                             |
 | [`RetryPolicy`](_autosummary/au.html.md#au.RetryPolicy)([max_attempts, backoff, ...])         | Configuration for retry behavior.                                                     |
 | [`BackoffStrategy`](_autosummary/au.html.md#au.BackoffStrategy)(\*values)                         | Backoff strategy for retries.                                                         |
@@ -2258,7 +2262,10 @@ Bases: [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)
 Middleware for logging computation lifecycle.
 
 ```pycon
->>> middleware = LoggingMiddleware(level=logging.INFO)
+>>> LoggingMiddleware(level=logging.INFO).level
+20
+>>> LoggingMiddleware(level="INFO").level
+20
 ```
 
 #### after_compute(key, result)
@@ -2329,7 +2336,7 @@ computation.
 
 Every backend but ThreadBackend runs a copy (a child process’s, or one a
 queue worker unpickled), so there the instance you hold counts nothing. Use
-`SharedMetricsMiddleware` with ProcessBackend to count across
+[`SharedMetricsMiddleware`](_autosummary/au.html.md#au.SharedMetricsMiddleware) with ProcessBackend to count across
 processes.
 
 ```pycon
@@ -2481,7 +2488,7 @@ Launch computation in a new process.
 The middleware goes to the child with the work and runs there only, so
 each `before_compute` is released by an `after_compute` or
 `on_error` in the same process (i2mint/au#14). Count across processes
-with `SharedMetricsMiddleware`; a plain one counts in the child.
+with [`SharedMetricsMiddleware`](_autosummary/au.html.md#au.SharedMetricsMiddleware); a plain one counts in the child.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -2632,6 +2639,24 @@ Base class for errors that should be retried.
 Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
 
 Supported serialization formats.
+
+### *class* au.SharedMetricsMiddleware(total_computations=None, completed_computations=None, failed_computations=None, total_duration=None, lock=None)
+
+Bases: [`Middleware`](_autosummary/au.base.html.md#au.base.Middleware)
+
+Metrics middleware using shared memory for multiprocessing.
+
+#### after_compute(key, result)
+
+Called after computation completes.
+
+#### before_compute(func, args, kwargs, key)
+
+Called before computation starts.
+
+#### on_error(key, error)
+
+Called when computation fails (`error` may be a BaseException).
 
 ### *class* au.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -3030,7 +3055,7 @@ Decorator to make functions asynchronous with status tracking.
 
 The default backend runs each call with a copy of its middleware, in a
 child process: a plain [`MetricsMiddleware`](_autosummary/au.html.md#au.MetricsMiddleware) counts there, not in the
-instance you hold. Use `SharedMetricsMiddleware` to count across
+instance you hold. Use [`SharedMetricsMiddleware`](_autosummary/au.html.md#au.SharedMetricsMiddleware) to count across
 processes.
 
 ### Example
@@ -3113,7 +3138,7 @@ This requires functions to be imported/registered before app creation.
 Create a complete observability middleware stack.
 
 * **Parameters:**
-  * **logging_level** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
+  * **logging_level** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
   * **enable_metrics** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable metrics collection
   * **enable_tracing** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable distributed tracing
   * **on_start** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`TaskEventHandler`](_autosummary/au.hooks.html.md#au.hooks.TaskEventHandler)]) – Optional start hook
@@ -4349,7 +4374,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 13:40 UTC** from commit <a href="https://github.com/i2mint/au/commit/aab88233c2ae276beff656b7b2d95cd0691c85e6"><code>aab8823</code></a> on branch <code>master</code>, for **au 0.1.6** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-27 13:49 UTC** from commit <a href="https://github.com/i2mint/au/commit/6e4540ace398ffc3525887f4fe73dbd0b3aa6d40"><code>6e4540a</code></a> on branch <code>master</code>, for **au 0.1.7** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4358,9 +4383,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/aab88233c2ae276beff656b7b2d95cd0691c85e6"><code>aab88233c2ae276beff656b7b2d95cd0691c85e6</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/6e4540ace398ffc3525887f4fe73dbd0b3aa6d40"><code>6e4540ace398ffc3525887f4fe73dbd0b3aa6d40</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.6</code>                                                                                                                               |
+| Tags at this commit | <code>0.1.7</code>                                                                                                                               |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4369,9 +4394,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40513885134">40513885134</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/40515173231">40515173231</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>efb4ce6f7fd47552fa7d8a5cc95dc6c10c99e072</code> (in the history of the built commit) |
+| Event commit | <code>df5af6c3034fd6f5193498901b20c3021b31d8a0</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4396,13 +4421,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.6/">0.1.6</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.7/">0.1.7</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout aab88233c2ae276beff656b7b2d95cd0691c85e6
+git checkout 6e4540ace398ffc3525887f4fe73dbd0b3aa6d40
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

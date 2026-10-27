@@ -51,6 +51,7 @@
       Middleware
       LoggingMiddleware
       MetricsMiddleware
+      SharedMetricsMiddleware
       AUConfig
       RetryPolicy
       BackoffStrategy

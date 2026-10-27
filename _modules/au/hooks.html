@@ -508,7 +508,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="viewcode-block" id="create_observability_middleware">
 <a class="viewcode-back" href="../../_autosummary/au.hooks.html#au.create_observability_middleware">[docs]</a>
 </span><span data-line="321"><span class="k">def</span><span class="w"> </span><span class="nf">create_observability_middleware</span><span class="p">(</span>
-</span><span data-line="322">    <span class="n">logging_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"INFO"</span><span class="p">,</span>
+</span><span data-line="322">    <span class="n">logging_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"INFO"</span><span class="p">,</span>
 </span><span data-line="323">    <span class="n">enable_metrics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span data-line="324">    <span class="n">enable_tracing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span data-line="325">    <span class="n">on_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -530,40 +530,33 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="341"><span class="sd">    """</span>
 </span><span data-line="342">    <span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingMiddleware</span>
 </span><span data-line="343">
-</span><span data-line="344">    <span class="c1"># LoggingMiddleware.log() needs an int level; accept a level name too.</span>
-</span><span data-line="345">    <span class="n">level</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="346">        <span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-</span><span data-line="347">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logging_level</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-</span><span data-line="348">        <span class="k">else</span> <span class="n">logging_level</span>
-</span><span data-line="349">    <span class="p">)</span>
-</span><span data-line="350">
-</span><span data-line="351">    <span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="352">
-</span><span data-line="353">    <span class="c1"># Add logging</span>
-</span><span data-line="354">    <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">))</span>
-</span><span data-line="355">
-</span><span data-line="356">    <span class="c1"># Add hooks if provided</span>
-</span><span data-line="357">    <span class="k">if</span> <span class="n">on_start</span> <span class="ow">or</span> <span class="n">on_complete</span> <span class="ow">or</span> <span class="n">on_error</span><span class="p">:</span>
-</span><span data-line="358">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-</span><span data-line="359">            <span class="n">HooksMiddleware</span><span class="p">(</span>
-</span><span data-line="360">                <span class="n">on_start</span><span class="o">=</span><span class="n">on_start</span><span class="p">,</span>
-</span><span data-line="361">                <span class="n">on_complete</span><span class="o">=</span><span class="n">on_complete</span><span class="p">,</span>
-</span><span data-line="362">                <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span>
-</span><span data-line="363">            <span class="p">)</span>
-</span><span data-line="364">        <span class="p">)</span>
-</span><span data-line="365">
-</span><span data-line="366">    <span class="c1"># Add metrics</span>
-</span><span data-line="367">    <span class="k">if</span> <span class="n">enable_metrics</span><span class="p">:</span>
-</span><span data-line="368">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetricsCollectorMiddleware</span><span class="p">())</span>
-</span><span data-line="369">
-</span><span data-line="370">    <span class="c1"># Add tracing</span>
-</span><span data-line="371">    <span class="k">if</span> <span class="n">enable_tracing</span><span class="p">:</span>
-</span><span data-line="372">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TracingMiddleware</span><span class="p">())</span>
-</span><span data-line="373">
-</span><span data-line="374">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span data-line="375">        <span class="k">return</span> <span class="n">middlewares</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span data-line="376">    <span class="k">else</span><span class="p">:</span>
-</span><span data-line="377">        <span class="k">return</span> <span class="n">CompositeMiddleware</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span></div>
+</span><span data-line="344">    <span class="n">middlewares</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="345">
+</span><span data-line="346">    <span class="c1"># Add logging</span>
+</span><span data-line="347">    <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">))</span>
+</span><span data-line="348">
+</span><span data-line="349">    <span class="c1"># Add hooks if provided</span>
+</span><span data-line="350">    <span class="k">if</span> <span class="n">on_start</span> <span class="ow">or</span> <span class="n">on_complete</span> <span class="ow">or</span> <span class="n">on_error</span><span class="p">:</span>
+</span><span data-line="351">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span data-line="352">            <span class="n">HooksMiddleware</span><span class="p">(</span>
+</span><span data-line="353">                <span class="n">on_start</span><span class="o">=</span><span class="n">on_start</span><span class="p">,</span>
+</span><span data-line="354">                <span class="n">on_complete</span><span class="o">=</span><span class="n">on_complete</span><span class="p">,</span>
+</span><span data-line="355">                <span class="n">on_error</span><span class="o">=</span><span class="n">on_error</span><span class="p">,</span>
+</span><span data-line="356">            <span class="p">)</span>
+</span><span data-line="357">        <span class="p">)</span>
+</span><span data-line="358">
+</span><span data-line="359">    <span class="c1"># Add metrics</span>
+</span><span data-line="360">    <span class="k">if</span> <span class="n">enable_metrics</span><span class="p">:</span>
+</span><span data-line="361">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetricsCollectorMiddleware</span><span class="p">())</span>
+</span><span data-line="362">
+</span><span data-line="363">    <span class="c1"># Add tracing</span>
+</span><span data-line="364">    <span class="k">if</span> <span class="n">enable_tracing</span><span class="p">:</span>
+</span><span data-line="365">        <span class="n">middlewares</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TracingMiddleware</span><span class="p">())</span>
+</span><span data-line="366">
+</span><span data-line="367">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span data-line="368">        <span class="k">return</span> <span class="n">middlewares</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span data-line="369">    <span class="k">else</span><span class="p">:</span>
+</span><span data-line="370">        <span class="k">return</span> <span class="n">CompositeMiddleware</span><span class="p">(</span><span class="n">middlewares</span><span class="p">)</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -592,7 +585,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../../_static/documentation_options.js?v=ca7ad2ea"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -49,6 +49,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`Middleware`](#au.Middleware)()                                      | Base class for middleware components.                                                 |
 | [`LoggingMiddleware`](#au.LoggingMiddleware)(\*[, level, logger_name])       | Middleware for logging computation lifecycle.                                         |
 | [`MetricsMiddleware`](#au.MetricsMiddleware)()                               | Middleware for collecting computation metrics, in the copy that runs the computation. |
+| [`SharedMetricsMiddleware`](#au.SharedMetricsMiddleware)([...])                    | Metrics middleware using shared memory for multiprocessing.                           |
 | [`AUConfig`](#au.AUConfig)([backend, redis_url, supabase_url, ...]) | Configuration for AU with smart defaults.                                             |
 | [`RetryPolicy`](#au.RetryPolicy)([max_attempts, backoff, ...])         | Configuration for retry behavior.                                                     |
 | [`BackoffStrategy`](#au.BackoffStrategy)(\*values)                         | Backoff strategy for retries.                                                         |
@@ -376,7 +377,10 @@ Bases: [`Middleware`](au.base.html.md#au.base.Middleware)
 Middleware for logging computation lifecycle.
 
 ```pycon
->>> middleware = LoggingMiddleware(level=logging.INFO)
+>>> LoggingMiddleware(level=logging.INFO).level
+20
+>>> LoggingMiddleware(level="INFO").level
+20
 ```
 
 #### after_compute(key, result)
@@ -447,7 +451,7 @@ computation.
 
 Every backend but ThreadBackend runs a copy (a child process’s, or one a
 queue worker unpickled), so there the instance you hold counts nothing. Use
-`SharedMetricsMiddleware` with ProcessBackend to count across
+[`SharedMetricsMiddleware`](#au.SharedMetricsMiddleware) with ProcessBackend to count across
 processes.
 
 ```pycon
@@ -599,7 +603,7 @@ Launch computation in a new process.
 The middleware goes to the child with the work and runs there only, so
 each `before_compute` is released by an `after_compute` or
 `on_error` in the same process (i2mint/au#14). Count across processes
-with `SharedMetricsMiddleware`; a plain one counts in the child.
+with [`SharedMetricsMiddleware`](#au.SharedMetricsMiddleware); a plain one counts in the child.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -750,6 +754,24 @@ Base class for errors that should be retried.
 Bases: [`Enum`](https://docs.python.org/3/library/enum.html#enum.Enum)
 
 Supported serialization formats.
+
+### *class* au.SharedMetricsMiddleware(total_computations=None, completed_computations=None, failed_computations=None, total_duration=None, lock=None)
+
+Bases: [`Middleware`](au.base.html.md#au.base.Middleware)
+
+Metrics middleware using shared memory for multiprocessing.
+
+#### after_compute(key, result)
+
+Called after computation completes.
+
+#### before_compute(func, args, kwargs, key)
+
+Called before computation starts.
+
+#### on_error(key, error)
+
+Called when computation fails (`error` may be a BaseException).
 
 ### *class* au.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -1148,7 +1170,7 @@ Decorator to make functions asynchronous with status tracking.
 
 The default backend runs each call with a copy of its middleware, in a
 child process: a plain [`MetricsMiddleware`](#au.MetricsMiddleware) counts there, not in the
-instance you hold. Use `SharedMetricsMiddleware` to count across
+instance you hold. Use [`SharedMetricsMiddleware`](#au.SharedMetricsMiddleware) to count across
 processes.
 
 ### Example
@@ -1231,7 +1253,7 @@ This requires functions to be imported/registered before app creation.
 Create a complete observability middleware stack.
 
 * **Parameters:**
-  * **logging_level** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
+  * **logging_level** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
   * **enable_metrics** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable metrics collection
   * **enable_tracing** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable distributed tracing
   * **on_start** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`TaskEventHandler`](au.hooks.html.md#au.hooks.TaskEventHandler)]) – Optional start hook

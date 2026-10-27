@@ -297,7 +297,10 @@ Bases: [`Middleware`](#au.base.Middleware)
 Middleware for logging computation lifecycle.
 
 ```pycon
->>> middleware = LoggingMiddleware(level=logging.INFO)
+>>> LoggingMiddleware(level=logging.INFO).level
+20
+>>> LoggingMiddleware(level="INFO").level
+20
 ```
 
 #### after_compute(key, result)

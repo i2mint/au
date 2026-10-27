@@ -210,6 +210,12 @@ data-aria-dark="Switch to auto color mode">
 </li>
 <li><a class="reference internal" href="#au.RetryableError"><code class="docutils literal notranslate"><span class="pre">RetryableError</span></code></a></li>
 <li><a class="reference internal" href="#au.SerializationFormat"><code class="docutils literal notranslate"><span class="pre">SerializationFormat</span></code></a></li>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a><ul>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.after_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.on_error()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#au.StdLibQueueBackend"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend</span></code></a><ul>
 <li><a class="reference internal" href="#au.StdLibQueueBackend.launch"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.launch()</span></code></a></li>
 <li><a class="reference internal" href="#au.StdLibQueueBackend.shutdown"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.shutdown()</span></code></a></li>
@@ -449,55 +455,58 @@ data-aria-dark="Switch to auto color mode">
 <tr class="row-even"><td><p><a class="reference internal" href="#au.MetricsMiddleware" title="au.MetricsMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a>()</p></td>
 <td><p>Middleware for collecting computation metrics, in the copy that runs the computation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.AUConfig" title="au.AUConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUConfig</span></code></a>([backend, redis_url, supabase_url, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.SharedMetricsMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a>([...])</p></td>
+<td><p>Metrics middleware using shared memory for multiprocessing.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.AUConfig" title="au.AUConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AUConfig</span></code></a>([backend, redis_url, supabase_url, ...])</p></td>
 <td><p>Configuration for AU with smart defaults.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.RetryPolicy" title="au.RetryPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a>([max_attempts, backoff, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.RetryPolicy" title="au.RetryPolicy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a>([max_attempts, backoff, ...])</p></td>
 <td><p>Configuration for retry behavior.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.BackoffStrategy" title="au.BackoffStrategy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a>(*values)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.BackoffStrategy" title="au.BackoffStrategy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackoffStrategy</span></code></a>(*values)</p></td>
 <td><p>Backoff strategy for retries.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.RetryState" title="au.RetryState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryState</span></code></a>([attempt_count, last_error, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.RetryState" title="au.RetryState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryState</span></code></a>([attempt_count, last_error, ...])</p></td>
 <td><p>State tracking for retries.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.InMemoryStore" title="au.InMemoryStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a>([ttl_seconds])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.InMemoryStore" title="au.InMemoryStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a>([ttl_seconds])</p></td>
 <td><p>In-memory store for testing.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.SyncTestBackend" title="au.SyncTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a>([middleware])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.SyncTestBackend" title="au.SyncTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a>([middleware])</p></td>
 <td><p>Synchronous test backend that executes immediately.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.TrackingTestBackend" title="au.TrackingTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a>([middleware])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.TrackingTestBackend" title="au.TrackingTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a>([middleware])</p></td>
 <td><p>Test backend that tracks all executions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.MockTaskTracker" title="au.MockTaskTracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a>([task_count, tasks_by_name, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.MockTaskTracker" title="au.MockTaskTracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MockTaskTracker</span></code></a>([task_count, tasks_by_name, ...])</p></td>
 <td><p>Tracks task executions for testing.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.TaskGraph" title="au.TaskGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskGraph</span></code></a>([backend, store])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.TaskGraph" title="au.TaskGraph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskGraph</span></code></a>([backend, store])</p></td>
 <td><p>Directed Acyclic Graph (DAG) for task execution.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.WorkflowTask" title="au.WorkflowTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a>(func[, args, kwargs, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.WorkflowTask" title="au.WorkflowTask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkflowTask</span></code></a>(func[, args, kwargs, ...])</p></td>
 <td><p>A task in a workflow with dependencies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.WorkflowBuilder" title="au.WorkflowBuilder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a>([backend, store])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.WorkflowBuilder" title="au.WorkflowBuilder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkflowBuilder</span></code></a>([backend, store])</p></td>
 <td><p>Fluent interface for building workflows.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.TaskState" title="au.TaskState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskState</span></code></a>(*values)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.TaskState" title="au.TaskState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskState</span></code></a>(*values)</p></td>
 <td><p>State of a task in a workflow.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.HooksMiddleware" title="au.HooksMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a>([on_start, on_complete, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.HooksMiddleware" title="au.HooksMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HooksMiddleware</span></code></a>([on_start, on_complete, ...])</p></td>
 <td><p>Middleware that provides lifecycle hooks.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.TracingMiddleware" title="au.TracingMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a>([service_name, trace_backend])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.TracingMiddleware" title="au.TracingMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TracingMiddleware</span></code></a>([service_name, trace_backend])</p></td>
 <td><p>Middleware for distributed tracing (OpenTelemetry compatible).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.MetricsCollectorMiddleware" title="au.MetricsCollectorMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a>([metrics_backend])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.MetricsCollectorMiddleware" title="au.MetricsCollectorMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricsCollectorMiddleware</span></code></a>([metrics_backend])</p></td>
 <td><p>Enhanced metrics middleware with histogram support.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.CompositeMiddleware" title="au.CompositeMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a>(middlewares)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.CompositeMiddleware" title="au.CompositeMiddleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CompositeMiddleware</span></code></a>(middlewares)</p></td>
 <td><p>Combines multiple middleware into one.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.TaskEvent" title="au.TaskEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskEvent</span></code></a>(task_id, event_type[, timestamp, data])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.TaskEvent" title="au.TaskEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskEvent</span></code></a>(task_id, event_type[, timestamp, data])</p></td>
 <td><p>Event fired during task lifecycle.</p></td>
 </tr>
 </tbody>
@@ -941,7 +950,10 @@ Useful for testing without filesystem dependencies.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">LoggingMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#LoggingMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.LoggingMiddleware" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="au.base.html#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
 <p>Middleware for logging computation lifecycle.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">middleware</span> <span class="o">=</span> <span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span><span class="o">.</span><span class="n">level</span>
+</span><span data-line="2"><span class="go">20</span>
+</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">LoggingMiddleware</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s2">"INFO"</span><span class="p">)</span><span class="o">.</span><span class="n">level</span>
+</span><span data-line="4"><span class="go">20</span>
 </span></pre></div>
 </div>
 <dl class="field-list simple">
@@ -1046,7 +1058,7 @@ Useful for testing without filesystem dependencies.</p>
 computation.</p>
 <p>Every backend but ThreadBackend runs a copy (a child process’s, or one a
 queue worker unpickled), so there the instance you hold counts nothing. Use
-<code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code> with ProcessBackend to count across
+<a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a> with ProcessBackend to count across
 processes.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MetricsMiddleware</span><span class="p">()</span>
 </span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
@@ -1268,7 +1280,7 @@ processes.</p>
 <p>The middleware goes to the child with the work and runs there only, so
 each <code class="docutils literal notranslate"><span class="pre">before_compute</span></code> is released by an <code class="docutils literal notranslate"><span class="pre">after_compute</span></code> or
 <code class="docutils literal notranslate"><span class="pre">on_error</span></code> in the same process (i2mint/au#14). Count across processes
-with <code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code>; a plain one counts in the child.</p>
+with <a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a>; a plain one counts in the child.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -1503,6 +1515,31 @@ with <code class="xref py py-class docutils literal notranslate"><span class="pr
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">SerializationFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SerializationFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SerializationFormat" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Supported serialization formats.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">SharedMetricsMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="au.base.html#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
+<p>Metrics middleware using shared memory for multiprocessing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware.after_compute">
+<span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called after computation completes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware.before_compute">
+<span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.before_compute" title="Link to this definition">#</a></dt>
+<dd><p>Called before computation starts.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware.on_error">
+<span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
+<dd><p>Called when computation fails (<code class="docutils literal notranslate"><span class="pre">error</span></code> may be a BaseException).</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -2073,7 +2110,7 @@ recorded FAILED, then re-raised to the caller.</p>
 </dl>
 <p>The default backend runs each call with a copy of its middleware, in a
 child process: a plain <a class="reference internal" href="#au.MetricsMiddleware" title="au.MetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetricsMiddleware</span></code></a> counts there, not in the
-instance you hold. Use <code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code> to count across
+instance you hold. Use <a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.SharedMetricsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a> to count across
 processes.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">SharedMetricsMiddleware</span><span class="p">()</span>
@@ -2176,7 +2213,7 @@ processes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>logging_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Logging level</p></li>
+<li><p><strong>logging_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Logging level</p></li>
 <li><p><strong>enable_metrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Enable metrics collection</p></li>
 <li><p><strong>enable_tracing</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Enable distributed tracing</p></li>
 <li><p><strong>on_start</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.hooks.html#au.hooks.TaskEventHandler" title="au.hooks.TaskEventHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaskEventHandler</span></code></a>]</span>) – Optional start hook</p></li>
@@ -2763,7 +2800,7 @@ key re-runs.</p></li>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../_static/documentation_options.js?v=ca7ad2ea"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -198,7 +198,7 @@ Mark span as failed (base.Middleware protocol).
 Create a complete observability middleware stack.
 
 * **Parameters:**
-  * **logging_level** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
+  * **logging_level** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Logging level
   * **enable_metrics** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable metrics collection
   * **enable_tracing** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Enable distributed tracing
   * **on_start** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`TaskEventHandler`](#au.hooks.TaskEventHandler)]) – Optional start hook
