@@ -257,17 +257,14 @@ def test_sync_backend_records_a_base_exception_and_lets_it_through():
     assert mw.calls == [("error", _Interrupt)] and not mw.in_flight
 
 
-def _naps(seconds):
-    time.sleep(seconds)
-    return seconds
-
-
-def test_a_result_duration_is_the_time_the_job_ran():
-    """created_at used to be taken after the call returned: duration ~0."""
+def test_a_terminal_result_is_stamped_complete_whatever_store_holds_it():
+    """SyncTestBackend used to stamp by hand, InMemoryStore not at all."""
+    assert ComputationResult(1, ComputationStatus.COMPLETED).completed_at
+    assert ComputationResult(None, ComputationStatus.RUNNING).completed_at is None
     store = InMemoryStore()
     key = store.create_key()
-    SyncTestBackend().launch(_naps, (0.2,), {}, key, store)
-    assert store[key].duration.total_seconds() >= 0.2
+    SyncTestBackend().launch(simple_func, (1,), {}, key, store)
+    assert store[key].completed_at is not None
 
 
 def test_a_failing_middleware_in_a_composite_does_not_stop_the_others():

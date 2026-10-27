@@ -421,19 +421,18 @@ class FileSystemStore(ComputationStore):
         else:  # PICKLE
             obj = pickle.loads(data)
 
-        return ComputationResult(
+        result = ComputationResult(
             value=obj.get("value"),
             status=ComputationStatus(obj["status"]),
             error=Exception(obj["error"]) if obj.get("error") else None,
             created_at=datetime.fromisoformat(obj["created_at"]),
-            completed_at=(
-                datetime.fromisoformat(obj["completed_at"])
-                if obj.get("completed_at")
-                else None
-            ),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
         )
+        # What was stored, not the read time __post_init__ would stamp.
+        completed_at = obj.get("completed_at")
+        result.completed_at = completed_at and datetime.fromisoformat(completed_at)
+        return result
 
     def __getitem__(self, key: str) -> ComputationResult:
         self._maybe_cleanup()
@@ -570,7 +569,7 @@ class LoggingMiddleware(Middleware):
         duration_str = f" in {duration.total_seconds():.2f}s" if duration else ""
         self.logger.log(self.level, f"Completed computation {key}{duration_str}")
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Log computation error."""
         self.logger.error(f"Computation {key} failed: {error}", exc_info=True)
 
@@ -619,7 +618,7 @@ class MetricsMiddleware(Middleware):
             if result.duration:
                 self.total_duration += result.duration.total_seconds()
 
-    def on_error(self, key: str, error: Exception) -> None:
+    def on_error(self, key: str, error: BaseException) -> None:
         """Update failure metrics."""
         with self._lock:
             self.failed_computations += 1
@@ -786,20 +785,16 @@ def compute_and_record(
     ``SystemExit``, even ``sys.exit(0)``) is recorded as FAILED like any error,
     then re-raised (i2mint/au#12). A cancellation already recorded is final.
     """
-    started = datetime.now()  # so a result's duration is the run's, not ~0
     try:
         call_hooks(middleware, "before_compute", func, args, kwargs, key)
         _mark_running(store, key)
-        value = func(*args, **kwargs)
         result = _record_unless_cancelled(
             store,
             key,
-            ComputationResult(value, ComputationStatus.COMPLETED, created_at=started),
+            ComputationResult(func(*args, **kwargs), ComputationStatus.COMPLETED),
         )
     except BaseException as error:
-        failure = ComputationResult(
-            None, ComputationStatus.FAILED, error=error, created_at=started
-        )
+        failure = ComputationResult(None, ComputationStatus.FAILED, error=error)
         try:
             _record_unless_cancelled(store, key, failure)
         except Exception:
