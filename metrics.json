@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.324413061141968,
-  "commit_message": "Merge 9fe5430b578d487620f76e406d3459eeada35117 into 2cdeefe3573737a7eb27084b156da4ee505cc484",
-  "commit_sha": "c034af31a329547fb704c85d6c7e5b9ec695dab9",
+  "collection_duration_seconds": 5.312727928161621,
+  "commit_message": "Re-review fixes: keep TTL from created_at; stable completion time on read (#15)\n\n- Revert created_at=start: TTL expiry counts from created_at, so a job longer\n  than its TTL was expired the moment it finished. The duration question\n  goes to #20.\n- FileSystemStore._deserialize restores the stored completed_at instead of\n  letting __post_init__ stamp the read time.\n- on_error overrides are annotated BaseException like the protocol.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+  "commit_sha": "b41aeb46f60fa3616e479739e28019871ad06a36",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35215,
-      "comment_lines_ratio": 0.06522105520499766,
-      "docs_lines": 42372,
-      "empty_lines": 70706,
-      "empty_lines_ratio": 0.1309532849446135,
-      "files_analyzed": 1332,
-      "function_lines": 323493,
-      "function_lines_ratio": 0.5991354482871023,
-      "mean_lines_per_function": 15.954478200828566,
-      "num_classes": 3021,
-      "num_functions": 20276,
-      "pypi_version": "0.1.5",
-      "total_lines": 539933
+      "comment_lines": 35366,
+      "comment_lines_ratio": 0.06519631157664982,
+      "docs_lines": 42466,
+      "empty_lines": 71107,
+      "empty_lines_ratio": 0.13108392601031607,
+      "files_analyzed": 1347,
+      "function_lines": 325260,
+      "function_lines_ratio": 0.5996084460617859,
+      "mean_lines_per_function": 15.956632653061224,
+      "num_classes": 3036,
+      "num_functions": 20384,
+      "pypi_version": "0.1.4",
+      "total_lines": 542454
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-10-27T13:34:22Z",
+      "last_success_timestamp": "2026-10-27T13:36:10Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/40512747077",
+      "run_url": "https://github.com/i2mint/au/actions/runs/40513234656",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-10-27T13:35:44.909241Z",
+  "timestamp": "2026-10-27T13:38:07.424850Z",
   "workflow_status": {}
 }
