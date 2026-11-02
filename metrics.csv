@@ -1,31 +1,31 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T11:33:43.150325Z
-commit_sha,af53cbfe382627cf02f93df930fca6fe3176b044
-commit_message,"feat(au): the retry and http settings take effect; metrics_enabled removed (#25) (#33)
+timestamp,2026-11-02T11:41:11.059493Z
+commit_sha,ed27db94266eca1857a94aa958728ffcde0eb044
+commit_message,"refactor(au): one backend-factory seam for async_compute and the simple API (#24 item 1)
 
-submit_task builds a RetryPolicy from the retry_* settings when retry_enabled
-and no retry_policy is passed; au.http.serve defaults to the http_* settings;
-metrics_enabled, which nothing read, is dropped with a FutureWarning for config
-files and AU_METRICS_ENABLED that still set it."
+au.base._backend_factory replaces the two override globals (au.base._default_backend
+and mock_async's overwrite of au.api._default_backend). mock_async installs a
+factory building TrackingTestBackends that share one tracker and carry each
+surface's middleware, so middleware given to async_compute now runs under the mock."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20482
-metrics.umpyre_stats.num_classes,3042
-metrics.umpyre_stats.total_lines,544949
-metrics.umpyre_stats.empty_lines,71424
-metrics.umpyre_stats.comment_lines,35619
-metrics.umpyre_stats.docs_lines,42949
-metrics.umpyre_stats.function_lines,327146
-metrics.umpyre_stats.empty_lines_ratio,0.1310654758518687
-metrics.umpyre_stats.comment_lines_ratio,0.06536207975425223
-metrics.umpyre_stats.function_lines_ratio,0.6003240670227856
-metrics.umpyre_stats.mean_lines_per_function,15.972365979884778
-metrics.umpyre_stats.files_analyzed,1348
+metrics.umpyre_stats.num_functions,20388
+metrics.umpyre_stats.num_classes,3027
+metrics.umpyre_stats.total_lines,542681
+metrics.umpyre_stats.empty_lines,71092
+metrics.umpyre_stats.comment_lines,35485
+metrics.umpyre_stats.docs_lines,42916
+metrics.umpyre_stats.function_lines,325594
+metrics.umpyre_stats.empty_lines_ratio,0.1310014538928026
+metrics.umpyre_stats.comment_lines_ratio,0.06538832205291875
+metrics.umpyre_stats.function_lines_ratio,0.599973096533691
+metrics.umpyre_stats.mean_lines_per_function,15.969884245634686
+metrics.umpyre_stats.files_analyzed,1333
 metrics.umpyre_stats.pypi_version,0.1.11
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-11-02T11:31:59Z
+metrics.workflow_status.last_success_timestamp,2026-11-02T11:35:20Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41437370431
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41437954256
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -41,4 +41,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.16526985168457
+collection_duration_seconds,5.0769758224487305
