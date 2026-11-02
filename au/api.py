@@ -5,6 +5,7 @@ Provides simple functions for submitting and retrieving async tasks
 without requiring decorator patterns.
 """
 
+import functools
 import logging
 from typing import Any, Callable, Optional, TypeVar
 from contextlib import contextmanager
@@ -21,8 +22,8 @@ from au.base import (
     Middleware,
     LoggingMiddleware,
 )
-from au.config import get_global_config
-from au.retry import RetryPolicy, retry_with_policy
+from au.config import get_global_config, setting_error
+from au.retry import BackoffStrategy, RetryPolicy, retry_with_policy
 
 T = TypeVar("T")
 
@@ -47,7 +48,37 @@ def _middleware_from_config(config) -> list[Middleware]:
     try:
         return [LoggingMiddleware(level=config.logging_level, logger_name=TASKS_LOGGER)]
     except (TypeError, ValueError) as e:
-        raise ValueError(f"AU_LOGGING_LEVEL (config.logging_level): {e}") from e
+        raise setting_error("logging_level", f"is unusable: {e}") from e
+
+
+def _retry_policy_from_config(config) -> Optional[RetryPolicy]:
+    """The retry policy the retry settings ask for (``retry_enabled`` and the
+    ``retry_*`` values), or None; refuses a bad value by its setting's name.
+
+    It retries on every exception, a ``TypeError`` from bad arguments too: pass
+    a ``RetryPolicy`` with ``retry_on`` / ``dont_retry_on`` to narrow it."""
+    if not config.retry_enabled:
+        return None
+    try:
+        backoff = BackoffStrategy(config.retry_backoff)
+    except ValueError:
+        choices = ", ".join(b.value for b in BackoffStrategy)
+        raise setting_error(
+            "retry_backoff", f"is {config.retry_backoff!r}; use one of: {choices}"
+        ) from None
+    if config.retry_max_attempts < 1:  # else the task would never run
+        raise setting_error(
+            "retry_max_attempts", f"is {config.retry_max_attempts}; it must be >= 1"
+        )
+    if config.retry_initial_delay < 0:
+        raise setting_error(
+            "retry_initial_delay", f"is {config.retry_initial_delay}; it must be >= 0"
+        )
+    return RetryPolicy(
+        max_attempts=config.retry_max_attempts,
+        backoff=backoff,
+        initial_delay=config.retry_initial_delay,
+    )
 
 
 def _get_default_backend() -> ComputationBackend:
@@ -184,6 +215,7 @@ class _WithRetryPolicy:
 
     def __init__(self, func: Callable, policy: RetryPolicy):
         self.func, self.policy = func, policy
+        functools.update_wrapper(self, func)  # a name for logs and middleware
 
     def __call__(self, *args, **kwargs):
         return retry_with_policy(self.func, args, kwargs, self.policy)
@@ -211,7 +243,9 @@ def submit_task(
             key re-runs.
         backend: Optional backend (uses default if not provided)
         store: Optional store (uses default if not provided)
-        retry_policy: Optional retry policy
+        retry_policy: Optional retry policy. When omitted, the configured one
+            applies (``AU_RETRY_ENABLED`` and the ``AU_RETRY_*`` settings);
+            pass ``RetryPolicy(max_attempts=1)`` to run once regardless.
         **kwargs: Keyword arguments for function
 
     Returns:
@@ -228,6 +262,8 @@ def submit_task(
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
+    if retry_policy is None:  # before the key is reserved: a bad setting raises
+        retry_policy = _retry_policy_from_config(get_global_config())
 
     if key is None:
         # No idempotency requested: mint a fresh key per call.
@@ -239,8 +275,7 @@ def submit_task(
             return key
         store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
-    # If retry policy provided, wrap function
-    if retry_policy:
+    if retry_policy is not None:
         func = _WithRetryPolicy(func, retry_policy)
 
     # Launch task. A launch that raises must not leave the key RUNNING for good

@@ -53,6 +53,7 @@ from au.api import (
     _get_default_backend,
     _get_default_store,
 )
+from au.config import get_global_config, setting_error
 
 # Pydantic models for API
 
@@ -500,3 +501,59 @@ def mk_flask_interface(
             return jsonify({"error": "Timeout"}), 408
 
     return app
+
+
+def _run_with_uvicorn(app, *, host: str, port: int) -> None:
+    import uvicorn  # in the `http` extra, with FastAPI
+
+    uvicorn.run(app, host=host, port=port)
+
+
+def _run_with_flask(app, *, host: str, port: int) -> None:
+    app.run(host=host, port=port)
+
+
+#: For each ``http_framework`` setting: the app factory and how to run its app.
+_FRAMEWORKS: dict[str, tuple[Callable, Callable]] = {
+    "fastapi": (mk_http_interface, _run_with_uvicorn),
+    "flask": (mk_flask_interface, _run_with_flask),
+}
+
+
+def serve(
+    functions: Optional[list[Callable]] = None,
+    *,
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    framework: Optional[str] = None,
+    backend: Optional[ComputationBackend] = None,
+    store: Optional[ComputationStore] = None,
+    run: Optional[Callable] = None,
+) -> None:
+    """Serve the task API for ``functions``, blocking until the server stops.
+
+    ``host``, ``port`` and ``framework`` default to the ``http_host``,
+    ``http_port`` and ``http_framework`` settings (``AU_HTTP_HOST``,
+    ``AU_HTTP_PORT``, ``AU_HTTP_FRAMEWORK``): ``fastapi`` (run with uvicorn) or
+    ``flask``. ``run(app, host=..., port=...)`` replaces the framework's own
+    runner, e.g. to serve with another ASGI server.
+
+    Example:
+        >>> serve([process_data], port=8080)  # doctest: +SKIP
+    """
+    config = get_global_config()
+    from_setting = framework is None
+    if from_setting:
+        framework = config.http_framework
+    if framework not in _FRAMEWORKS:
+        problem = f"is {framework!r}; use one of: {', '.join(_FRAMEWORKS)}"
+        if from_setting:
+            raise setting_error("http_framework", problem)
+        raise ValueError(f"framework {problem}")
+    make_app, default_run = _FRAMEWORKS[framework]
+    app = make_app(functions, backend=backend, store=store)
+    (run or default_run)(
+        app,
+        host=host if host is not None else config.http_host,
+        port=port if port is not None else config.http_port,
+    )

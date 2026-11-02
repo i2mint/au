@@ -8,6 +8,7 @@ Supports configuration cascade:
 """
 
 import os
+import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Any
@@ -40,12 +41,11 @@ class AUConfig:
     # Observability
     logging_enabled: bool = True  # the simple API logs each task's start/end
     logging_level: str = "INFO"  # the level those are logged at, not a filter
-    metrics_enabled: bool = False
 
-    # HTTP configuration (for HTTP module)
+    # HTTP configuration: what au.http.serve defaults to
     http_host: str = "127.0.0.1"
     http_port: int = 8000
-    http_framework: str = "fastapi"  # fastapi, flask, starlette
+    http_framework: str = "fastapi"  # fastapi, flask
 
 
 def load_config_from_env() -> dict[str, Any]:
@@ -61,11 +61,18 @@ def load_config_from_env() -> dict[str, Any]:
     - AU_STORAGE_PATH: Path for filesystem storage
     - AU_TTL_SECONDS: Time-to-live for results
     - AU_SERIALIZATION: Serialization format (json, pickle)
-    - AU_RETRY_ENABLED: Enable retry (true/false)
-    - AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
+    - AU_RETRY_ENABLED: ``submit_task`` (so also ``async_task``, ``submit_many``,
+      the HTTP endpoints and workflows) retries by the settings below when no
+      ``retry_policy`` is passed (true/false)
+    - AU_RETRY_MAX_ATTEMPTS: Maximum attempts
+    - AU_RETRY_BACKOFF: exponential, linear or constant
+    - AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+    - AU_LOGGING_ENABLED: The simple API logs each task's start and end
     - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
       (a level name or number; not a filter: configure logging for that)
-    - AU_METRICS_ENABLED: Enable metrics (true/false)
+    - AU_HTTP_HOST, AU_HTTP_PORT, AU_HTTP_FRAMEWORK (fastapi, flask): what
+      ``au.http.serve`` defaults to
+    - AU_METRICS_ENABLED: removed; read only to warn that it does nothing
 
     Returns:
         Dictionary of configuration values from environment
@@ -125,7 +132,7 @@ def load_config_from_env() -> dict[str, Any]:
     bool_mappings = {
         "AU_RETRY_ENABLED": "retry_enabled",
         "AU_LOGGING_ENABLED": "logging_enabled",
-        "AU_METRICS_ENABLED": "metrics_enabled",
+        "AU_METRICS_ENABLED": "metrics_enabled",  # removed: get_config warns
     }
 
     for env_var, config_key in bool_mappings.items():
@@ -303,7 +310,36 @@ def get_config(config_file: Optional[Path] = None, **overrides) -> AUConfig:
     # Layer 3: Explicit overrides
     config_dict.update({k: v for k, v in overrides.items() if v is not None})
 
-    return AUConfig(**config_dict)
+    return AUConfig(**_without_removed_settings(config_dict))
+
+
+def setting_error(name: str, problem: str) -> ValueError:
+    """An error naming a bad setting both ways it is set: ``AU_<NAME>`` and
+    ``config.<name>``.
+
+    >>> setting_error("retry_backoff", "is 'x'")
+    ValueError("AU_RETRY_BACKOFF (config.retry_backoff) is 'x'")
+    """
+    return ValueError(f"AU_{name.upper()} (config.{name}) {problem}")
+
+
+#: Settings au once had and dropped, with why: a config file that still sets
+#: one gets a warning rather than a ``TypeError``.
+_REMOVED_SETTINGS = {
+    "metrics_enabled": "au has no metrics surface to enable (i2mint/au#25); "
+    "add a MetricsMiddleware to your backend instead",
+}
+
+
+def _without_removed_settings(config_dict: dict[str, Any]) -> dict[str, Any]:
+    removed = config_dict.keys() & _REMOVED_SETTINGS.keys()
+    for name in sorted(removed):
+        warnings.warn(
+            f"The au setting {name!r} was removed and is ignored: "
+            f"{_REMOVED_SETTINGS[name]}",
+            FutureWarning,  # shown by default: the app's user set it
+        )
+    return {k: v for k, v in config_dict.items() if k not in removed}
 
 
 # Global configuration instance (can be modified)

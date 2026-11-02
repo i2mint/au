@@ -98,6 +98,9 @@ export AU_REDIS_URL=redis://localhost:6379
 export AU_STORAGE_PATH=/var/au/tasks
 export AU_TTL_SECONDS=7200
 export AU_MAX_WORKERS=8
+export AU_RETRY_ENABLED=true        # submit_task retries on any error when given no retry_policy (so do async_task, submit_many, the HTTP endpoints and workflows); @async_compute does not read it
+export AU_RETRY_MAX_ATTEMPTS=3      # with AU_RETRY_BACKOFF, AU_RETRY_INITIAL_DELAY
+export AU_HTTP_PORT=8080            # what au.http.serve defaults to (with AU_HTTP_HOST, AU_HTTP_FRAMEWORK)
 ```
 
 ### 2. Config File (au.toml)
@@ -190,6 +193,14 @@ def process_data(data: dict) -> dict:
 app = mk_http_interface([process_data])
 
 # Run with: uvicorn main:app
+```
+
+Or serve it directly, on the `AU_HTTP_HOST` / `AU_HTTP_PORT` / `AU_HTTP_FRAMEWORK` settings unless you pass `host`, `port` or `framework` (`fastapi` or `flask`):
+
+```python
+from au.http import serve
+
+serve([process_data], port=8080)
 ```
 
 ### API Endpoints

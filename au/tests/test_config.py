@@ -181,3 +181,161 @@ def test_task_logs_stay_quiet_unless_configured_but_au_errors_do_not():
 
     assert has_null_handler(au.api.TASKS_LOGGER)
     assert not has_null_handler("au") and not has_null_handler("au.base")
+
+
+# --- i2mint/au#25: every setting does something, or is gone -------------------
+
+
+@pytest.fixture
+def configured(monkeypatch):
+    """Install a global config for the test, then restore the default, and
+    keep the default backend and store it may build from leaking out."""
+    import au.api
+
+    monkeypatch.setattr(au.api, "_default_backend", None)
+    monkeypatch.setattr(au.api, "_default_store", None)
+
+    def install(**settings):
+        set_global_config(AUConfig(**settings))
+
+    yield install
+    reset_global_config()
+
+
+def _flaky_until(attempts):
+    calls = []
+
+    def flaky():
+        calls.append(1)
+        if len(calls) < attempts:
+            raise ConnectionError("not yet")
+        return len(calls)
+
+    return flaky, calls
+
+
+def _submit_and_wait(func, **kwargs):
+    from au.api import get_result, submit_task
+    from au.base import ThreadBackend
+
+    store = InMemoryStore()
+    task_id = submit_task(func, backend=ThreadBackend(), store=store, **kwargs)
+    return lambda: get_result(task_id, timeout=5, store=store)
+
+
+def test_retry_settings_make_submit_task_retry(configured):
+    configured(retry_enabled=True, retry_max_attempts=3, retry_initial_delay=0)
+    flaky, calls = _flaky_until(3)
+    assert _submit_and_wait(flaky)() == 3
+
+
+def test_without_retry_settings_submit_task_runs_once(configured):
+    configured()
+    flaky, calls = _flaky_until(2)
+    with pytest.raises(Exception, match="not yet"):
+        _submit_and_wait(flaky)()
+    assert len(calls) == 1
+
+
+def test_a_retry_policy_passed_overrides_the_settings(configured):
+    from au.retry import RetryPolicy
+
+    configured(retry_enabled=True, retry_max_attempts=5, retry_initial_delay=0)
+    flaky, calls = _flaky_until(3)
+    with pytest.raises(Exception, match="not yet"):
+        _submit_and_wait(flaky, retry_policy=RetryPolicy(max_attempts=1))()
+    assert len(calls) == 1
+
+
+def test_a_bad_backoff_setting_is_refused_by_name_before_the_key_is_reserved(
+    configured,
+):
+    from au.api import submit_task
+    from au.base import ThreadBackend
+
+    configured(retry_enabled=True, retry_backoff="fibonacci")
+    store = InMemoryStore()
+    with pytest.raises(ValueError, match="AU_RETRY_BACKOFF"):
+        submit_task(int, key="job", backend=ThreadBackend(), store=store)
+    assert "job" not in store
+
+
+@pytest.mark.parametrize("framework", ["fastapi", "flask"])
+def test_serve_defaults_to_the_http_settings(configured, framework):
+    pytest.importorskip(framework)
+    from au.http import serve
+
+    configured(http_host="0.0.0.0", http_port=9123, http_framework=framework)
+    served = {}
+
+    def run(app, *, host, port):
+        served.update(app=app, host=host, port=port)
+
+    from au.base import ThreadBackend
+
+    serve([int], run=run, backend=ThreadBackend(), store=InMemoryStore())
+    assert (served["host"], served["port"]) == ("0.0.0.0", 9123)
+    module = type(served["app"]).__module__.split(".")[0]
+    assert module == framework
+    serve([int], port=80, run=run, backend=ThreadBackend(), store=InMemoryStore())
+    assert served["port"] == 80  # an argument beats the setting
+
+
+def test_serve_refuses_an_unknown_framework_by_its_setting(configured):
+    from au.http import serve
+
+    configured(http_framework="starlette")
+    with pytest.raises(ValueError, match="AU_HTTP_FRAMEWORK"):
+        serve([int], run=lambda app, **kw: None)
+
+
+def test_the_removed_metrics_setting_warns_instead_of_breaking(monkeypatch, tmp_path):
+    monkeypatch.setenv("AU_METRICS_ENABLED", "true")
+    with pytest.warns(FutureWarning, match="metrics_enabled"):
+        config = get_config(config_file=tmp_path / "absent.toml")
+    assert not hasattr(config, "metrics_enabled")
+    monkeypatch.delenv("AU_METRICS_ENABLED")
+    file = tmp_path / "au.toml"
+    file.write_text("[au]\nmetrics_enabled = true\nmax_workers = 2\n")
+    with pytest.warns(FutureWarning, match="metrics_enabled"):
+        assert get_config(config_file=file).max_workers == 2
+
+
+def test_retry_settings_keep_the_task_logging_its_name(configured, caplog):
+    """The retried function kept no ``__name__``: LoggingMiddleware failed on
+    every task once retry was enabled."""
+    from au.api import get_result, submit_task
+    from au.base import LoggingMiddleware, ThreadBackend
+
+    configured(retry_enabled=True, retry_initial_delay=0)
+    store = InMemoryStore()
+    backend = ThreadBackend(middleware=[LoggingMiddleware(level=logging.INFO)])
+    with caplog.at_level(logging.INFO):
+        task_id = submit_task(_flaky_until(1)[0], backend=backend, store=store)
+        assert get_result(task_id, timeout=5, store=store) == 1
+    assert "flaky" in caplog.text
+    assert "failed" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "setting, value",
+    [
+        ("retry_max_attempts", 0),
+        ("retry_max_attempts", -1),
+        ("retry_initial_delay", -1),
+    ],
+)
+def test_a_retry_setting_that_would_skip_or_break_the_task_is_refused(
+    configured, setting, value
+):
+    configured(retry_enabled=True, **{setting: value})
+    with pytest.raises(ValueError, match=f"AU_{setting.upper()}"):
+        _submit_and_wait(int)
+
+
+def test_serve_blames_an_argument_not_the_setting(configured):
+    from au.http import serve
+
+    configured()
+    with pytest.raises(ValueError, match="^framework is 'bottle'"):
+        serve([int], framework="bottle", run=lambda app, **kw: None)
