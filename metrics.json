@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.295786619186401,
-  "commit_message": "Merge 5cc3bd7a8803c51dd82fb489092c4198f1a2bb06 into ad8d1be75718ba9583392be688ecd75750ad27ba",
-  "commit_sha": "bbb2c6eaf0f0a0bbbff64ce1e017e385e2b6ce00",
+  "collection_duration_seconds": 7.328050374984741,
+  "commit_message": "fix(au): cancel restates CANCELLED after terminate only where it is needed (#30)\n\nThe unconditional re-write could clobber a job resubmitted under the key while\nProcessBackend's terminate waited. It now runs only when the store's\ncompare-and-set does not span its writers (new compare_and_set_spans_writers).",
+  "commit_sha": "5cc3bd7a8803c51dd82fb489092c4198f1a2bb06",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.967246874233881,
       "num_classes": 3028,
       "num_functions": 20395,
-      "pypi_version": "0.1.15",
+      "pypi_version": "0.1.14",
       "total_lines": 542782
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T12:10:54.335238Z",
+  "timestamp": "2026-11-02T12:11:03.126411Z",
   "workflow_status": {}
 }
