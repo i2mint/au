@@ -1303,3 +1303,128 @@ def test_mock_async_does_not_hide_a_broken_logging_setting(monkeypatch):
             au.api.submit_task(_double, 1)
     finally:
         reset_global_config()
+
+
+# --- i2mint/au#24 item 4: the error's type survives the store's round trip ----
+
+
+class _AppError(Exception):
+    pass
+
+
+def _round_trip(tmp_path, error, serialization=SerializationFormat.JSON):
+    store = FileSystemStore(
+        tmp_path / serialization.value, serialization=serialization, auto_cleanup=False
+    )
+    store["k"] = ComputationResult(None, ComputationStatus.FAILED, error=error)
+    return store["k"].error
+
+
+@pytest.mark.parametrize("serialization", list(SerializationFormat))
+def test_a_builtin_error_comes_back_as_itself(tmp_path, serialization):
+    for error in [ValueError("bad"), KeyError("x"), FileNotFoundError(2, "gone")]:
+        back = _round_trip(tmp_path, error, serialization)
+        assert type(back) is type(error)
+        assert (str(back), back.args) == (str(error), error.args)
+
+
+def test_an_error_whose_rebuild_would_change_its_message_is_not_rebuilt(tmp_path):
+    """Rebuilt from its arguments, a missing file lost its path and a tuple
+    key came back a list: the message users see must stay the stored one."""
+    from au.base import StoredError
+
+    try:
+        open(tmp_path / "missing" / "x")
+    except FileNotFoundError as e:
+        missing = e
+    for error in [missing, KeyError(("a", 1)), ValueError({1: 2})]:
+        back = _round_trip(tmp_path, error)
+        assert str(back) == str(error)
+        assert type(back) is type(error) or isinstance(back, StoredError)
+    assert isinstance(_round_trip(tmp_path, KeyError(("a", 1))), StoredError)
+
+
+def test_a_stand_in_pickles_and_shows_what_it_is(tmp_path):
+    import traceback
+
+    back = _round_trip(tmp_path, _AppError("nope"))
+    again = pickle.loads(pickle.dumps(back))
+    assert type(again) is type(back) and str(again) == "nope"
+    from au.base import StoredError
+
+    plain = pickle.loads(pickle.dumps(StoredError("x")))
+    assert type(plain) is StoredError and str(plain) == "x"
+    shown = traceback.format_exception_only(back)[-1]
+    assert shown.startswith(f"au.stored.{__name__}._AppError: nope")
+
+
+def test_a_base_exception_that_is_not_an_exception_is_not_rebuilt(tmp_path):
+    """``raise result.error`` must not exit or interrupt the reader."""
+    from au.base import StoredError
+
+    for error in [SystemExit(3), KeyboardInterrupt()]:
+        back = _round_trip(tmp_path, error)
+        assert isinstance(back, StoredError) and isinstance(back, Exception)
+
+
+@pytest.mark.parametrize("error_type, error_args", [(123, None), (["x"], "abc")])
+def test_a_malformed_record_keeps_its_message(tmp_path, error_type, error_args):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    record = {
+        "value": None,
+        "status": "failed",
+        "error": "the message",
+        "created_at": datetime.now().isoformat(),
+        "error_type": error_type,
+        "error_args": error_args,
+    }
+    (tmp_path / "odd.json").write_text(json.dumps(record))
+    assert str(store["odd"].error) == "the message"
+
+
+def test_any_other_error_comes_back_named_after_its_class(tmp_path):
+    from au.base import StoredError
+
+    back = _round_trip(tmp_path, _AppError("nope"))
+    assert isinstance(back, StoredError) and not isinstance(back, _AppError)
+    assert type(back).__name__ == "_AppError"
+    assert back.type_name == f"{__name__}._AppError"
+    assert str(back) == "nope"
+    assert type(_round_trip(tmp_path, _AppError("again"))) is type(back)  # cached
+
+
+def test_a_builtin_that_cannot_be_rebuilt_gets_a_stand_in(tmp_path):
+    from au.base import StoredError
+
+    error = UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte")
+    back = _round_trip(tmp_path, error)  # bytes args: not kept, not rebuildable
+    assert isinstance(back, StoredError)
+    assert (type(back).__name__, str(back)) == ("UnicodeDecodeError", str(error))
+    odd = _round_trip(tmp_path, ValueError(object()))  # args not kept: message
+    assert type(odd) is ValueError and str(odd).startswith("<object object")
+
+
+def test_a_record_stored_before_the_error_type_reads_as_before(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    record = {
+        "value": None,
+        "status": "failed",
+        "error": "old failure",
+        "created_at": datetime.now().isoformat(),
+    }
+    (tmp_path / "old.json").write_text(json.dumps(record))
+    error = store["old"].error
+    assert type(error) is Exception and str(error) == "old failure"
+
+
+def test_get_result_chains_the_rebuilt_error_and_names_a_silent_one(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    for key, error, message in [
+        ("v", ValueError("bad"), "bad"),
+        ("i", KeyboardInterrupt(), "KeyboardInterrupt"),
+    ]:
+        store[key] = ComputationResult(None, ComputationStatus.FAILED, error=error)
+        with pytest.raises(RuntimeError, match=f"^{message}$") as raised:
+            ComputationHandle(key, store).get_result(timeout=1)
+        cause = raised.value.__cause__
+        assert type(cause).__name__ == type(error).__name__
