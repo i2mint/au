@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T11:51:40.699227Z
+timestamp,2026-11-02T11:51:45.193499Z
 commit_sha,f649369064e0ef0695ae4a856bcfb697880fda71
 commit_message,"fix(au): a stored error keeps its type through FileSystemStore (#24 item 4)
 
@@ -9,18 +9,18 @@ class is rebuilt as itself when that gives back the stored message; any other
 becomes an au.StoredError stand-in named after it. Old records read as before.
 get_result names a silent cause."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20489
-metrics.umpyre_stats.num_classes,3043
-metrics.umpyre_stats.total_lines,545079
-metrics.umpyre_stats.empty_lines,71444
-metrics.umpyre_stats.comment_lines,35624
-metrics.umpyre_stats.docs_lines,42973
-metrics.umpyre_stats.function_lines,327237
-metrics.umpyre_stats.empty_lines_ratio,0.13107090898750456
-metrics.umpyre_stats.comment_lines_ratio,0.06535566404135915
-metrics.umpyre_stats.function_lines_ratio,0.6003478394874872
-metrics.umpyre_stats.mean_lines_per_function,15.971350480745766
-metrics.umpyre_stats.files_analyzed,1348
+metrics.umpyre_stats.num_functions,20393
+metrics.umpyre_stats.num_classes,3028
+metrics.umpyre_stats.total_lines,542775
+metrics.umpyre_stats.empty_lines,71107
+metrics.umpyre_stats.comment_lines,35490
+metrics.umpyre_stats.docs_lines,42933
+metrics.umpyre_stats.function_lines,325655
+metrics.umpyre_stats.empty_lines_ratio,0.1310064022845562
+metrics.umpyre_stats.comment_lines_ratio,0.06538620975542352
+metrics.umpyre_stats.function_lines_ratio,0.5999815761595505
+metrics.umpyre_stats.mean_lines_per_function,15.968959937233365
+metrics.umpyre_stats.files_analyzed,1333
 metrics.umpyre_stats.pypi_version,0.1.12
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-11-02T11:44:55Z
@@ -41,4 +41,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.317776679992676
+collection_duration_seconds,7.293881893157959
