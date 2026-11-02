@@ -288,6 +288,9 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="3"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_STORAGE_PATH</span><span class="o">=</span>/var/au/tasks
 </span><span data-line="4"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_TTL_SECONDS</span><span class="o">=</span><span class="m">7200</span>
 </span><span data-line="5"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_MAX_WORKERS</span><span class="o">=</span><span class="m">8</span>
+</span><span data-line="6"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_RETRY_ENABLED</span><span class="o">=</span><span class="nb">true</span><span class="w">        </span><span class="c1"># submit_task retries on any error when given no retry_policy (so do async_task, submit_many, the HTTP endpoints and workflows); @async_compute does not read it</span>
+</span><span data-line="7"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_RETRY_MAX_ATTEMPTS</span><span class="o">=</span><span class="m">3</span><span class="w">      </span><span class="c1"># with AU_RETRY_BACKOFF, AU_RETRY_INITIAL_DELAY</span>
+</span><span data-line="8"><span class="nb">export</span><span class="w"> </span><span class="nv">AU_HTTP_PORT</span><span class="o">=</span><span class="m">8080</span><span class="w">            </span><span class="c1"># what au.http.serve defaults to (with AU_HTTP_HOST, AU_HTTP_FRAMEWORK)</span>
 </span></pre></div>
 </div>
 </section>
@@ -381,6 +384,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="12"><span class="n">app</span> <span class="o">=</span> <span class="n">mk_http_interface</span><span class="p">([</span><span class="n">process_data</span><span class="p">])</span>
 </span><span data-line="13">
 </span><span data-line="14"><span class="c1"># Run with: uvicorn main:app</span>
+</span></pre></div>
+</div>
+<p>Or serve it directly, on the <code class="docutils literal notranslate"><span class="pre">AU_HTTP_HOST</span></code> / <code class="docutils literal notranslate"><span class="pre">AU_HTTP_PORT</span></code> / <code class="docutils literal notranslate"><span class="pre">AU_HTTP_FRAMEWORK</span></code> settings unless you pass <code class="docutils literal notranslate"><span class="pre">host</span></code>, <code class="docutils literal notranslate"><span class="pre">port</span></code> or <code class="docutils literal notranslate"><span class="pre">framework</span></code> (<code class="docutils literal notranslate"><span class="pre">fastapi</span></code> or <code class="docutils literal notranslate"><span class="pre">flask</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">au.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">serve</span><span class="p">([</span><span class="n">process_data</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">)</span>
 </span></pre></div>
 </div>
 <section id="api-endpoints">
@@ -764,7 +773,7 @@ data-aria-dark="Switch to auto color mode">
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-02 11:21 UTC from <a href="https://github.com/i2mint/au/commit/c3336c5a897bf9c04271175dd9748522ee24b0a1">c3336c5</a> (master) · au 0.1.11 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-02 11:34 UTC from <a href="https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1">0884710</a> (master) · au 0.1.12 · <a href="about-this-build.html">about this build</a></p>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
@@ -799,7 +808,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="_static/documentation_options.js?v=1e825a29"></script>
+      <script src="_static/documentation_options.js?v=297ad043"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>

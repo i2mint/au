@@ -1,4 +1,4 @@
-> built 2026-11-02 11:21 UTC from c3336c5 (master) · au 0.1.11. Details: build_info.json
+> built 2026-11-02 11:34 UTC from 0884710 (master) · au 0.1.12. Details: build_info.json
 
 # index.html.md
 
@@ -104,6 +104,9 @@ export AU_REDIS_URL=redis://localhost:6379
 export AU_STORAGE_PATH=/var/au/tasks
 export AU_TTL_SECONDS=7200
 export AU_MAX_WORKERS=8
+export AU_RETRY_ENABLED=true        # submit_task retries on any error when given no retry_policy (so do async_task, submit_many, the HTTP endpoints and workflows); @async_compute does not read it
+export AU_RETRY_MAX_ATTEMPTS=3      # with AU_RETRY_BACKOFF, AU_RETRY_INITIAL_DELAY
+export AU_HTTP_PORT=8080            # what au.http.serve defaults to (with AU_HTTP_HOST, AU_HTTP_FRAMEWORK)
 ```
 
 ### 2. Config File (au.toml)
@@ -196,6 +199,14 @@ def process_data(data: dict) -> dict:
 app = mk_http_interface([process_data])
 
 # Run with: uvicorn main:app
+```
+
+Or serve it directly, on the `AU_HTTP_HOST` / `AU_HTTP_PORT` / `AU_HTTP_FRAMEWORK` settings unless you pass `host`, `port` or `framework` (`fastapi` or `flask`):
+
+```python
+from au.http import serve
+
+serve([process_data], port=8080)
 ```
 
 ### API Endpoints
@@ -811,7 +822,9 @@ Submit a task for async execution without decorator.
     key re-runs.
   * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional backend (uses default if not provided)
   * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)]) – Optional store (uses default if not provided)
-  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](_autosummary/au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy
+  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](_autosummary/au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy. When omitted, the configured one
+    applies (`AU_RETRY_ENABLED` and the `AU_RETRY_*` settings);
+    pass `RetryPolicy(max_attempts=1)` to run once regardless.
   * **\*\*kwargs** – Keyword arguments for function
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -1541,6 +1554,9 @@ Launch computation in a new thread.
 
 Decorator to make functions asynchronous with status tracking.
 
+It does not read the au settings (`AU_RETRY_*` and the like): those
+configure the simple API ([`au.submit_task()`](_autosummary/au.html.md#au.submit_task)).
+
 * **Parameters:**
   * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
     `_default_backend`, else ProcessBackend). `@async_compute` may
@@ -1627,20 +1643,21 @@ Supports configuration cascade:
 
 ### Functions
 
-| [`get_config`](_autosummary/au.config.html.md#au.config.get_config)([config_file])     | Get configuration with cascade: env vars → config file → defaults → overrides.   |
-|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| [`get_global_config`](_autosummary/au.config.html.md#au.config.get_global_config)()           | Get the global configuration instance.                                           |
-| [`load_config_from_env`](_autosummary/au.config.html.md#au.config.load_config_from_env)()        | Load configuration from environment variables.                                   |
-| [`load_config_from_file`](_autosummary/au.config.html.md#au.config.load_config_from_file)([path]) | Load configuration from file.                                                    |
-| [`reset_global_config`](_autosummary/au.config.html.md#au.config.reset_global_config)()         | Reset the global configuration to None.                                          |
-| [`set_global_config`](_autosummary/au.config.html.md#au.config.set_global_config)(config)     | Set the global configuration instance.                                           |
+| [`get_config`](_autosummary/au.config.html.md#au.config.get_config)([config_file])     | Get configuration with cascade: env vars → config file → defaults → overrides.      |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`get_global_config`](_autosummary/au.config.html.md#au.config.get_global_config)()           | Get the global configuration instance.                                              |
+| [`load_config_from_env`](_autosummary/au.config.html.md#au.config.load_config_from_env)()        | Load configuration from environment variables.                                      |
+| [`load_config_from_file`](_autosummary/au.config.html.md#au.config.load_config_from_file)([path]) | Load configuration from file.                                                       |
+| [`reset_global_config`](_autosummary/au.config.html.md#au.config.reset_global_config)()         | Reset the global configuration to None.                                             |
+| [`set_global_config`](_autosummary/au.config.html.md#au.config.set_global_config)(config)     | Set the global configuration instance.                                              |
+| [`setting_error`](_autosummary/au.config.html.md#au.config.setting_error)(name, problem)  | An error naming a bad setting both ways it is set: `AU_<NAME>` and `config.<name>`. |
 
 ### Classes
 
 | [`AUConfig`](_autosummary/au.config.html.md#au.config.AUConfig)([backend, redis_url, supabase_url, ...])   | Configuration for AU with smart defaults.   |
 |------------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', metrics_enabled=False, http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1692,11 +1709,18 @@ Environment variables:
 - AU_STORAGE_PATH: Path for filesystem storage
 - AU_TTL_SECONDS: Time-to-live for results
 - AU_SERIALIZATION: Serialization format (json, pickle)
-- AU_RETRY_ENABLED: Enable retry (true/false)
-- AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
+- AU_RETRY_ENABLED: `submit_task` (so also `async_task`, `submit_many`,
+  the HTTP endpoints and workflows) retries by the settings below when no
+  `retry_policy` is passed (true/false)
+- AU_RETRY_MAX_ATTEMPTS: Maximum attempts
+- AU_RETRY_BACKOFF: exponential, linear or constant
+- AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+- AU_LOGGING_ENABLED: The simple API logs each task’s start and end
 - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
   (a level name or number; not a filter: configure logging for that)
-- AU_METRICS_ENABLED: Enable metrics (true/false)
+- AU_HTTP_HOST, AU_HTTP_PORT, AU_HTTP_FRAMEWORK (fastapi, flask): what
+  `au.http.serve` defaults to
+- AU_METRICS_ENABLED: removed; read only to warn that it does nothing
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
@@ -1738,6 +1762,19 @@ Set the global configuration instance.
   **config** ([`AUConfig`](_autosummary/au.config.html.md#au.config.AUConfig)) – AUConfig instance to use globally
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.config.setting_error(name, problem)
+
+An error naming a bad setting both ways it is set: `AU_<NAME>` and
+`config.<name>`.
+
+```pycon
+>>> setting_error("retry_backoff", "is 'x'")
+ValueError("AU_RETRY_BACKOFF (config.retry_backoff) is 'x'")
+```
+
+* **Return type:**
+  [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
 
 
 # _autosummary/au.hooks.html.md
@@ -2033,7 +2070,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryableError`](_autosummary/au.html.md#au.RetryableError)              | Base class for errors that should be retried.                                                                                 |
 | [`NonRetryableError`](_autosummary/au.html.md#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                             |
 
-### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', metrics_enabled=False, http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -3172,6 +3209,9 @@ Check if all dependencies are completed.
 
 Decorator to make functions asynchronous with status tracking.
 
+It does not read the au settings (`AU_RETRY_*` and the like): those
+configure the simple API ([`au.submit_task()`](_autosummary/au.html.md#au.submit_task)).
+
 * **Parameters:**
   * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
     `_default_backend`, else ProcessBackend). `@async_compute` may
@@ -3627,7 +3667,9 @@ Submit a task for async execution without decorator.
     key re-runs.
   * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend)]) – Optional backend (uses default if not provided)
   * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore)]) – Optional store (uses default if not provided)
-  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](_autosummary/au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy
+  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](_autosummary/au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy. When omitted, the configured one
+    applies (`AU_RETRY_ENABLED` and the `AU_RETRY_*` settings);
+    pass `RetryPolicy(max_attempts=1)` to run once regardless.
   * **\*\*kwargs** – Keyword arguments for function
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -3694,6 +3736,7 @@ Provides REST API endpoints for async task management using FastAPI.
 | [`create_app_from_decorator`](_autosummary/au.http.html.md#au.http.create_app_from_decorator)([title, description]) | Create a FastAPI app that auto-discovers @async_compute decorated functions. |
 | [`mk_flask_interface`](_autosummary/au.http.html.md#au.http.mk_flask_interface)([functions, backend, store]) | Create a Flask application for task management.                              |
 | [`mk_http_interface`](_autosummary/au.http.html.md#au.http.mk_http_interface)([functions, backend, ...])    | Create a FastAPI application for task management.                            |
+| [`serve`](_autosummary/au.http.html.md#au.http.serve)([functions, host, port, framework, ...])  | Serve the task API for `functions`, blocking until the server stops.         |
 
 ### Classes
 
@@ -3810,6 +3853,25 @@ Create a FastAPI application for task management.
 >>> app = mk_http_interface([my_func])
 >>> # Run with: uvicorn main:app --reload
 ```
+
+### au.http.serve(functions=None, , host=None, port=None, framework=None, backend=None, store=None, run=None)
+
+Serve the task API for `functions`, blocking until the server stops.
+
+`host`, `port` and `framework` default to the `http_host`,
+`http_port` and `http_framework` settings (`AU_HTTP_HOST`,
+`AU_HTTP_PORT`, `AU_HTTP_FRAMEWORK`): `fastapi` (run with uvicorn) or
+`flask`. `run(app, host=..., port=...)` replaces the framework’s own
+runner, e.g. to serve with another ASGI server.
+
+### Example
+
+```pycon
+>>> serve([process_data], port=8080)
+```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 
 # _autosummary/au.retry.html.md
@@ -4517,7 +4579,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 11:21 UTC** from commit <a href="https://github.com/i2mint/au/commit/c3336c5a897bf9c04271175dd9748522ee24b0a1"><code>c3336c5</code></a> on branch <code>master</code>, for **au 0.1.11** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 11:34 UTC** from commit <a href="https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1"><code>0884710</code></a> on branch <code>master</code>, for **au 0.1.12** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4526,9 +4588,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/c3336c5a897bf9c04271175dd9748522ee24b0a1"><code>c3336c5a897bf9c04271175dd9748522ee24b0a1</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1"><code>0884710944d6fde2bc950444bb9105ec4dd7c3d1</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.11</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.12</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4537,9 +4599,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41435947099">41435947099</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41437626495">41437626495</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>89a0b3d49d6b3af3829ac794af05e5ba2e987937</code> (in the history of the built commit) |
+| Event commit | <code>af53cbfe382627cf02f93df930fca6fe3176b044</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4564,13 +4626,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.11/">0.1.11</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.12/">0.1.12</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout c3336c5a897bf9c04271175dd9748522ee24b0a1
+git checkout 0884710944d6fde2bc950444bb9105ec4dd7c3d1
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

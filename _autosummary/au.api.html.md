@@ -242,7 +242,9 @@ Submit a task for async execution without decorator.
     key re-runs.
   * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](au.base.html.md#au.base.ComputationBackend)]) – Optional backend (uses default if not provided)
   * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](au.base.html.md#au.base.ComputationStore)]) – Optional store (uses default if not provided)
-  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy
+  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy. When omitted, the configured one
+    applies (`AU_RETRY_ENABLED` and the `AU_RETRY_*` settings);
+    pass `RetryPolicy(max_attempts=1)` to run once regardless.
   * **\*\*kwargs** – Keyword arguments for function
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

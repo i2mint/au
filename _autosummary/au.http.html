@@ -105,6 +105,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.http.create_app_from_decorator"><code class="docutils literal notranslate"><span class="pre">create_app_from_decorator()</span></code></a></li>
 <li><a class="reference internal" href="#au.http.mk_flask_interface"><code class="docutils literal notranslate"><span class="pre">mk_flask_interface()</span></code></a></li>
 <li><a class="reference internal" href="#au.http.mk_http_interface"><code class="docutils literal notranslate"><span class="pre">mk_http_interface()</span></code></a></li>
+<li><a class="reference internal" href="#au.http.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -168,6 +169,9 @@ data-aria-dark="Switch to auto color mode">
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#au.http.mk_http_interface" title="au.http.mk_http_interface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mk_http_interface</span></code></a>([functions, backend, ...])</p></td>
 <td><p>Create a FastAPI application for task management.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.http.serve" title="au.http.serve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">serve</span></code></a>([functions, host, port, framework, ...])</p></td>
+<td><p>Serve the task API for <code class="docutils literal notranslate"><span class="pre">functions</span></code>, blocking until the server stops.</p></td>
 </tr>
 </tbody>
 </table>
@@ -345,6 +349,26 @@ data-aria-dark="Switch to auto color mode">
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="au.http.serve">
+<span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">serve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/http.html#serve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.serve" title="Link to this definition">#</a></dt>
+<dd><p>Serve the task API for <code class="docutils literal notranslate"><span class="pre">functions</span></code>, blocking until the server stops.</p>
+<p><code class="docutils literal notranslate"><span class="pre">host</span></code>, <code class="docutils literal notranslate"><span class="pre">port</span></code> and <code class="docutils literal notranslate"><span class="pre">framework</span></code> default to the <code class="docutils literal notranslate"><span class="pre">http_host</span></code>,
+<code class="docutils literal notranslate"><span class="pre">http_port</span></code> and <code class="docutils literal notranslate"><span class="pre">http_framework</span></code> settings (<code class="docutils literal notranslate"><span class="pre">AU_HTTP_HOST</span></code>,
+<code class="docutils literal notranslate"><span class="pre">AU_HTTP_PORT</span></code>, <code class="docutils literal notranslate"><span class="pre">AU_HTTP_FRAMEWORK</span></code>): <code class="docutils literal notranslate"><span class="pre">fastapi</span></code> (run with uvicorn) or
+<code class="docutils literal notranslate"><span class="pre">flask</span></code>. <code class="docutils literal notranslate"><span class="pre">run(app,</span> <span class="pre">host=...,</span> <span class="pre">port=...)</span></code> replaces the framework’s own
+runner, e.g. to serve with another ASGI server.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">serve</span><span class="p">([</span><span class="n">process_data</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
         </article><button class="back-to-top" type="button">
@@ -387,7 +411,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../_static/documentation_options.js?v=297ad043"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

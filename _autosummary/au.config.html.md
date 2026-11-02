@@ -10,20 +10,21 @@ Supports configuration cascade:
 
 ### Functions
 
-| [`get_config`](#au.config.get_config)([config_file])     | Get configuration with cascade: env vars → config file → defaults → overrides.   |
-|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| [`get_global_config`](#au.config.get_global_config)()           | Get the global configuration instance.                                           |
-| [`load_config_from_env`](#au.config.load_config_from_env)()        | Load configuration from environment variables.                                   |
-| [`load_config_from_file`](#au.config.load_config_from_file)([path]) | Load configuration from file.                                                    |
-| [`reset_global_config`](#au.config.reset_global_config)()         | Reset the global configuration to None.                                          |
-| [`set_global_config`](#au.config.set_global_config)(config)     | Set the global configuration instance.                                           |
+| [`get_config`](#au.config.get_config)([config_file])     | Get configuration with cascade: env vars → config file → defaults → overrides.      |
+|--------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| [`get_global_config`](#au.config.get_global_config)()           | Get the global configuration instance.                                              |
+| [`load_config_from_env`](#au.config.load_config_from_env)()        | Load configuration from environment variables.                                      |
+| [`load_config_from_file`](#au.config.load_config_from_file)([path]) | Load configuration from file.                                                       |
+| [`reset_global_config`](#au.config.reset_global_config)()         | Reset the global configuration to None.                                             |
+| [`set_global_config`](#au.config.set_global_config)(config)     | Set the global configuration instance.                                              |
+| [`setting_error`](#au.config.setting_error)(name, problem)  | An error naming a bad setting both ways it is set: `AU_<NAME>` and `config.<name>`. |
 
 ### Classes
 
 | [`AUConfig`](#au.config.AUConfig)([backend, redis_url, supabase_url, ...])   | Configuration for AU with smart defaults.   |
 |------------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', metrics_enabled=False, http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -75,11 +76,18 @@ Environment variables:
 - AU_STORAGE_PATH: Path for filesystem storage
 - AU_TTL_SECONDS: Time-to-live for results
 - AU_SERIALIZATION: Serialization format (json, pickle)
-- AU_RETRY_ENABLED: Enable retry (true/false)
-- AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts
+- AU_RETRY_ENABLED: `submit_task` (so also `async_task`, `submit_many`,
+  the HTTP endpoints and workflows) retries by the settings below when no
+  `retry_policy` is passed (true/false)
+- AU_RETRY_MAX_ATTEMPTS: Maximum attempts
+- AU_RETRY_BACKOFF: exponential, linear or constant
+- AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+- AU_LOGGING_ENABLED: The simple API logs each task’s start and end
 - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
   (a level name or number; not a filter: configure logging for that)
-- AU_METRICS_ENABLED: Enable metrics (true/false)
+- AU_HTTP_HOST, AU_HTTP_PORT, AU_HTTP_FRAMEWORK (fastapi, flask): what
+  `au.http.serve` defaults to
+- AU_METRICS_ENABLED: removed; read only to warn that it does nothing
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Any`](https://docs.python.org/3/library/typing.html#typing.Any)]
@@ -121,3 +129,16 @@ Set the global configuration instance.
   **config** ([`AUConfig`](#au.config.AUConfig)) – AUConfig instance to use globally
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.config.setting_error(name, problem)
+
+An error naming a bad setting both ways it is set: `AU_<NAME>` and
+`config.<name>`.
+
+```pycon
+>>> setting_error("retry_backoff", "is 'x'")
+ValueError("AU_RETRY_BACKOFF (config.retry_backoff) is 'x'")
+```
+
+* **Return type:**
+  [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)

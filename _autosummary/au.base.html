@@ -1012,6 +1012,8 @@ task queuing. Not persistent across application restarts.</p>
 <dt class="sig sig-object py" id="au.base.async_compute">
 <span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">async_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/tmp/computations'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SerializationFormat.JSON</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#async_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.async_compute" title="Link to this definition">#</a></dt>
 <dd><p>Decorator to make functions asynchronous with status tracking.</p>
+<p>It does not read the au settings (<code class="docutils literal notranslate"><span class="pre">AU_RETRY_*</span></code> and the like): those
+configure the simple API (<a class="reference internal" href="au.html#au.submit_task" title="au.submit_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">au.submit_task()</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1135,7 +1137,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../_static/documentation_options.js?v=297ad043"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

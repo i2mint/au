@@ -482,7 +482,9 @@ it is in flight. A terminal (completed/failed/cancelled) or expired
 key re-runs.</p></li>
 <li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a>]</span>) – Optional backend (uses default if not provided)</p></li>
 <li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.base.html#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a>]</span>) – Optional store (uses default if not provided)</p></li>
-<li><p><strong>retry_policy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.retry.html#au.retry.RetryPolicy" title="au.retry.RetryPolicy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a>]</span>) – Optional retry policy</p></li>
+<li><p><strong>retry_policy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.15)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="au.retry.html#au.retry.RetryPolicy" title="au.retry.RetryPolicy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RetryPolicy</span></code></a>]</span>) – Optional retry policy. When omitted, the configured one
+applies (<code class="docutils literal notranslate"><span class="pre">AU_RETRY_ENABLED</span></code> and the <code class="docutils literal notranslate"><span class="pre">AU_RETRY_*</span></code> settings);
+pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(max_attempts=1)</span></code> to run once regardless.</p></li>
 <li><p><strong>**kwargs</strong> – Keyword arguments for function</p></li>
 </ul>
 </dd>
@@ -548,7 +550,7 @@ key re-runs.</p></li>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../_static/documentation_options.js?v=297ad043"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

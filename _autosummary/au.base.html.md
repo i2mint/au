@@ -578,6 +578,9 @@ Launch computation in a new thread.
 
 Decorator to make functions asynchronous with status tracking.
 
+It does not read the au settings (`AU_RETRY_*` and the like): those
+configure the simple API ([`au.submit_task()`](au.html.md#au.submit_task)).
+
 * **Parameters:**
   * **backend** ([`ComputationBackend`](#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
     `_default_backend`, else ProcessBackend). `@async_compute` may

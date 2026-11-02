@@ -102,6 +102,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.config.load_config_from_file"><code class="docutils literal notranslate"><span class="pre">load_config_from_file()</span></code></a></li>
 <li><a class="reference internal" href="#au.config.reset_global_config"><code class="docutils literal notranslate"><span class="pre">reset_global_config()</span></code></a></li>
 <li><a class="reference internal" href="#au.config.set_global_config"><code class="docutils literal notranslate"><span class="pre">set_global_config()</span></code></a></li>
+<li><a class="reference internal" href="#au.config.setting_error"><code class="docutils literal notranslate"><span class="pre">setting_error()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -171,6 +172,9 @@ data-aria-dark="Switch to auto color mode">
 <tr class="row-even"><td><p><a class="reference internal" href="#au.config.set_global_config" title="au.config.set_global_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_global_config</span></code></a>(config)</p></td>
 <td><p>Set the global configuration instance.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.config.setting_error" title="au.config.setting_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setting_error</span></code></a>(name, problem)</p></td>
+<td><p>An error naming a bad setting both ways it is set: <code class="docutils literal notranslate"><span class="pre">AU_&lt;NAME&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">config.&lt;name&gt;</span></code>.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -186,7 +190,7 @@ data-aria-dark="Switch to auto color mode">
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="au.config.AUConfig">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.config.</span></span><span class="sig-name descname"><span class="pre">AUConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thread'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supabase_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supabase_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'filesystem'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/tmp/au_tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exponential'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_framework</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastapi'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/config.html#AUConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.config.AUConfig" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.config.</span></span><span class="sig-name descname"><span class="pre">AUConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'thread'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supabase_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supabase_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'filesystem'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/tmp/au_tasks'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_backoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exponential'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_initial_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logging_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_framework</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fastapi'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/config.html#AUConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.config.AUConfig" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Configuration for AU with smart defaults.</p>
 <dl class="field-list simple">
@@ -249,11 +253,18 @@ data-aria-dark="Switch to auto color mode">
 <li><p>AU_STORAGE_PATH: Path for filesystem storage</p></li>
 <li><p>AU_TTL_SECONDS: Time-to-live for results</p></li>
 <li><p>AU_SERIALIZATION: Serialization format (json, pickle)</p></li>
-<li><p>AU_RETRY_ENABLED: Enable retry (true/false)</p></li>
-<li><p>AU_RETRY_MAX_ATTEMPTS: Maximum retry attempts</p></li>
+<li><p>AU_RETRY_ENABLED: <code class="docutils literal notranslate"><span class="pre">submit_task</span></code> (so also <code class="docutils literal notranslate"><span class="pre">async_task</span></code>, <code class="docutils literal notranslate"><span class="pre">submit_many</span></code>,
+the HTTP endpoints and workflows) retries by the settings below when no
+<code class="docutils literal notranslate"><span class="pre">retry_policy</span></code> is passed (true/false)</p></li>
+<li><p>AU_RETRY_MAX_ATTEMPTS: Maximum attempts</p></li>
+<li><p>AU_RETRY_BACKOFF: exponential, linear or constant</p></li>
+<li><p>AU_RETRY_INITIAL_DELAY: Seconds before the first retry</p></li>
+<li><p>AU_LOGGING_ENABLED: The simple API logs each task’s start and end</p></li>
 <li><p>AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
 (a level name or number; not a filter: configure logging for that)</p></li>
-<li><p>AU_METRICS_ENABLED: Enable metrics (true/false)</p></li>
+<li><p>AU_HTTP_HOST, AU_HTTP_PORT, AU_HTTP_FRAMEWORK (fastapi, flask): what
+<code class="docutils literal notranslate"><span class="pre">au.http.serve</span></code> defaults to</p></li>
+<li><p>AU_METRICS_ENABLED: removed; read only to warn that it does nothing</p></li>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -316,6 +327,22 @@ data-aria-dark="Switch to auto color mode">
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="au.config.setting_error">
+<span class="sig-prename descclassname"><span class="pre">au.config.</span></span><span class="sig-name descname"><span class="pre">setting_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/config.html#setting_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.config.setting_error" title="Link to this definition">#</a></dt>
+<dd><p>An error naming a bad setting both ways it is set: <code class="docutils literal notranslate"><span class="pre">AU_&lt;NAME&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">config.&lt;name&gt;</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">setting_error</span><span class="p">(</span><span class="s2">"retry_backoff"</span><span class="p">,</span> <span class="s2">"is 'x'"</span><span class="p">)</span>
+</span><span data-line="2"><span class="go">ValueError("AU_RETRY_BACKOFF (config.retry_backoff) is 'x'")</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
         </article><button class="back-to-top" type="button">
@@ -358,7 +385,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../_static/documentation_options.js?v=297ad043"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

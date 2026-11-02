@@ -75,7 +75,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryableError`](#au.RetryableError)              | Base class for errors that should be retried.                                                                                 |
 | [`NonRetryableError`](#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                             |
 
-### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', metrics_enabled=False, http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1214,6 +1214,9 @@ Check if all dependencies are completed.
 
 Decorator to make functions asynchronous with status tracking.
 
+It does not read the au settings (`AU_RETRY_*` and the like): those
+configure the simple API ([`au.submit_task()`](#au.submit_task)).
+
 * **Parameters:**
   * **backend** ([`ComputationBackend`](au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
     `_default_backend`, else ProcessBackend). `@async_compute` may
@@ -1669,7 +1672,9 @@ Submit a task for async execution without decorator.
     key re-runs.
   * **backend** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationBackend`](au.base.html.md#au.base.ComputationBackend)]) – Optional backend (uses default if not provided)
   * **store** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`ComputationStore`](au.base.html.md#au.base.ComputationStore)]) – Optional store (uses default if not provided)
-  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy
+  * **retry_policy** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`RetryPolicy`](au.retry.html.md#au.retry.RetryPolicy)]) – Optional retry policy. When omitted, the configured one
+    applies (`AU_RETRY_ENABLED` and the `AU_RETRY_*` settings);
+    pass `RetryPolicy(max_attempts=1)` to run once regardless.
   * **\*\*kwargs** – Keyword arguments for function
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

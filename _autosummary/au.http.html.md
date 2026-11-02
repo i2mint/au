@@ -13,6 +13,7 @@ Provides REST API endpoints for async task management using FastAPI.
 | [`create_app_from_decorator`](#au.http.create_app_from_decorator)([title, description]) | Create a FastAPI app that auto-discovers @async_compute decorated functions. |
 | [`mk_flask_interface`](#au.http.mk_flask_interface)([functions, backend, store]) | Create a Flask application for task management.                              |
 | [`mk_http_interface`](#au.http.mk_http_interface)([functions, backend, ...])    | Create a FastAPI application for task management.                            |
+| [`serve`](#au.http.serve)([functions, host, port, framework, ...])  | Serve the task API for `functions`, blocking until the server stops.         |
 
 ### Classes
 
@@ -129,3 +130,22 @@ Create a FastAPI application for task management.
 >>> app = mk_http_interface([my_func])
 >>> # Run with: uvicorn main:app --reload
 ```
+
+### au.http.serve(functions=None, , host=None, port=None, framework=None, backend=None, store=None, run=None)
+
+Serve the task API for `functions`, blocking until the server stops.
+
+`host`, `port` and `framework` default to the `http_host`,
+`http_port` and `http_framework` settings (`AU_HTTP_HOST`,
+`AU_HTTP_PORT`, `AU_HTTP_FRAMEWORK`): `fastapi` (run with uvicorn) or
+`flask`. `run(app, host=..., port=...)` replaces the framework’s own
+runner, e.g. to serve with another ASGI server.
+
+### Example
+
+```pycon
+>>> serve([process_data], port=8080)
+```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
