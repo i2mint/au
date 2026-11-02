@@ -22,6 +22,7 @@ from au.base import (
     Middleware,
     LoggingMiddleware,
 )
+from au import base as _base
 from au.config import get_global_config, setting_error
 from au.retry import BackoffStrategy, RetryPolicy, retry_with_policy
 
@@ -82,9 +83,13 @@ def _retry_policy_from_config(config) -> Optional[RetryPolicy]:
 
 
 def _get_default_backend() -> ComputationBackend:
-    """Get or create the default backend based on configuration."""
+    """Get or create the default backend based on configuration, or build one
+    with ``au.base._backend_factory`` when that is set (uncached)."""
     global _default_backend
 
+    if _base._backend_factory is not None:
+        config = get_global_config()
+        return _base._backend_factory(None, _middleware_from_config(config))
     if _default_backend is None:
         config = get_global_config()
         middleware = _middleware_from_config(config)

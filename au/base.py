@@ -1362,9 +1362,20 @@ class ComputationHandle(Generic[T]):
         return self.store[self.key].metadata
 
 
-_default_backend: ComputationBackend | None = None
-"""The backend :func:`async_compute` uses when given none (ProcessBackend if
-None); :func:`au.testing.mock_async` swaps it."""
+BackendFactory = Callable[
+    [Optional["ComputationStore"], list["Middleware"]], "ComputationBackend"
+]
+"""``(store, middleware) -> backend``: how a surface given no backend builds one."""
+
+_backend_factory: BackendFactory | None = None
+"""A test seam: when set, :func:`async_compute` (per call) and the simple API
+(``au.submit_task``, ...; per call, uncached) build their backend with it, in
+place of their own default, passing the middleware they were given and, from
+``async_compute``, its store. One seam for both (i2mint/au#24):
+:func:`au.testing.mock_async` sets it. Workflows and HTTP apps resolve their
+backend when built, so only those built while it is set use it. As the simple
+API rebuilds per call (a cancel gets another instance), what it builds must
+hold no per-task state."""
 
 
 def async_compute(
@@ -1383,9 +1394,9 @@ def async_compute(
     configure the simple API (:func:`au.submit_task`).
 
     Args:
-        backend: Backend to execute computations (default: the module's
-            ``_default_backend``, else ProcessBackend). ``@async_compute`` may
-            also be used bare, without parentheses.
+        backend: Backend to execute computations (default: a ProcessBackend,
+            or what ``_backend_factory`` builds when one is set).
+            ``@async_compute`` may also be used bare, without parentheses.
         store: Store for results (default: FileSystemStore)
         base_path: Path for FileSystemStore if no store provided
         ttl_seconds: Time-to-live for results (default: 1 hour)
@@ -1430,18 +1441,20 @@ def async_compute(
         backend = ProcessBackend(store, middleware=middleware)
 
     def _active_backend() -> ComputationBackend:
-        """The default backend is looked up per call, so that one swapped in
-        later (:func:`au.testing.mock_async`) also reaches functions decorated
+        """Looked up per call, so that a factory set later
+        (:func:`au.testing.mock_async`) also reaches functions decorated
         before, at import time."""
-        if backend_given or _default_backend is None:
+        if backend_given or _backend_factory is None:
             return backend
-        if middleware:
+        built = _backend_factory(store, list(middleware or []))
+        runs = getattr(built, "middleware", ())
+        if any(mw not in runs for mw in middleware or []):
             warnings.warn(  # once per call site, not once per call
-                f"{type(_default_backend).__name__} replaces the default backend: "
+                f"{type(built).__name__} replaces the default backend: "
                 "the middleware given to async_compute does not run",
                 stacklevel=3,
             )
-        return _default_backend
+        return built
 
     def decorator(func: Callable[..., T]) -> Callable[..., ComputationHandle[T]]:
         @wraps(func)
@@ -1454,7 +1467,7 @@ def async_compute(
         # Attach utility methods
         wrapper.cleanup_expired = lambda: store.cleanup_expired()
         wrapper.store = store
-        wrapper.backend = backend  # as decorated; a call may use _default_backend
+        wrapper.backend = backend  # as decorated; a call may use _backend_factory
 
         return wrapper
 
