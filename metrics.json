@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 5.971489667892456,
-  "commit_message": "Merge ed27db94266eca1857a94aa958728ffcde0eb044 into 0884710944d6fde2bc950444bb9105ec4dd7c3d1",
-  "commit_sha": "31f16e727244a873cce8a79dbabe7eed3fac50c3",
+  "collection_duration_seconds": 8.294821739196777,
+  "commit_message": "refactor(au): one backend-factory seam for async_compute and the simple API (#24 item 1)\n\nau.base._backend_factory replaces the two override globals (au.base._default_backend\nand mock_async's overwrite of au.api._default_backend). mock_async installs a\nfactory building TrackingTestBackends that share one tracker and carry each\nsurface's middleware, so middleware given to async_compute now runs under the mock.",
+  "commit_sha": "ed27db94266eca1857a94aa958728ffcde0eb044",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35485,
-      "comment_lines_ratio": 0.06538832205291875,
-      "docs_lines": 42916,
-      "empty_lines": 71092,
-      "empty_lines_ratio": 0.1310014538928026,
-      "files_analyzed": 1333,
-      "function_lines": 325594,
-      "function_lines_ratio": 0.599973096533691,
-      "mean_lines_per_function": 15.969884245634686,
-      "num_classes": 3027,
-      "num_functions": 20388,
-      "pypi_version": "0.1.12",
-      "total_lines": 542681
+      "comment_lines": 35619,
+      "comment_lines_ratio": 0.06535776214024239,
+      "docs_lines": 42956,
+      "empty_lines": 71429,
+      "empty_lines_ratio": 0.13106599264199933,
+      "files_analyzed": 1348,
+      "function_lines": 327176,
+      "function_lines_ratio": 0.6003394588841895,
+      "mean_lines_per_function": 15.972271040812341,
+      "num_classes": 3042,
+      "num_functions": 20484,
+      "pypi_version": "0.1.11",
+      "total_lines": 544985
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-11-02T11:35:20Z",
+      "last_success_timestamp": "2026-11-02T11:41:25Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/41437954256",
+      "run_url": "https://github.com/i2mint/au/actions/runs/41438643638",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T11:41:19.789230Z",
+  "timestamp": "2026-11-02T11:41:40.445642Z",
   "workflow_status": {}
 }
