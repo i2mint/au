@@ -1,26 +1,22 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T12:25:20.410580Z
-commit_sha,96e1985dbbc91acdff50f90d9a9c84327a143322
-commit_message,"feat(au): opt-in reservation lease so a crash does not block its key (#36)
-
-reservation_lease_seconds / AU_RESERVATION_LEASE_SECONDS (default unset: no
-change): a resubmit takes over a key whose RUNNING record began at least the
-lease ago. Atomic through a new keyword-only stale_after on write_unless."
+timestamp,2026-11-02T12:25:28.714448Z
+commit_sha,c824edd28a64e605a3878ccb2c6d5bc9bd4a62bd
+commit_message,Merge 96e1985dbbc91acdff50f90d9a9c84327a143322 into 76bdab32333c73387d903e07f1b7d7f94ce3f22c
 python_version,3.10
-metrics.umpyre_stats.num_functions,20493
-metrics.umpyre_stats.num_classes,3043
-metrics.umpyre_stats.total_lines,545163
-metrics.umpyre_stats.empty_lines,71454
-metrics.umpyre_stats.comment_lines,35641
-metrics.umpyre_stats.docs_lines,42994
-metrics.umpyre_stats.function_lines,327297
-metrics.umpyre_stats.empty_lines_ratio,0.1310690564106515
-metrics.umpyre_stats.comment_lines_ratio,0.06537677722075783
-metrics.umpyre_stats.function_lines_ratio,0.6003653953037899
-metrics.umpyre_stats.mean_lines_per_function,15.971160884204362
-metrics.umpyre_stats.files_analyzed,1348
-metrics.umpyre_stats.pypi_version,0.1.15
+metrics.umpyre_stats.num_functions,20397
+metrics.umpyre_stats.num_classes,3028
+metrics.umpyre_stats.total_lines,542859
+metrics.umpyre_stats.empty_lines,71117
+metrics.umpyre_stats.comment_lines,35507
+metrics.umpyre_stats.docs_lines,42954
+metrics.umpyre_stats.function_lines,325715
+metrics.umpyre_stats.empty_lines_ratio,0.13100455182653323
+metrics.umpyre_stats.comment_lines_ratio,0.06540740781676273
+metrics.umpyre_stats.function_lines_ratio,0.5999992631604155
+metrics.umpyre_stats.mean_lines_per_function,15.968769917144678
+metrics.umpyre_stats.files_analyzed,1333
+metrics.umpyre_stats.pypi_version,0.1.16
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-11-02T12:14:36Z
 metrics.workflow_status.recent_failure_count,0
@@ -40,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.03281307220459
+collection_duration_seconds,7.398206472396851
