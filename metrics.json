@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.258531808853149,
-  "commit_message": "fix(au): timestamps hold across time zones and daylight saving (#39)\n\nDurations, expiry and the reservation lease compare in UTC (a naive time read\nas local). FileSystemStore keeps each time naive local and adds its UTC offset\nbeside it, so a reader elsewhere reads the same instant and an older au still\nreads naive times. HTTP timing carries offsets. In-memory times stay naive.",
-  "commit_sha": "ac40a531f6b5afb024942ad013abb24df21a32e9",
+  "collection_duration_seconds": 7.478384733200073,
+  "commit_message": "Merge ac40a531f6b5afb024942ad013abb24df21a32e9 into 28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896",
+  "commit_sha": "f56cb41708312aecdb341e04482580eabb94924d",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35511,
-      "comment_lines_ratio": 0.0654081493569884,
-      "docs_lines": 42968,
-      "empty_lines": 71131,
-      "empty_lines_ratio": 0.131017067159808,
-      "files_analyzed": 1333,
-      "function_lines": 325750,
-      "function_lines_ratio": 0.6000029470597553,
-      "mean_lines_per_function": 15.965789344704211,
-      "num_classes": 3028,
-      "num_functions": 20403,
-      "pypi_version": "0.1.16",
-      "total_lines": 542914
+      "comment_lines": 35645,
+      "comment_lines_ratio": 0.06537751871728373,
+      "docs_lines": 43008,
+      "empty_lines": 71468,
+      "empty_lines_ratio": 0.13108151234918877,
+      "files_analyzed": 1348,
+      "function_lines": 327332,
+      "function_lines_ratio": 0.6003690267012461,
+      "mean_lines_per_function": 15.96819357041807,
+      "num_classes": 3043,
+      "num_functions": 20499,
+      "pypi_version": "0.1.17",
+      "total_lines": 545218
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T12:37:59.964472Z",
+  "timestamp": "2026-11-02T12:38:05.020745Z",
   "workflow_status": {}
 }
