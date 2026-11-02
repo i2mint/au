@@ -1,65 +1,32 @@
 metric,value
 schema_version,1.0
-timestamp,2026-10-27T14:32:31.107560Z
-commit_sha,d6f398c8a8ba041848ac1f59fd47414984805a2d
-commit_message,"HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (#27)
+timestamp,2026-11-02T11:19:04.355996Z
+commit_sha,a3ef0b283bff6a1726c8d2589d97f6708b382e36
+commit_message,"fix(au): compare-and-set for RUNNING, outcome and CANCELLED writes (#28)
 
-* HTTP endpoints report timing; RUNNING says when it began; mock keeps API results in memory (part of #24)
-
-- The status and result endpoints read created_at/completed_at/duration
-  from the stored result (they read them off handle.metadata, a plain dict,
-  so they were never sent); one _timing helper for both.
-- _mark_running writes started_at, so a running job shows when it began.
-- mock_async also swaps the simple API's default store for an in-memory one.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Review fixes: zero durations, one read, started_at in responses, no made-up times (part of #24)
-
-- _timing reports a zero duration as 0.0 (a timedelta(0) reached the
-  response model: HTTP 500), sends started_at (when the run began; created_at
-  is when the record was written), and nothing for a PENDING record, which
-  FileSystemStore makes up, stamped now, for any unknown id.
-- /status reads the store once, so status and timing agree; the Flask status
-  route reports timing too.
-- mock_async(store=...) keeps the simple API's results where the caller can
-  read them after the block.
-- ComputationHandle treats a key nothing has written yet as PENDING:
-  get_result right after submit_task on an InMemoryStore raised KeyError.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
-* Re-review fixes: unknown task results are 404 again, at once (part of #24)
-
-With a handle now reading an unwritten key as PENDING, the FastAPI and
-Flask /result routes check the key exists first (Flask had lost its 404
-on InMemoryStore; FastAPI waited out the timeout before it). Docstrings
-say a typo'd key reads PENDING, and that cancel() works before the
-first write; tested.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-
----------
-
-Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>"
+A worker's RUNNING could land on a CANCELLED written between its read and its
+write. The three conditional writes now go through ComputationStore.write_unless
+under ComputationStore.exclusive: a per-store in-process lock, plus a POSIX
+record lock (lockf) for FileSystemStore, falling back to the in-process lock
+where the filesystem refuses locks."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20388
-metrics.umpyre_stats.num_classes,3036
-metrics.umpyre_stats.total_lines,542559
-metrics.umpyre_stats.empty_lines,71109
-metrics.umpyre_stats.comment_lines,35360
-metrics.umpyre_stats.docs_lines,42496
-metrics.umpyre_stats.function_lines,325331
-metrics.umpyre_stats.empty_lines_ratio,0.1310622439218592
-metrics.umpyre_stats.comment_lines_ratio,0.06517263560276394
-metrics.umpyre_stats.function_lines_ratio,0.5996232667783596
-metrics.umpyre_stats.mean_lines_per_function,15.956984500686678
-metrics.umpyre_stats.files_analyzed,1347
-metrics.umpyre_stats.pypi_version,0.1.9
+metrics.umpyre_stats.num_functions,20380
+metrics.umpyre_stats.num_classes,3027
+metrics.umpyre_stats.total_lines,542514
+metrics.umpyre_stats.empty_lines,71065
+metrics.umpyre_stats.comment_lines,35483
+metrics.umpyre_stats.docs_lines,42877
+metrics.umpyre_stats.function_lines,325462
+metrics.umpyre_stats.empty_lines_ratio,0.13099201126606871
+metrics.umpyre_stats.comment_lines_ratio,0.06540476374803231
+metrics.umpyre_stats.function_lines_ratio,0.5999144722532506
+metrics.umpyre_stats.mean_lines_per_function,15.969676153091266
+metrics.umpyre_stats.files_analyzed,1333
+metrics.umpyre_stats.pypi_version,0.1.10
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-10-27T14:30:53Z
+metrics.workflow_status.last_success_timestamp,2026-10-27T14:34:18Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40521608367
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/40522304354
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -75,4 +42,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.573906898498535
+collection_duration_seconds,5.147980690002441
