@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 4.515158653259277,
+  "collection_duration_seconds": 7.16526985168457,
   "commit_message": "feat(au): the retry and http settings take effect; metrics_enabled removed (#25) (#33)\n\nsubmit_task builds a RetryPolicy from the retry_* settings when retry_enabled\nand no retry_policy is passed; au.http.serve defaults to the http_* settings;\nmetrics_enabled, which nothing read, is dropped with a FutureWarning for config\nfiles and AU_METRICS_ENABLED that still set it.",
   "commit_sha": "af53cbfe382627cf02f93df930fca6fe3176b044",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35485,
-      "comment_lines_ratio": 0.0653926600263524,
-      "docs_lines": 42909,
-      "empty_lines": 71087,
-      "empty_lines_ratio": 0.13100093062683707,
-      "files_analyzed": 1333,
-      "function_lines": 325564,
-      "function_lines_ratio": 0.5999576150153415,
-      "mean_lines_per_function": 15.969979397625822,
-      "num_classes": 3027,
-      "num_functions": 20386,
+      "comment_lines": 35619,
+      "comment_lines_ratio": 0.06536207975425223,
+      "docs_lines": 42949,
+      "empty_lines": 71424,
+      "empty_lines_ratio": 0.1310654758518687,
+      "files_analyzed": 1348,
+      "function_lines": 327146,
+      "function_lines_ratio": 0.6003240670227856,
+      "mean_lines_per_function": 15.972365979884778,
+      "num_classes": 3042,
+      "num_functions": 20482,
       "pypi_version": "0.1.11",
-      "total_lines": 542645
+      "total_lines": 544949
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T11:33:33.402725Z",
+  "timestamp": "2026-11-02T11:33:43.150325Z",
   "workflow_status": {}
 }

@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T11:33:33.402725Z
+timestamp,2026-11-02T11:33:43.150325Z
 commit_sha,af53cbfe382627cf02f93df930fca6fe3176b044
 commit_message,"feat(au): the retry and http settings take effect; metrics_enabled removed (#25) (#33)
 
@@ -9,18 +9,18 @@ and no retry_policy is passed; au.http.serve defaults to the http_* settings;
 metrics_enabled, which nothing read, is dropped with a FutureWarning for config
 files and AU_METRICS_ENABLED that still set it."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20386
-metrics.umpyre_stats.num_classes,3027
-metrics.umpyre_stats.total_lines,542645
-metrics.umpyre_stats.empty_lines,71087
-metrics.umpyre_stats.comment_lines,35485
-metrics.umpyre_stats.docs_lines,42909
-metrics.umpyre_stats.function_lines,325564
-metrics.umpyre_stats.empty_lines_ratio,0.13100093062683707
-metrics.umpyre_stats.comment_lines_ratio,0.0653926600263524
-metrics.umpyre_stats.function_lines_ratio,0.5999576150153415
-metrics.umpyre_stats.mean_lines_per_function,15.969979397625822
-metrics.umpyre_stats.files_analyzed,1333
+metrics.umpyre_stats.num_functions,20482
+metrics.umpyre_stats.num_classes,3042
+metrics.umpyre_stats.total_lines,544949
+metrics.umpyre_stats.empty_lines,71424
+metrics.umpyre_stats.comment_lines,35619
+metrics.umpyre_stats.docs_lines,42949
+metrics.umpyre_stats.function_lines,327146
+metrics.umpyre_stats.empty_lines_ratio,0.1310654758518687
+metrics.umpyre_stats.comment_lines_ratio,0.06536207975425223
+metrics.umpyre_stats.function_lines_ratio,0.6003240670227856
+metrics.umpyre_stats.mean_lines_per_function,15.972365979884778
+metrics.umpyre_stats.files_analyzed,1348
 metrics.umpyre_stats.pypi_version,0.1.11
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-11-02T11:31:59Z
@@ -41,4 +41,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,4.515158653259277
+collection_duration_seconds,7.16526985168457
