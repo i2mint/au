@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from datetime import datetime, timedelta
 import pytest
+import au.base as au_base
 from au.testing import InMemoryStore
 from au.base import (
     async_compute,
@@ -306,6 +307,147 @@ def test_a_worker_starting_late_does_not_undo_a_cancellation(tmp_path):
     fresh = store.create_key()
     _mark_running(store, fresh)
     assert store[fresh].status == ComputationStatus.RUNNING
+
+
+@pytest.mark.parametrize(
+    "make_store, read",
+    # The read the compare-and-set makes (InMemoryStore's goes through
+    # __getitem__); on master, _mark_running's read went through the same.
+    [("file", "_read"), ("memory", "__getitem__")],
+)
+def test_a_cancel_between_the_running_read_and_write_is_not_lost(
+    tmp_path, monkeypatch, make_store, read
+):
+    """i2mint/au#28: RUNNING written over a CANCELLED that landed between the
+    worker's read and its write, so the job read back unfinished."""
+    from au.base import _mark_running
+
+    store = (
+        FileSystemStore(tmp_path, auto_cleanup=False)
+        if make_store == "file"
+        else InMemoryStore()
+    )
+    real_read = getattr(type(store), read)
+    cancellers = []
+
+    def read_then_cancel(self, key):
+        try:
+            return real_read(self, key)
+        finally:  # after the read, whether it found the key or raised KeyError
+            if not cancellers:
+                handle = ComputationHandle(key, self, None)
+                cancellers.append(threading.Thread(target=handle.cancel))
+                cancellers[0].start()
+                cancellers[0].join(0.2)  # unlocked, it lands now; locked, it waits
+
+    monkeypatch.setattr(type(store), read, read_then_cancel)
+    _mark_running(store, "k")
+    cancellers[0].join()
+    assert store["k"].status == ComputationStatus.CANCELLED
+
+
+def test_a_thread_job_cancelled_right_after_launch_never_ends_running(tmp_path):
+    """i2mint/au#28, as reelee#765 saw it: about 5% of cancels just after
+    launch read back RUNNING. Once every job has ended, each cancelled one
+    must read CANCELLED."""
+    from au.base import ThreadBackend
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    ended = threading.Semaphore(0)
+
+    class _Ended(Middleware):
+        """Released once a job's outcome is recorded (or refused)."""
+
+        def before_compute(self, func, args, kwargs, key):
+            pass
+
+        def after_compute(self, key, result):
+            ended.release()
+
+        def on_error(self, key, error):
+            ended.release()
+
+    backend = ThreadBackend(store, middleware=[_Ended()])
+    wrapped = async_compute(backend=backend, store=store)(_double)
+    runs = 150
+    cancelled = []
+    for i in range(runs):
+        handle = wrapped(i)
+        if handle.cancel():
+            cancelled.append(handle)
+    for _ in range(runs):
+        assert ended.acquire(timeout=5)
+    left = [h.get_status() for h in cancelled]
+    assert left == [ComputationStatus.CANCELLED] * len(cancelled)
+
+
+def _mark_running_in(base_path, key):
+    from au.base import _mark_running
+
+    _mark_running(FileSystemStore(base_path, auto_cleanup=False), key)
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="record locks are POSIX")
+def test_a_file_store_holds_off_a_writer_in_another_process(tmp_path):
+    """The queue's process pool and ProcessBackend write from child processes:
+    an in-process lock would not hold them off."""
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    ctx = __import__("multiprocessing").get_context("fork")
+    with store.exclusive("k"):
+        child = ctx.Process(target=_mark_running_in, args=(tmp_path, "k"))
+        child.start()
+        child.join(0.5)
+        assert child.is_alive(), "the child wrote while the lock was held"
+        store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+    child.join(5)
+    assert child.exitcode == 0  # not still blocked, say on an inherited lock
+    assert store["k"].status == ComputationStatus.CANCELLED
+    assert list(store) == ["k"]  # the lock file is not a key
+
+
+@pytest.mark.skipif(au_base.fcntl is None, reason="record locks are POSIX")
+def test_a_file_store_without_record_locks_still_writes(tmp_path, monkeypatch, caplog):
+    """NFS without lockd and some FUSE mounts refuse ``lockf`` (ENOLCK): the
+    writes go on, held off in this process only, with one warning."""
+    import errno
+    from au import base
+
+    def no_locks(*args):
+        raise OSError(errno.ENOLCK, "No locks available")
+
+    monkeypatch.setattr(base.fcntl, "lockf", no_locks)
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    with caplog.at_level(logging.WARNING, logger="au.base"):
+        base._mark_running(store, "k")
+        base._record_unless_cancelled(
+            store, "k", ComputationResult(1, ComputationStatus.COMPLETED)
+        )
+        assert ComputationHandle("j", store, None).cancel()
+    assert store["k"].value == 1 and store["j"].status == ComputationStatus.CANCELLED
+    warned = [r for r in caplog.records if "No file lock" in r.getMessage()]
+    assert len(warned) == 1
+
+
+class _UnreadableStore(InMemoryStore):
+    """A store whose reads fail (a dropped connection)."""
+
+    def _read(self, key):
+        raise ConnectionError("store unreachable")
+
+
+def test_a_read_that_fails_stops_a_cancel_but_not_an_outcome():
+    """A cancel or a RUNNING mark on a store it cannot read raises, as before
+    the compare-and-set; a worker's outcome is written rather than lost."""
+    from au.base import _mark_running, _record_unless_cancelled
+
+    store = _UnreadableStore()
+    with pytest.raises(ConnectionError):
+        ComputationHandle("k", store, None).cancel()
+    with pytest.raises(ConnectionError):
+        _mark_running(store, "k")
+    done = ComputationResult(1, ComputationStatus.COMPLETED)
+    assert _record_unless_cancelled(store, "k", done) is done
+    assert store["k"] is done
 
 
 # --- review of au#8 -----------------------------------------------------------
