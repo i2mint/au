@@ -43,6 +43,7 @@ from au.base import (
     ComputationResult,
     ComputationBackend,
     ComputationStore,
+    moment_iso,
 )
 from au.api import (
     submit_task,
@@ -119,16 +120,17 @@ def _timing(result: ComputationResult) -> dict[str, Any]:
     """The timing fields of a task's response, from its stored result.
 
     ``created_at`` is when this record was written, ``started_at`` when the run
-    began. A PENDING record gets none: FileSystemStore reports any unknown id as
-    PENDING, stamped with the time of the read.
+    began; each with its UTC offset, so a client anywhere reads the instant. A
+    PENDING record gets none: FileSystemStore reports any unknown id as PENDING,
+    stamped with the time of the read.
     """
     if result.status == ComputationStatus.PENDING:
         return {}
     duration = result.duration
     return {
-        "created_at": result.created_at.isoformat(),
-        "started_at": result.started_at and result.started_at.isoformat(),
-        "completed_at": result.completed_at and result.completed_at.isoformat(),
+        "created_at": moment_iso(result.created_at),
+        "started_at": moment_iso(result.started_at),
+        "completed_at": moment_iso(result.completed_at),
         "duration": None if duration is None else duration.total_seconds(),
     }
 

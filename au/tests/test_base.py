@@ -1483,3 +1483,99 @@ def test_cancel_still_restates_itself_where_the_lock_stays_in_process(
     store = FileSystemStore(tmp_path / "nolocks", auto_cleanup=False)
     assert _cancel_during_a_resubmit(store) == ComputationStatus.CANCELLED
     assert not store.compare_and_set_spans_writers
+
+
+# --- i2mint/au#39: timestamps across time zones and daylight saving -----------
+
+
+@pytest.fixture
+def local_zone(monkeypatch):
+    """Switch this process's local time zone (``TZ`` + ``tzset``), restored after."""
+    if not hasattr(time, "tzset"):
+        pytest.skip("time.tzset is POSIX")
+
+    def switch(zone):
+        monkeypatch.setenv("TZ", zone)
+        time.tzset()
+
+    yield switch
+    monkeypatch.undo()
+    time.tzset()
+
+
+def test_a_record_written_in_another_time_zone_reads_as_the_same_instant(
+    tmp_path, local_zone
+):
+    """A writer in New York stored its naive local time; a reader in Tokyo took
+    it for its own local time, so the record looked 14 h old (i2mint/au#39)."""
+    local_zone("America/New_York")
+    store = FileSystemStore(tmp_path, ttl_seconds=3600, auto_cleanup=False)
+    store["k"] = ComputationResult(1, ComputationStatus.COMPLETED)  # au's naive now
+    written = time.time()
+    local_zone("Asia/Tokyo")
+    read = store["k"]
+    assert read.created_at.tzinfo is None  # au's own times stay naive local
+    assert abs(read.created_at.timestamp() - written) < 5  # the same instant
+    assert not store.is_expired(read)
+
+
+def test_an_older_reader_still_reads_a_naive_time(tmp_path):
+    """The offset sits beside the time, not in it: an au from before #39
+    reading this record gets a naive time it can compare with its own."""
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    store["k"] = ComputationResult(1, ComputationStatus.COMPLETED)
+    stored = json.loads((tmp_path / "k.json").read_text())
+    for name in ["created_at", "completed_at"]:
+        assert datetime.fromisoformat(stored[name]).tzinfo is None
+        assert isinstance(stored[name + "_utcoffset"], float)
+
+
+def test_a_time_in_the_repeated_daylight_saving_hour_survives_the_store(
+    tmp_path, local_zone
+):
+    """New York repeats 01:00-02:00 on 2026-11-01: the second 01:30 (fold=1)
+    must not read back as the first."""
+    local_zone("America/New_York")
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    record = ComputationResult(1, ComputationStatus.COMPLETED)
+    record.started_at = datetime(2026, 11, 1, 1, 50)  # EDT, the first pass
+    record.completed_at = datetime(2026, 11, 1, 1, 30, fold=1)  # EST, the second
+    store["k"] = record
+    assert record.duration == store["k"].duration == timedelta(minutes=40)
+
+
+def test_an_aware_time_can_be_measured_against_a_naive_one():
+    from datetime import timezone
+
+    store = InMemoryStore(ttl_seconds=60)
+    record = ComputationResult(1, ComputationStatus.COMPLETED)
+    record.created_at = datetime.now(timezone.utc) - timedelta(seconds=120)
+    record.completed_at = datetime.now()  # naive local, as au writes it
+    assert store.is_expired(record)  # no TypeError
+    assert timedelta(seconds=119) < record.duration < timedelta(seconds=125)
+
+
+def test_a_record_stored_without_an_offset_reads_as_before(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    written = datetime(2026, 1, 2, 3, 4, 5)
+    record = {"value": 1, "status": "completed", "created_at": written.isoformat()}
+    (tmp_path / "old.json").write_text(json.dumps(record))
+    assert store["old"].created_at == written
+
+
+def test_a_duration_across_a_daylight_saving_change_is_the_time_that_passed(
+    local_zone,
+):
+    """New York's clocks jump 02:00 -> 03:00 on 2026-03-08: from 01:30 to 03:30
+    on the wall is one hour."""
+    local_zone("America/New_York")
+    record = ComputationResult(1, ComputationStatus.COMPLETED)
+    record.started_at = datetime(2026, 3, 8, 1, 30)
+    record.completed_at = datetime(2026, 3, 8, 3, 30)
+    assert record.duration == timedelta(hours=1)
+
+
+def test_a_record_without_its_creation_time_still_reads_as_failed(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    (tmp_path / "bad.json").write_text(json.dumps({"value": 1, "status": "completed"}))
+    assert store["bad"].status == ComputationStatus.FAILED

@@ -217,6 +217,61 @@ _FINISHED = frozenset(
 _CANCELLED = frozenset({ComputationStatus.CANCELLED})
 
 
+def _as_utc(moment: datetime) -> datetime:
+    """``moment`` in UTC, to measure time with: a naive one is read as this
+    machine's local time, as au writes it, so a daylight-saving change between
+    two moments does not count (i2mint/au#39)."""
+    return moment.astimezone(timezone.utc)
+
+
+def _local_naive(moment: datetime) -> datetime:
+    """``moment`` as this machine's naive local time, as au's own times are
+    (``datetime.now()``); ``fromtimestamp`` keeps ``fold`` for the hour a
+    daylight-saving change repeats."""
+    return datetime.fromtimestamp(moment.timestamp()) if moment.tzinfo else moment
+
+
+def moment_iso(moment: datetime | None) -> str | None:
+    """ISO 8601 with its UTC offset (a naive moment read as local time), so a
+    reader in another time zone reads the same instant."""
+    return moment and moment.astimezone().isoformat()
+
+
+#: The suffix of the key, beside each stored time, holding its UTC offset in
+#: seconds. Beside it, not inside it: the time itself stays naive local, which
+#: an au from before i2mint/au#39 sharing the store still reads (an offset in
+#: it would make that reader's comparisons raise).
+_UTC_OFFSET_SUFFIX = "_utcoffset"
+
+
+def _stamp(name: str, moment: datetime | None) -> dict[str, Any]:
+    """How a store writes a moment: naive local ISO under ``name``, its UTC
+    offset in seconds under ``name + _UTC_OFFSET_SUFFIX``."""
+    if moment is None:
+        return {name: None}
+    moment = _local_naive(moment)
+    offset = moment.astimezone().utcoffset().total_seconds()
+    return {name: moment.isoformat(), name + _UTC_OFFSET_SUFFIX: offset}
+
+
+def _missing(name: str):
+    """Raise for a required field a stored record lacks (read as FAILED)."""
+    raise KeyError(name)
+
+
+def _read_stamp(stored: Mapping[str, Any], name: str) -> datetime | None:
+    """A stored moment as this machine's naive local time. One stored without
+    an offset (before i2mint/au#39) is taken as written: local time."""
+    text = stored.get(name)
+    if not text:
+        return None
+    moment = datetime.fromisoformat(text)
+    offset = stored.get(name + _UTC_OFFSET_SUFFIX)
+    if isinstance(offset, (int, float)) and moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone(timedelta(seconds=offset)))
+    return _local_naive(moment)
+
+
 class ComputationCancelledError(Exception):
     """Raised by :meth:`ComputationHandle.get_result` when a computation was cancelled.
 
@@ -266,7 +321,9 @@ class ComputationResult:
     def duration(self) -> timedelta | None:
         """How long the run took (from the record's creation, if no start)."""
         if self.completed_at:
-            return self.completed_at - (self.started_at or self.created_at)
+            return _as_utc(self.completed_at) - _as_utc(
+                self.started_at or self.created_at
+            )
         return None
 
 
@@ -304,8 +361,8 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         if self.ttl_seconds is None or not result.is_ready:
             return False
 
-        expiry_time = result.created_at + timedelta(seconds=self.ttl_seconds)
-        return datetime.now() > expiry_time
+        expiry_time = _as_utc(result.created_at) + timedelta(seconds=self.ttl_seconds)
+        return datetime.now(timezone.utc) > expiry_time
 
     @abstractmethod
     def cleanup_expired(self) -> int:
@@ -438,7 +495,7 @@ def _set_unless(
     def is_stale(record: ComputationResult) -> bool:
         if stale_after is None:
             return False
-        began = (record.started_at or record.created_at).astimezone(timezone.utc)
+        began = _as_utc(record.started_at or record.created_at)
         return datetime.now(timezone.utc) - began >= stale_after
 
     current = read(key)
@@ -721,13 +778,11 @@ class FileSystemStore(ComputationStore):
                 if result.error
                 else None
             ),
-            "created_at": result.created_at.isoformat(),
-            "completed_at": (
-                result.completed_at.isoformat() if result.completed_at else None
-            ),
+            **_stamp("created_at", result.created_at),
+            **_stamp("completed_at", result.completed_at),
             "metadata": result.metadata,
             "terminal_reason": result.terminal_reason,
-            "started_at": result.started_at and result.started_at.isoformat(),
+            **_stamp("started_at", result.started_at),
             **_error_identity(result.error),
         }
 
@@ -753,15 +808,13 @@ class FileSystemStore(ComputationStore):
                 if obj.get("error")
                 else None
             ),
-            created_at=datetime.fromisoformat(obj["created_at"]),
+            created_at=_read_stamp(obj, "created_at") or _missing("created_at"),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
-            started_at=obj.get("started_at")
-            and datetime.fromisoformat(obj["started_at"]),
+            started_at=_read_stamp(obj, "started_at"),
         )
         # What was stored, not the read time __post_init__ would stamp.
-        completed_at = obj.get("completed_at")
-        result.completed_at = completed_at and datetime.fromisoformat(completed_at)
+        result.completed_at = _read_stamp(obj, "completed_at")
         return result
 
     def __getitem__(self, key: str) -> ComputationResult:
