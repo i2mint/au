@@ -1379,6 +1379,9 @@ def async_compute(
     """
     Decorator to make functions asynchronous with status tracking.
 
+    It does not read the au settings (``AU_RETRY_*`` and the like): those
+    configure the simple API (:func:`au.submit_task`).
+
     Args:
         backend: Backend to execute computations (default: the module's
             ``_default_backend``, else ProcessBackend). ``@async_compute`` may
