@@ -327,8 +327,9 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         another's read and write (i2mint/au#28). This default reads (with
         :meth:`_read`) and writes under :meth:`exclusive`. A store with an
         atomic conditional write of its own (one ``UPDATE ... WHERE status NOT
-        IN ...`` on a database) overrides this method whole instead. A read
-        that fails raises.
+        IN ...`` on a database) overrides this method whole instead, and
+        answers True to :attr:`compare_and_set_spans_writers`. A read that
+        fails raises.
 
         >>> from au.testing import InMemoryStore
         >>> store = InMemoryStore()
@@ -348,6 +349,15 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         effect: :meth:`write_unless` reads under the lock that holds off every
         writer. Override where reading does more (a cleanup sweep)."""
         return self.get(key)
+
+    @property
+    def compare_and_set_spans_writers(self) -> bool:
+        """Whether every compare-and-set write to this store, from whatever
+        process or machine, goes through this :meth:`write_unless` (default:
+        no, its lock holds off this process only). A store that can say yes (one living in a single
+        process, or whose compare-and-set is atomic where the data lives) lets
+        :meth:`ComputationHandle.cancel` trust it rather than restate itself."""
+        return False
 
     def _lock_identity(self) -> Hashable:
         """What tells stores sharing one in-process lock apart: two instances
@@ -589,6 +599,14 @@ class FileSystemStore(ComputationStore):
     def create_key(self) -> str:
         """Generate a unique filename."""
         return str(uuid.uuid4())
+
+    @property
+    def compare_and_set_spans_writers(self) -> bool:
+        """Yes, where record locks work in this directory (POSIX, and not a
+        filesystem found to refuse them). It is this process's finding: it
+        assumes the other writers' locks work too, which a filesystem whose
+        lock service fails for some processes only would belie."""
+        return fcntl is not None and self._lock_identity() not in _UNLOCKABLE_DIRS
 
     def _lock_identity(self) -> Hashable:
         """The directory: two instances over one directory share a lock."""
@@ -1440,12 +1458,13 @@ class ComputationHandle(Generic[T]):
             return False
         if self.backend:
             self.backend.terminate(self.key)
-            # Matters only where the compare-and-set does not span processes (a
-            # FileSystemStore on Windows, or on a filesystem without record
-            # locks) and the backend's terminate waits for the worker process
-            # to exit (ProcessBackend): that worker may have written RUNNING
-            # over the CANCELLED, and nothing of it writes after this.
-            self.store[self.key] = cancelled
+            # Only where the compare-and-set does not span processes: a worker
+            # process may then have written over the CANCELLED, and once a
+            # terminate that waits for it (ProcessBackend) returns, nothing of
+            # it writes again. Elsewhere this write could only clobber a job
+            # resubmitted under the key meanwhile (i2mint/au#30).
+            if not getattr(self.store, "compare_and_set_spans_writers", False):
+                self.store[self.key] = cancelled
         return True
 
     @property

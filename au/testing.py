@@ -37,6 +37,11 @@ class InMemoryStore(ComputationStore):
         super().__init__(ttl_seconds=ttl_seconds)
         self._data: dict[str, ComputationResult] = {}
 
+    @property
+    def compare_and_set_spans_writers(self) -> bool:
+        """Yes: nothing in another process can write to this memory."""
+        return True
+
     def create_key(self) -> str:
         """Create a unique key for a computation."""
         return str(uuid.uuid4())

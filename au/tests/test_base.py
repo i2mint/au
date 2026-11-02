@@ -1428,3 +1428,58 @@ def test_get_result_chains_the_rebuilt_error_and_names_a_silent_one(tmp_path):
             ComputationHandle(key, store).get_result(timeout=1)
         cause = raised.value.__cause__
         assert type(cause).__name__ == type(error).__name__
+
+
+# --- i2mint/au#30: cancel's re-write after terminate --------------------------
+
+
+class _ResubmittedWhileTerminating(au_base.ComputationBackend):
+    """A terminate that waits, during which another caller resubmits the key."""
+
+    def __init__(self, store):
+        super().__init__()
+        self.store = store
+
+    def launch(self, func, args, kwargs, key, store=None):
+        pass
+
+    def terminate(self, key):
+        self.store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+
+
+def _cancel_during_a_resubmit(store):
+    store["k"] = ComputationResult(None, ComputationStatus.RUNNING)
+    handle = ComputationHandle("k", store, _ResubmittedWhileTerminating(store))
+    assert handle.cancel()
+    return store["k"].status
+
+
+@pytest.mark.skipif(au_base.fcntl is None, reason="record locks are POSIX")
+def test_cancel_does_not_clobber_a_job_resubmitted_while_it_terminates(tmp_path):
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    assert store.compare_and_set_spans_writers
+    assert _cancel_during_a_resubmit(store) == ComputationStatus.RUNNING
+
+
+def test_cancel_does_not_clobber_a_resubmit_on_an_in_memory_store():
+    assert InMemoryStore().compare_and_set_spans_writers
+    assert _cancel_during_a_resubmit(InMemoryStore()) == ComputationStatus.RUNNING
+
+
+def test_cancel_still_restates_itself_where_the_lock_stays_in_process(
+    tmp_path, monkeypatch
+):
+    """There a worker process may have written over the CANCELLED: the
+    re-write is what keeps it (and a resubmit in that window is clobbered,
+    the part of i2mint/au#30 left open)."""
+    monkeypatch.setattr(au_base, "_UNLOCKABLE_DIRS", set())
+    assert _cancel_during_a_resubmit({}) == ComputationStatus.CANCELLED
+    if au_base.fcntl is not None:  # a filesystem that refuses record locks
+
+        def refuse(*args):
+            raise OSError(37, "No locks available")
+
+        monkeypatch.setattr(au_base.fcntl, "lockf", refuse)
+    store = FileSystemStore(tmp_path / "nolocks", auto_cleanup=False)
+    assert _cancel_during_a_resubmit(store) == ComputationStatus.CANCELLED
+    assert not store.compare_and_set_spans_writers
