@@ -1,8 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T11:51:45.193499Z
-commit_sha,f649369064e0ef0695ae4a856bcfb697880fda71
-commit_message,"fix(au): a stored error keeps its type through FileSystemStore (#24 item 4)
+timestamp,2026-11-02T11:53:41.962072Z
+commit_sha,f4deb549f4d4cb8da79f2f8dcff44132c35c6286
+commit_message,"fix(au): a stored error keeps its type through FileSystemStore (#24 item 4) (#35)
 
 Records keep error_type (and error_args when JSON-safe). A builtin Exception
 class is rebuilt as itself when that gives back the stored message; any other
@@ -21,11 +21,11 @@ metrics.umpyre_stats.comment_lines_ratio,0.06538620975542352
 metrics.umpyre_stats.function_lines_ratio,0.5999815761595505
 metrics.umpyre_stats.mean_lines_per_function,15.968959937233365
 metrics.umpyre_stats.files_analyzed,1333
-metrics.umpyre_stats.pypi_version,0.1.12
+metrics.umpyre_stats.pypi_version,0.1.13
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-11-02T11:44:55Z
+metrics.workflow_status.last_success_timestamp,2026-11-02T11:51:44Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41439173224
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41439955559
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -41,4 +41,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.293881893157959
+collection_duration_seconds,6.111892938613892

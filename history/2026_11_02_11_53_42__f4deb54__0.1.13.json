@@ -1,0 +1,47 @@
+{
+  "collection_duration_seconds": 6.111892938613892,
+  "commit_message": "fix(au): a stored error keeps its type through FileSystemStore (#24 item 4) (#35)\n\nRecords keep error_type (and error_args when JSON-safe). A builtin Exception\nclass is rebuilt as itself when that gives back the stored message; any other\nbecomes an au.StoredError stand-in named after it. Old records read as before.\nget_result names a silent cause.",
+  "commit_sha": "f4deb549f4d4cb8da79f2f8dcff44132c35c6286",
+  "metrics": {
+    "coverage": {
+      "branch_coverage": 0.0,
+      "error": "No coverage file found",
+      "line_coverage": 0.0,
+      "statements_covered": 0,
+      "statements_total": 0
+    },
+    "umpyre_stats": {
+      "comment_lines": 35490,
+      "comment_lines_ratio": 0.06538620975542352,
+      "docs_lines": 42933,
+      "empty_lines": 71107,
+      "empty_lines_ratio": 0.1310064022845562,
+      "files_analyzed": 1333,
+      "function_lines": 325655,
+      "function_lines_ratio": 0.5999815761595505,
+      "mean_lines_per_function": 15.968959937233365,
+      "num_classes": 3028,
+      "num_functions": 20393,
+      "pypi_version": "0.1.13",
+      "total_lines": 542775
+    },
+    "wily": {
+      "cyclomatic_avg": 0.0,
+      "error": "wily report failed: Usage: wily report [OPTIONS] FILE [METRICS]...\nTry 'wily report --help' for help.\n\nError: Invalid value for '-f' / '--format': 'json' is not one of 'CONSOLE', 'HTML'.\n",
+      "files_analyzed": 0,
+      "maintainability_index": 0.0,
+      "total_loc": 0
+    },
+    "workflow_status": {
+      "last_run_status": "success",
+      "last_success_timestamp": "2026-11-02T11:51:44Z",
+      "recent_failure_count": 0,
+      "run_url": "https://github.com/i2mint/au/actions/runs/41439955559",
+      "total_runs_analyzed": 10
+    }
+  },
+  "python_version": "3.10",
+  "schema_version": "1.0",
+  "timestamp": "2026-11-02T11:53:41.962072Z",
+  "workflow_status": {}
+}
