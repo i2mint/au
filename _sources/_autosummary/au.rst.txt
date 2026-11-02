@@ -75,6 +75,7 @@
    .. autosummary::
    
       ComputationCancelledError
+      StoredError
       RetryableError
       NonRetryableError
    

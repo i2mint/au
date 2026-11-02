@@ -175,6 +175,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.base.StdLibQueueBackend.terminate"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.terminate()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#au.base.StoredError"><code class="docutils literal notranslate"><span class="pre">StoredError</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ThreadBackend"><code class="docutils literal notranslate"><span class="pre">ThreadBackend</span></code></a><ul>
 <li><a class="reference internal" href="#au.base.ThreadBackend.launch"><code class="docutils literal notranslate"><span class="pre">ThreadBackend.launch()</span></code></a></li>
 </ul>
@@ -361,6 +362,9 @@ and retrieve results later.</p>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.base.ComputationCancelledError" title="au.base.ComputationCancelledError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></p></td>
 <td><p>Raised by <a class="reference internal" href="#au.base.ComputationHandle.get_result" title="au.base.ComputationHandle.get_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationHandle.get_result()</span></code></a> when a computation was cancelled.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.StoredError" title="au.base.StoredError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StoredError</span></code></a></p></td>
+<td><p>Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin <code class="docutils literal notranslate"><span class="pre">Exception</span></code> one, or one whose rebuilt message would differ.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1006,6 +1010,19 @@ task queuing. Not persistent across application restarts.</p>
 
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="au.base.StoredError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">StoredError</span></span><a class="reference internal" href="../_modules/au/base.html#StoredError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.StoredError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin <code class="docutils literal notranslate"><span class="pre">Exception</span></code> one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+<code class="docutils literal notranslate"><span class="pre">au.stored.&lt;module&gt;.&lt;name&gt;</span></code> (<code class="docutils literal notranslate"><span class="pre">type_name</span></code> holds the original’s full
+name); its message is the original’s. <code class="docutils literal notranslate"><span class="pre">except</span></code> the original class does
+not match it: test <code class="docutils literal notranslate"><span class="pre">isinstance(error.__cause__,</span> <span class="pre">au.StoredError)</span></code> on what
+<code class="docutils literal notranslate"><span class="pre">get_result</span></code> raises.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="au.base.ThreadBackend">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ThreadBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ThreadBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ThreadBackend" title="Link to this definition">#</a></dt>
@@ -1160,7 +1177,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=8d02545a"></script>
+      <script src="../_static/documentation_options.js?v=468bc497"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

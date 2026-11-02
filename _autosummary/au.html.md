@@ -70,10 +70,11 @@ A lightweight, convention-over-configuration async framework for Python.
 
 ### Exceptions
 
-| [`ComputationCancelledError`](#au.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](#au.ComputationHandle.get_result) when a computation was cancelled.   |
-|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| [`RetryableError`](#au.RetryableError)              | Base class for errors that should be retried.                                                                                 |
-| [`NonRetryableError`](#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                             |
+| [`ComputationCancelledError`](#au.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](#au.ComputationHandle.get_result) when a computation was cancelled.                                            |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StoredError`](#au.StoredError)                 | Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin `Exception` one, or one whose rebuilt message would differ. |
+| [`RetryableError`](#au.RetryableError)              | Base class for errors that should be retried.                                                                                                                          |
+| [`NonRetryableError`](#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                                                                      |
 
 ### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
@@ -858,6 +859,18 @@ Attempt to cancel a running task.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *exception* au.StoredError
+
+Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
+
+Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin `Exception` one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+`au.stored.<module>.<name>` (`type_name` holds the original’s full
+name); its message is the original’s. `except` the original class does
+not match it: test `isinstance(error.__cause__, au.StoredError)` on what
+`get_result` raises.
 
 ### *class* au.SyncTestBackend(middleware=None)
 

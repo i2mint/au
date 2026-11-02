@@ -91,8 +91,9 @@ True
 
 ### Exceptions
 
-| [`ComputationCancelledError`](#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](#au.base.ComputationHandle.get_result) when a computation was cancelled.   |
-|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`ComputationCancelledError`](#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](#au.base.ComputationHandle.get_result) when a computation was cancelled.                                            |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StoredError`](#au.base.StoredError)                 | Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin `Exception` one, or one whose rebuilt message would differ. |
 
 ### au.base.BackendFactory
 
@@ -568,6 +569,18 @@ Attempt to cancel a running task.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *exception* au.base.StoredError
+
+Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
+
+Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin `Exception` one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+`au.stored.<module>.<name>` (`type_name` holds the original’s full
+name); its message is the original’s. `except` the original class does
+not match it: test `isinstance(error.__cause__, au.StoredError)` on what
+`get_result` raises.
 
 ### *class* au.base.ThreadBackend(store=None, middleware=None)
 

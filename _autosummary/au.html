@@ -225,6 +225,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.StdLibQueueBackend.terminate"><code class="docutils literal notranslate"><span class="pre">StdLibQueueBackend.terminate()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#au.StoredError"><code class="docutils literal notranslate"><span class="pre">StoredError</span></code></a></li>
 <li><a class="reference internal" href="#au.SyncTestBackend"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a><ul>
 <li><a class="reference internal" href="#au.SyncTestBackend.get_execution"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend.get_execution()</span></code></a></li>
 <li><a class="reference internal" href="#au.SyncTestBackend.launch"><code class="docutils literal notranslate"><span class="pre">SyncTestBackend.launch()</span></code></a></li>
@@ -522,10 +523,13 @@ data-aria-dark="Switch to auto color mode">
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.ComputationCancelledError" title="au.ComputationCancelledError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComputationCancelledError</span></code></a></p></td>
 <td><p>Raised by <a class="reference internal" href="#au.ComputationHandle.get_result" title="au.ComputationHandle.get_result"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationHandle.get_result()</span></code></a> when a computation was cancelled.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.RetryableError" title="au.RetryableError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryableError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.StoredError" title="au.StoredError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StoredError</span></code></a></p></td>
+<td><p>Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin <code class="docutils literal notranslate"><span class="pre">Exception</span></code> one, or one whose rebuilt message would differ.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.RetryableError" title="au.RetryableError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RetryableError</span></code></a></p></td>
 <td><p>Base class for errors that should be retried.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.NonRetryableError" title="au.NonRetryableError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.NonRetryableError" title="au.NonRetryableError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonRetryableError</span></code></a></p></td>
 <td><p>Base class for errors that should not be retried.</p></td>
 </tr>
 </tbody>
@@ -1650,6 +1654,19 @@ task queuing. Not persistent across application restarts.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="au.StoredError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">StoredError</span></span><a class="reference internal" href="../_modules/au/base.html#StoredError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.StoredError" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin <code class="docutils literal notranslate"><span class="pre">Exception</span></code> one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+<code class="docutils literal notranslate"><span class="pre">au.stored.&lt;module&gt;.&lt;name&gt;</span></code> (<code class="docutils literal notranslate"><span class="pre">type_name</span></code> holds the original’s full
+name); its message is the original’s. <code class="docutils literal notranslate"><span class="pre">except</span></code> the original class does
+not match it: test <code class="docutils literal notranslate"><span class="pre">isinstance(error.__cause__,</span> <span class="pre">au.StoredError)</span></code> on what
+<code class="docutils literal notranslate"><span class="pre">get_result</span></code> raises.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -2883,7 +2900,7 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=8d02545a"></script>
+      <script src="../_static/documentation_options.js?v=468bc497"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

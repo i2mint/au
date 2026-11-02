@@ -1,4 +1,4 @@
-> built 2026-11-02 11:44 UTC from f19a283 (master) · au 0.1.13. Details: build_info.json
+> built 2026-11-02 11:54 UTC from fd12512 (master) · au 0.1.14. Details: build_info.json
 
 # index.html.md
 
@@ -1067,8 +1067,9 @@ True
 
 ### Exceptions
 
-| [`ComputationCancelledError`](_autosummary/au.base.html.md#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](_autosummary/au.base.html.md#au.base.ComputationHandle.get_result) when a computation was cancelled.   |
-|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| [`ComputationCancelledError`](_autosummary/au.base.html.md#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](_autosummary/au.base.html.md#au.base.ComputationHandle.get_result) when a computation was cancelled.                                            |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StoredError`](_autosummary/au.base.html.md#au.base.StoredError)                 | Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin `Exception` one, or one whose rebuilt message would differ. |
 
 ### au.base.BackendFactory
 
@@ -1544,6 +1545,18 @@ Attempt to cancel a running task.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *exception* au.base.StoredError
+
+Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
+
+Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin `Exception` one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+`au.stored.<module>.<name>` (`type_name` holds the original’s full
+name); its message is the original’s. `except` the original class does
+not match it: test `isinstance(error.__cause__, au.StoredError)` on what
+`get_result` raises.
 
 ### *class* au.base.ThreadBackend(store=None, middleware=None)
 
@@ -2079,10 +2092,11 @@ A lightweight, convention-over-configuration async framework for Python.
 
 ### Exceptions
 
-| [`ComputationCancelledError`](_autosummary/au.html.md#au.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](_autosummary/au.html.md#au.ComputationHandle.get_result) when a computation was cancelled.   |
-|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| [`RetryableError`](_autosummary/au.html.md#au.RetryableError)              | Base class for errors that should be retried.                                                                                 |
-| [`NonRetryableError`](_autosummary/au.html.md#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                             |
+| [`ComputationCancelledError`](_autosummary/au.html.md#au.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](_autosummary/au.html.md#au.ComputationHandle.get_result) when a computation was cancelled.                                            |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`StoredError`](_autosummary/au.html.md#au.StoredError)                 | Stands in, after a store's round trip, for an error au does not rebuild as itself: any class but a builtin `Exception` one, or one whose rebuilt message would differ. |
+| [`RetryableError`](_autosummary/au.html.md#au.RetryableError)              | Base class for errors that should be retried.                                                                                                                          |
+| [`NonRetryableError`](_autosummary/au.html.md#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                                                                      |
 
 ### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
@@ -2867,6 +2881,18 @@ Attempt to cancel a running task.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *exception* au.StoredError
+
+Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
+
+Stands in, after a store’s round trip, for an error au does not rebuild
+as itself: any class but a builtin `Exception` one, or one whose rebuilt
+message would differ. Its class is named after the original and shown as
+`au.stored.<module>.<name>` (`type_name` holds the original’s full
+name); its message is the original’s. `except` the original class does
+not match it: test `isinstance(error.__cause__, au.StoredError)` on what
+`get_result` raises.
 
 ### *class* au.SyncTestBackend(middleware=None)
 
@@ -4601,7 +4627,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 11:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/f19a2832d03e918d849da2bf4c5c06fb298872a3"><code>f19a283</code></a> on branch <code>master</code>, for **au 0.1.13** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 11:54 UTC** from commit <a href="https://github.com/i2mint/au/commit/fd1251253b8b12145b5654ad227153ed04dd2063"><code>fd12512</code></a> on branch <code>master</code>, for **au 0.1.14** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4610,9 +4636,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/f19a2832d03e918d849da2bf4c5c06fb298872a3"><code>f19a2832d03e918d849da2bf4c5c06fb298872a3</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/fd1251253b8b12145b5654ad227153ed04dd2063"><code>fd1251253b8b12145b5654ad227153ed04dd2063</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.13</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.14</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4621,9 +4647,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41438864774">41438864774</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41440224454">41440224454</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>925c60666a200c6656ef6bedbac823ed74418716</code> (in the history of the built commit) |
+| Event commit | <code>f4deb549f4d4cb8da79f2f8dcff44132c35c6286</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4648,13 +4674,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.13/">0.1.13</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.14/">0.1.14</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout f19a2832d03e918d849da2bf4c5c06fb298872a3
+git checkout fd1251253b8b12145b5654ad227153ed04dd2063
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

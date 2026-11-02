@@ -44,4 +44,5 @@ au.base
    .. autosummary::
    
       ComputationCancelledError
+      StoredError
    
