@@ -1,6 +1,6 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T11:43:05.347032Z
+timestamp,2026-11-02T11:43:17.247594Z
 commit_sha,925c60666a200c6656ef6bedbac823ed74418716
 commit_message,"refactor(au): one backend-factory seam for async_compute and the simple API (#24 item 1) (#34)
 
@@ -9,18 +9,18 @@ and mock_async's overwrite of au.api._default_backend). mock_async installs a
 factory building TrackingTestBackends that share one tracker and carry each
 surface's middleware, so middleware given to async_compute now runs under the mock."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20484
-metrics.umpyre_stats.num_classes,3042
-metrics.umpyre_stats.total_lines,544985
-metrics.umpyre_stats.empty_lines,71429
-metrics.umpyre_stats.comment_lines,35619
-metrics.umpyre_stats.docs_lines,42956
-metrics.umpyre_stats.function_lines,327176
-metrics.umpyre_stats.empty_lines_ratio,0.13106599264199933
-metrics.umpyre_stats.comment_lines_ratio,0.06535776214024239
-metrics.umpyre_stats.function_lines_ratio,0.6003394588841895
-metrics.umpyre_stats.mean_lines_per_function,15.972271040812341
-metrics.umpyre_stats.files_analyzed,1348
+metrics.umpyre_stats.num_functions,20388
+metrics.umpyre_stats.num_classes,3027
+metrics.umpyre_stats.total_lines,542681
+metrics.umpyre_stats.empty_lines,71092
+metrics.umpyre_stats.comment_lines,35485
+metrics.umpyre_stats.docs_lines,42916
+metrics.umpyre_stats.function_lines,325594
+metrics.umpyre_stats.empty_lines_ratio,0.1310014538928026
+metrics.umpyre_stats.comment_lines_ratio,0.06538832205291875
+metrics.umpyre_stats.function_lines_ratio,0.599973096533691
+metrics.umpyre_stats.mean_lines_per_function,15.969884245634686
+metrics.umpyre_stats.files_analyzed,1333
 metrics.umpyre_stats.pypi_version,0.1.12
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-11-02T11:41:25Z
@@ -41,4 +41,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,4.501306772232056
+collection_duration_seconds,7.672097682952881
