@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T11:54:47Z",
+  "built_at": "2026-11-02T12:04:46Z",
   "package": {
     "name": "au",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "display_name": "au",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "fd1251253b8b12145b5654ad227153ed04dd2063",
-    "short_commit": "fd12512",
+    "commit": "ad8d1be75718ba9583392be688ecd75750ad27ba",
+    "short_commit": "ad8d1be",
     "branch": "master",
     "tags": [
-      "0.1.14"
+      "0.1.15"
     ],
     "dirty": false,
     "remote_url": "https://github.com/i2mint/au",
-    "commit_url": "https://github.com/i2mint/au/commit/fd1251253b8b12145b5654ad227153ed04dd2063",
+    "commit_url": "https://github.com/i2mint/au/commit/ad8d1be75718ba9583392be688ecd75750ad27ba",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "i2mint/au",
-    "sha": "f4deb549f4d4cb8da79f2f8dcff44132c35c6286",
+    "sha": "5d9d9848692cffea467486d07aec0579c2157a12",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "41440224454",
-    "run_url": "https://github.com/i2mint/au/actions/runs/41440224454",
+    "run_id": "41441517782",
+    "run_url": "https://github.com/i2mint/au/actions/runs/41441517782",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -63,13 +63,15 @@
   "pypi": {
     "checked": true,
     "latest": "0.1.14",
-    "relation": "same",
+    "relation": "ahead",
     "error": null
   },
-  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout fd1251253b8b12145b5654ad227153ed04dd2063\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout ad8d1be75718ba9583392be688ecd75750ad27ba\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.1.15) is ahead of the latest release on PyPI (0.1.14): these docs describe unreleased code."
+    ]
   }
 }

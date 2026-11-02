@@ -5,19 +5,21 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-02 11:54 UTC** from commit <a href="https://github.com/i2mint/au/commit/fd1251253b8b12145b5654ad227153ed04dd2063"><code>fd12512</code></a> on branch <code>master</code>, for **au 0.1.14** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 12:04 UTC** from commit <a href="https://github.com/i2mint/au/commit/ad8d1be75718ba9583392be688ecd75750ad27ba"><code>ad8d1be</code></a> on branch <code>master</code>, for **au 0.1.15** (from <code>pyproject.toml</code>).
 
-:::{note}
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+:::{warning}
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.15) is ahead of the latest release on PyPI (0.1.14): these docs describe unreleased code.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/i2mint/au/commit/fd1251253b8b12145b5654ad227153ed04dd2063"><code>fd1251253b8b12145b5654ad227153ed04dd2063</code></a> |
+| Commit | <a href="https://github.com/i2mint/au/commit/ad8d1be75718ba9583392be688ecd75750ad27ba"><code>ad8d1be75718ba9583392be688ecd75750ad27ba</code></a> |
 | Branch | <code>master</code> |
-| Tags at this commit | <code>0.1.14</code> |
+| Tags at this commit | <code>0.1.15</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/i2mint/au</code> |
 
@@ -26,9 +28,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 | | |
 |---|---|
 | Repository | <code>i2mint/au</code> |
-| Run | <a href="https://github.com/i2mint/au/actions/runs/41440224454">41440224454</a> |
+| Run | <a href="https://github.com/i2mint/au/actions/runs/41441517782">41441517782</a> |
 | Ref | <code>refs/heads/master</code> |
-| Event commit | <code>f4deb549f4d4cb8da79f2f8dcff44132c35c6286</code> (in the history of the built commit) |
+| Event commit | <code>5d9d9848692cffea467486d07aec0579c2157a12</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -53,13 +55,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.14/">0.1.14</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.14/">0.1.14</a>, older than the documented version (0.1.15).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout fd1251253b8b12145b5654ad227153ed04dd2063
+git checkout ad8d1be75718ba9583392be688ecd75750ad27ba
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
