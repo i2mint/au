@@ -45,6 +45,13 @@ Clear all stored results.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+nothing in another process can write to this memory.
+
+* **Type:**
+  Yes
+
 #### create_key()
 
 Create a unique key for a computation.

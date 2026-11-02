@@ -252,6 +252,14 @@ Remove expired results. Returns count of removed items.
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether every compare-and-set write to this store, from whatever
+process or machine, goes through this [`write_unless()`](#au.base.ComputationStore.write_unless) (default:
+no, its lock holds off this process only). A store that can say yes (one living in a single
+process, or whose compare-and-set is atomic where the data lives) lets
+[`ComputationHandle.cancel()`](#au.base.ComputationHandle.cancel) trust it rather than restate itself.
+
 #### *abstractmethod* create_key()
 
 Generate a unique key for a new computation.
@@ -292,8 +300,9 @@ outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](#au.base.ComputationStore.exclusive). A store with an
 atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead. A read
-that fails raises.
+IN ...` on a database) overrides this method whole instead, and
+answers True to [`compare_and_set_spans_writers`](#au.base.ComputationStore.compare_and_set_spans_writers). A read that
+fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore
@@ -332,6 +341,13 @@ Remove expired results from filesystem.
 
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Yes, where record locks work in this directory (POSIX, and not a
+filesystem found to refuse them). It is this process’s finding: it
+assumes the other writers’ locks work too, which a filesystem whose
+lock service fails for some processes only would belie.
 
 #### create_key()
 

@@ -98,6 +98,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.testing.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.testing.InMemoryStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.cleanup_expired()</span></code></a></li>
 <li><a class="reference internal" href="#au.testing.InMemoryStore.clear"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.clear()</span></code></a></li>
+<li><a class="reference internal" href="#au.testing.InMemoryStore.compare_and_set_spans_writers"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.compare_and_set_spans_writers</span></code></a></li>
 <li><a class="reference internal" href="#au.testing.InMemoryStore.create_key"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.create_key()</span></code></a></li>
 <li><a class="reference internal" href="#au.testing.InMemoryStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.get_reconstruction_info()</span></code></a></li>
 </ul>
@@ -236,6 +237,17 @@ Useful for testing without filesystem dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="au.testing.InMemoryStore.compare_and_set_spans_writers">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_and_set_spans_writers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#au.testing.InMemoryStore.compare_and_set_spans_writers" title="Link to this definition">#</a></dt>
+<dd><p>nothing in another process can write to this memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Yes</p>
 </dd>
 </dl>
 </dd></dl>
@@ -591,7 +603,7 @@ read them inside the block, or pass a store you keep.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=e2f3408e"></script>
+      <script src="../_static/documentation_options.js?v=d50bcae4"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

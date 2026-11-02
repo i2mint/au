@@ -120,6 +120,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.ComputationStatus"><code class="docutils literal notranslate"><span class="pre">ComputationStatus</span></code></a></li>
 <li><a class="reference internal" href="#au.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.ComputationStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.cleanup_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.ComputationStore.compare_and_set_spans_writers"><code class="docutils literal notranslate"><span class="pre">ComputationStore.compare_and_set_spans_writers</span></code></a></li>
 <li><a class="reference internal" href="#au.ComputationStore.create_key"><code class="docutils literal notranslate"><span class="pre">ComputationStore.create_key()</span></code></a></li>
 <li><a class="reference internal" href="#au.ComputationStore.exclusive"><code class="docutils literal notranslate"><span class="pre">ComputationStore.exclusive()</span></code></a></li>
 <li><a class="reference internal" href="#au.ComputationStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">ComputationStore.get_reconstruction_info()</span></code></a></li>
@@ -129,6 +130,7 @@ data-aria-dark="Switch to auto color mode">
 </li>
 <li><a class="reference internal" href="#au.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.FileSystemStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.cleanup_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.FileSystemStore.compare_and_set_spans_writers"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.compare_and_set_spans_writers</span></code></a></li>
 <li><a class="reference internal" href="#au.FileSystemStore.create_key"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.create_key()</span></code></a></li>
 <li><a class="reference internal" href="#au.FileSystemStore.exclusive"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.exclusive()</span></code></a></li>
 <li><a class="reference internal" href="#au.FileSystemStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.get_reconstruction_info()</span></code></a></li>
@@ -144,6 +146,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.InMemoryStore"><code class="docutils literal notranslate"><span class="pre">InMemoryStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.InMemoryStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.cleanup_expired()</span></code></a></li>
 <li><a class="reference internal" href="#au.InMemoryStore.clear"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.clear()</span></code></a></li>
+<li><a class="reference internal" href="#au.InMemoryStore.compare_and_set_spans_writers"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.compare_and_set_spans_writers</span></code></a></li>
 <li><a class="reference internal" href="#au.InMemoryStore.create_key"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.create_key()</span></code></a></li>
 <li><a class="reference internal" href="#au.InMemoryStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">InMemoryStore.get_reconstruction_info()</span></code></a></li>
 </ul>
@@ -752,6 +755,16 @@ them (<code class="docutils literal notranslate"><span class="pre">FileSystemSto
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="au.ComputationStore.compare_and_set_spans_writers">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_and_set_spans_writers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#au.ComputationStore.compare_and_set_spans_writers" title="Link to this definition">#</a></dt>
+<dd><p>Whether every compare-and-set write to this store, from whatever
+process or machine, goes through this <a class="reference internal" href="#au.ComputationStore.write_unless" title="au.ComputationStore.write_unless"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_unless()</span></code></a> (default:
+no, its lock holds off this process only). A store that can say yes (one living in a single
+process, or whose compare-and-set is atomic where the data lives) lets
+<a class="reference internal" href="#au.ComputationHandle.cancel" title="au.ComputationHandle.cancel"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationHandle.cancel()</span></code></a> trust it rather than restate itself.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="au.ComputationStore.create_key">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.create_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ComputationStore.create_key" title="Link to this definition">#</a></dt>
@@ -807,8 +820,9 @@ outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">_read()</span></code>) and writes under <a class="reference internal" href="#au.ComputationStore.exclusive" title="au.ComputationStore.exclusive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">exclusive()</span></code></a>. A store with an
 atomic conditional write of its own (one <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">...</span> <span class="pre">WHERE</span> <span class="pre">status</span> <span class="pre">NOT</span>
-<span class="pre">IN</span> <span class="pre">...</span></code> on a database) overrides this method whole instead. A read
-that fails raises.</p>
+<span class="pre">IN</span> <span class="pre">...</span></code> on a database) overrides this method whole instead, and
+answers True to <a class="reference internal" href="#au.ComputationStore.compare_and_set_spans_writers" title="au.ComputationStore.compare_and_set_spans_writers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">compare_and_set_spans_writers</span></code></a>. A read that
+fails raises.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">au.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">InMemoryStore</span>
 </span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">InMemoryStore</span><span class="p">()</span>
 </span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">done</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
@@ -854,6 +868,15 @@ that fails raises.</p>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="au.FileSystemStore.compare_and_set_spans_writers">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_and_set_spans_writers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#au.FileSystemStore.compare_and_set_spans_writers" title="Link to this definition">#</a></dt>
+<dd><p>Yes, where record locks work in this directory (POSIX, and not a
+filesystem found to refuse them). It is this process’s finding: it
+assumes the other writers’ locks work too, which a filesystem whose
+lock service fails for some processes only would belie.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -984,6 +1007,17 @@ Useful for testing without filesystem dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="au.InMemoryStore.compare_and_set_spans_writers">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">compare_and_set_spans_writers</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#au.InMemoryStore.compare_and_set_spans_writers" title="Link to this definition">#</a></dt>
+<dd><p>nothing in another process can write to this memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Yes</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2900,7 +2934,7 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=e2f3408e"></script>
+      <script src="../_static/documentation_options.js?v=d50bcae4"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

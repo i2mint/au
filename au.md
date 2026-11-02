@@ -1,4 +1,4 @@
-> built 2026-11-02 12:04 UTC from ad8d1be (master) · au 0.1.15. Details: build_info.json
+> built 2026-11-02 12:13 UTC from 76bdab3 (master) · au 0.1.16. Details: build_info.json
 
 # index.html.md
 
@@ -1228,6 +1228,14 @@ Remove expired results. Returns count of removed items.
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether every compare-and-set write to this store, from whatever
+process or machine, goes through this [`write_unless()`](_autosummary/au.base.html.md#au.base.ComputationStore.write_unless) (default:
+no, its lock holds off this process only). A store that can say yes (one living in a single
+process, or whose compare-and-set is atomic where the data lives) lets
+[`ComputationHandle.cancel()`](_autosummary/au.base.html.md#au.base.ComputationHandle.cancel) trust it rather than restate itself.
+
 #### *abstractmethod* create_key()
 
 Generate a unique key for a new computation.
@@ -1268,8 +1276,9 @@ outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](_autosummary/au.base.html.md#au.base.ComputationStore.exclusive). A store with an
 atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead. A read
-that fails raises.
+IN ...` on a database) overrides this method whole instead, and
+answers True to [`compare_and_set_spans_writers`](_autosummary/au.base.html.md#au.base.ComputationStore.compare_and_set_spans_writers). A read that
+fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore
@@ -1308,6 +1317,13 @@ Remove expired results from filesystem.
 
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Yes, where record locks work in this directory (POSIX, and not a
+filesystem found to refuse them). It is this process’s finding: it
+assumes the other writers’ locks work too, which a filesystem whose
+lock service fails for some processes only would belie.
 
 #### create_key()
 
@@ -2261,6 +2277,14 @@ Remove expired results. Returns count of removed items.
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
 
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether every compare-and-set write to this store, from whatever
+process or machine, goes through this [`write_unless()`](_autosummary/au.html.md#au.ComputationStore.write_unless) (default:
+no, its lock holds off this process only). A store that can say yes (one living in a single
+process, or whose compare-and-set is atomic where the data lives) lets
+[`ComputationHandle.cancel()`](_autosummary/au.html.md#au.ComputationHandle.cancel) trust it rather than restate itself.
+
 #### *abstractmethod* create_key()
 
 Generate a unique key for a new computation.
@@ -2301,8 +2325,9 @@ outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](_autosummary/au.html.md#au.ComputationStore.exclusive). A store with an
 atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead. A read
-that fails raises.
+IN ...` on a database) overrides this method whole instead, and
+answers True to [`compare_and_set_spans_writers`](_autosummary/au.html.md#au.ComputationStore.compare_and_set_spans_writers). A read that
+fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore
@@ -2341,6 +2366,13 @@ Remove expired results from filesystem.
 
 * **Return type:**
   [`int`](https://docs.python.org/3/builtins/functions.html#int)
+
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Yes, where record locks work in this directory (POSIX, and not a
+filesystem found to refuse them). It is this process’s finding: it
+assumes the other writers’ locks work too, which a filesystem whose
+lock service fails for some processes only would belie.
 
 #### create_key()
 
@@ -2432,6 +2464,13 @@ Clear all stored results.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+nothing in another process can write to this memory.
+
+* **Type:**
+  Yes
 
 #### create_key()
 
@@ -4156,6 +4195,13 @@ Clear all stored results.
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
+#### *property* compare_and_set_spans_writers *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+nothing in another process can write to this memory.
+
+* **Type:**
+  Yes
+
 #### create_key()
 
 Create a unique key for a computation.
@@ -4627,20 +4673,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 12:04 UTC** from commit <a href="https://github.com/i2mint/au/commit/ad8d1be75718ba9583392be688ecd75750ad27ba"><code>ad8d1be</code></a> on branch <code>master</code>, for **au 0.1.15** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 12:13 UTC** from commit <a href="https://github.com/i2mint/au/commit/76bdab32333c73387d903e07f1b7d7f94ce3f22c"><code>76bdab3</code></a> on branch <code>master</code>, for **au 0.1.16** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.15) is ahead of the latest release on PyPI (0.1.14): these docs describe unreleased code.
+- The documented version (0.1.16) is ahead of the latest release on PyPI (0.1.15): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/ad8d1be75718ba9583392be688ecd75750ad27ba"><code>ad8d1be75718ba9583392be688ecd75750ad27ba</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/76bdab32333c73387d903e07f1b7d7f94ce3f22c"><code>76bdab32333c73387d903e07f1b7d7f94ce3f22c</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.15</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.16</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4649,9 +4695,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41441517782">41441517782</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41442667747">41442667747</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>5d9d9848692cffea467486d07aec0579c2157a12</code> (in the history of the built commit) |
+| Event commit | <code>1c8362d01b35e3651a6f6aec7435ff78072afed4</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4676,13 +4722,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.14/">0.1.14</a>, older than the documented version (0.1.15).
+Latest release: <a href="https://pypi.org/project/au/0.1.15/">0.1.15</a>, older than the documented version (0.1.16).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout ad8d1be75718ba9583392be688ecd75750ad27ba
+git checkout 76bdab32333c73387d903e07f1b7d7f94ce3f22c
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
