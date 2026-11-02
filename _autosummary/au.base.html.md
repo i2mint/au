@@ -64,11 +64,12 @@ True
 
 ### Functions
 
-| [`async_compute`](#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [`call_hooks`](#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.              |
-| [`compute_and_record`](#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.    |
-| [`temporary_async_compute`](#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup. |
+| [`async_compute`](#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.                                                             |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| [`call_hooks`](#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.                                                                |
+| [`compute_and_record`](#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.                                                      |
+| [`moment_iso`](#au.base.moment_iso)(moment)                                | ISO 8601 with its UTC offset (a naive moment read as local time), so a reader in another time zone reads the same instant. |
+| [`temporary_async_compute`](#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup.                                                   |
 
 ### Classes
 
@@ -688,6 +689,14 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.base.moment_iso(moment)
+
+ISO 8601 with its UTC offset (a naive moment read as local time), so a
+reader in another time zone reads the same instant.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### au.base.temporary_async_compute(\*\*kwargs)
 

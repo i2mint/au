@@ -185,6 +185,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.base.async_compute"><code class="docutils literal notranslate"><span class="pre">async_compute()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.call_hooks"><code class="docutils literal notranslate"><span class="pre">call_hooks()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.compute_and_record"><code class="docutils literal notranslate"><span class="pre">compute_and_record()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.moment_iso"><code class="docutils literal notranslate"><span class="pre">moment_iso()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.temporary_async_compute"><code class="docutils literal notranslate"><span class="pre">temporary_async_compute()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
@@ -300,7 +301,10 @@ and retrieve results later.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.base.compute_and_record" title="au.base.compute_and_record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_and_record</span></code></a>(func, args, kwargs, *, ...)</p></td>
 <td><p>Run <code class="docutils literal notranslate"><span class="pre">func</span></code>, record its outcome under <code class="docutils literal notranslate"><span class="pre">key</span></code>, and drive the middleware.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#au.base.temporary_async_compute" title="au.base.temporary_async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">temporary_async_compute</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.base.moment_iso" title="au.base.moment_iso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">moment_iso</span></code></a>(moment)</p></td>
+<td><p>ISO 8601 with its UTC offset (a naive moment read as local time), so a reader in another time zone reads the same instant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.temporary_async_compute" title="au.base.temporary_async_compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">temporary_async_compute</span></code></a>(**kwargs)</p></td>
 <td><p>Context manager for temporary async computations with automatic cleanup.</p></td>
 </tr>
 </tbody>
@@ -1151,6 +1155,18 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="au.base.moment_iso">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">moment_iso</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#moment_iso"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.moment_iso" title="Link to this definition">#</a></dt>
+<dd><p>ISO 8601 with its UTC offset (a naive moment read as local time), so a
+reader in another time zone reads the same instant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="au.base.temporary_async_compute">
 <span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">temporary_async_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#temporary_async_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.temporary_async_compute" title="Link to this definition">#</a></dt>
 <dd><p>Context manager for temporary async computations with automatic cleanup.</p>
@@ -1207,7 +1223,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=71734efd"></script>
+      <script src="../_static/documentation_options.js?v=9969ed3f"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

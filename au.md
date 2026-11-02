@@ -1,4 +1,4 @@
-> built 2026-11-02 12:28 UTC from 28fafd7 (master) · au 0.1.17. Details: build_info.json
+> built 2026-11-02 12:41 UTC from d598676 (master) · au 0.1.18. Details: build_info.json
 
 # index.html.md
 
@@ -1040,11 +1040,12 @@ True
 
 ### Functions
 
-| [`async_compute`](_autosummary/au.base.html.md#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
-|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [`call_hooks`](_autosummary/au.base.html.md#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.              |
-| [`compute_and_record`](_autosummary/au.base.html.md#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.    |
-| [`temporary_async_compute`](_autosummary/au.base.html.md#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup. |
+| [`async_compute`](_autosummary/au.base.html.md#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.                                                             |
+|----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| [`call_hooks`](_autosummary/au.base.html.md#au.base.call_hooks)(middleware, hook, \*args)              | Call `hook` on every middleware, whatever the others raise.                                                                |
+| [`compute_and_record`](_autosummary/au.base.html.md#au.base.compute_and_record)(func, args, kwargs, \*, ...)   | Run `func`, record its outcome under `key`, and drive the middleware.                                                      |
+| [`moment_iso`](_autosummary/au.base.html.md#au.base.moment_iso)(moment)                                | ISO 8601 with its UTC offset (a naive moment read as local time), so a reader in another time zone reads the same instant. |
+| [`temporary_async_compute`](_autosummary/au.base.html.md#au.base.temporary_async_compute)(\*\*kwargs)               | Context manager for temporary async computations with automatic cleanup.                                                   |
 
 ### Classes
 
@@ -1664,6 +1665,14 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### au.base.moment_iso(moment)
+
+ISO 8601 with its UTC offset (a naive moment read as local time), so a
+reader in another time zone reads the same instant.
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str) | [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### au.base.temporary_async_compute(\*\*kwargs)
 
@@ -4693,20 +4702,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 12:28 UTC** from commit <a href="https://github.com/i2mint/au/commit/28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896"><code>28fafd7</code></a> on branch <code>master</code>, for **au 0.1.17** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 12:41 UTC** from commit <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d598676</code></a> on branch <code>master</code>, for **au 0.1.18** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.17) is ahead of the latest release on PyPI (0.1.16): these docs describe unreleased code.
+- The documented version (0.1.18) is ahead of the latest release on PyPI (0.1.17): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896"><code>28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d5986761913191995152f97cb2960560eb4fbe0a</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.17</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.18</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4715,9 +4724,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41444657697">41444657697</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41446386942">41446386942</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>81cf702450fbd26b6099996dc46fdaad22a29e1c</code> (in the history of the built commit) |
+| Event commit | <code>4d263d138eb36a5ac0a3cbf14920ad56b3655e5e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4742,13 +4751,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.16/">0.1.16</a>, older than the documented version (0.1.17).
+Latest release: <a href="https://pypi.org/project/au/0.1.17/">0.1.17</a>, older than the documented version (0.1.18).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896
+git checkout d5986761913191995152f97cb2960560eb4fbe0a
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

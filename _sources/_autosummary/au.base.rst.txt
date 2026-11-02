@@ -17,6 +17,7 @@ au.base
       async_compute
       call_hooks
       compute_and_record
+      moment_iso
       temporary_async_compute
    
    .. rubric:: Classes
