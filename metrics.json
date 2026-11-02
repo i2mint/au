@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 7.328050374984741,
-  "commit_message": "fix(au): cancel restates CANCELLED after terminate only where it is needed (#30)\n\nThe unconditional re-write could clobber a job resubmitted under the key while\nProcessBackend's terminate waited. It now runs only when the store's\ncompare-and-set does not span its writers (new compare_and_set_spans_writers).",
-  "commit_sha": "5cc3bd7a8803c51dd82fb489092c4198f1a2bb06",
+  "collection_duration_seconds": 7.699826717376709,
+  "commit_message": "fix(au): cancel restates CANCELLED after terminate only where it is needed (#30) (#38)\n\nThe unconditional re-write could clobber a job resubmitted under the key while\nProcessBackend's terminate waited. It now runs only when the store's\ncompare-and-set does not span its writers (new compare_and_set_spans_writers).",
+  "commit_sha": "1c8362d01b35e3651a6f6aec7435ff78072afed4",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.967246874233881,
       "num_classes": 3028,
       "num_functions": 20395,
-      "pypi_version": "0.1.14",
+      "pypi_version": "0.1.15",
       "total_lines": 542782
     },
     "wily": {
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-11-02T12:05:45Z",
+      "last_success_timestamp": "2026-11-02T12:11:01Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/41441800970",
+      "run_url": "https://github.com/i2mint/au/actions/runs/41442435130",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T12:11:03.126411Z",
+  "timestamp": "2026-11-02T12:12:44.277645Z",
   "workflow_status": {}
 }
