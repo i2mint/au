@@ -38,6 +38,13 @@ class AUConfig:
     retry_backoff: str = "exponential"  # exponential, linear, constant
     retry_initial_delay: float = 1.0
 
+    # Idempotent submission: how long a RUNNING record holds its key against a
+    # resubmit (None: for good; set it so a crash does not block the key). It
+    # counts from the reservation, so queue wait counts too: set it above queue
+    # wait plus the longest run. A job running past it is re-run by a resubmit,
+    # and its old worker's outcome may land over the new run's (i2mint/au#30)
+    reservation_lease_seconds: Optional[float] = None
+
     # Observability
     logging_enabled: bool = True  # the simple API logs each task's start/end
     logging_level: str = "INFO"  # the level those are logged at, not a filter
@@ -46,6 +53,12 @@ class AUConfig:
     http_host: str = "127.0.0.1"
     http_port: int = 8000
     http_framework: str = "fastapi"  # fastapi, flask
+
+
+#: Settings whose unparseable environment value is kept, not dropped, so that
+#: their consumer refuses it by name: dropping ``AU_RESERVATION_LEASE_SECONDS=1h``
+#: would silently leave the lease off, the very thing it is set to prevent.
+_REFUSED_BY_NAME_WHEN_UNPARSED = frozenset({"reservation_lease_seconds"})
 
 
 def load_config_from_env() -> dict[str, Any]:
@@ -67,6 +80,8 @@ def load_config_from_env() -> dict[str, Any]:
     - AU_RETRY_MAX_ATTEMPTS: Maximum attempts
     - AU_RETRY_BACKOFF: exponential, linear or constant
     - AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+    - AU_RESERVATION_LEASE_SECONDS: How long a RUNNING record holds its
+      idempotency key against a resubmit (unset: for good)
     - AU_LOGGING_ENABLED: The simple API logs each task's start and end
     - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
       (a level name or number; not a filter: configure logging for that)
@@ -118,6 +133,7 @@ def load_config_from_env() -> dict[str, Any]:
     # Float mappings
     float_mappings = {
         "AU_RETRY_INITIAL_DELAY": "retry_initial_delay",
+        "AU_RESERVATION_LEASE_SECONDS": "reservation_lease_seconds",
     }
 
     for env_var, config_key in float_mappings.items():
@@ -126,7 +142,8 @@ def load_config_from_env() -> dict[str, Any]:
             try:
                 config[config_key] = float(value)
             except ValueError:
-                pass
+                if config_key in _REFUSED_BY_NAME_WHEN_UNPARSED:
+                    config[config_key] = value  # its consumer refuses it by name
 
     # Boolean mappings
     bool_mappings = {

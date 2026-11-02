@@ -6,9 +6,12 @@ without requiring decorator patterns.
 """
 
 import functools
+from datetime import timedelta
 import logging
+import math
+from numbers import Real
 from typing import Any, Callable, Optional, TypeVar
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 from au.base import (
     ComputationBackend,
@@ -190,8 +193,34 @@ def set_default_store(store: ComputationStore) -> None:
 
 #: What makes a key "in flight" for an idempotent ``submit_task``: a record
 #: that is RUNNING (missing, PENDING or terminal ones re-run). A RUNNING record
-#: never expires (``is_expired`` is for finished ones), so no TTL check.
+#: never expires (``is_expired`` is for finished ones), so it holds its key for
+#: good unless ``reservation_lease_seconds`` sets a lease: see ``_reservation_lease``.
 _IN_FLIGHT = frozenset({ComputationStatus.RUNNING})
+
+
+def _reservation_lease(config) -> timedelta | None:
+    """How long a RUNNING record holds its key against a resubmit, from
+    ``reservation_lease_seconds`` (None: for good); refuses a bad value by name.
+
+    Past it, the RUNNING record a crash left behind stops blocking its key
+    (i2mint/au#36). The lease counts from the reservation until a worker records
+    its start (``started_at``), so time spent queued counts too: set it above
+    the queue wait plus the longest run. A job still running past its lease is
+    run again by a resubmit, and its old worker's outcome may land over the new
+    run's (no per-submission token fences it yet: i2mint/au#30).
+    """
+    lease = config.reservation_lease_seconds
+    if lease is None:
+        return None
+    if isinstance(lease, Real) and not isinstance(lease, bool) and 0 < lease < math.inf:
+        with suppress(OverflowError):  # finite, but past timedelta.max
+            lease = timedelta(seconds=float(lease))
+            if lease > timedelta(0):  # not below timedelta's microsecond
+                return lease
+    raise setting_error(
+        "reservation_lease_seconds",
+        f"is {lease!r}; it must be a finite number of seconds > 0",
+    )
 
 
 class _WithRetryPolicy:
@@ -247,8 +276,9 @@ def submit_task(
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
+    config = get_global_config()
     if retry_policy is None:  # before the key is reserved: a bad setting raises
-        retry_policy = _retry_policy_from_config(get_global_config())
+        retry_policy = _retry_policy_from_config(config)
 
     if key is None:
         # No idempotency requested: mint a fresh key per call.
@@ -256,10 +286,14 @@ def submit_task(
     else:
         # Idempotency: reserve the key with RUNNING unless a computation is in
         # flight under it, in one compare-and-set, so of two concurrent
-        # submits of one key only one launches (i2mint/au#31).
+        # submits of one key only one launches (i2mint/au#31); a RUNNING record
+        # older than the lease (a crash's) no longer counts (i2mint/au#36).
+        lease = _reservation_lease(config)  # a bad setting raises before reserving
         reservation = ComputationResult(None, ComputationStatus.RUNNING)
         # Any mapping, as the workers' writes: not only a ComputationStore.
-        reserved, _ = _base._write_unless(store, key, reservation, keep=_IN_FLIGHT)
+        reserved, _ = _base._write_unless(
+            store, key, reservation, keep=_IN_FLIGHT, stale_after=lease
+        )
         if not reserved:
             return key
 
