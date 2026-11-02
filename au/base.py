@@ -56,6 +56,8 @@ from enum import Enum
 from functools import wraps
 from pathlib import Path
 from typing import Any, Generic, Optional, TypeVar, Union, List, Dict
+import builtins
+import functools
 import json
 import logging
 import multiprocessing
@@ -470,6 +472,89 @@ _LOCK_FILE = "lock"
 _UNLOCKABLE_DIRS: set[Path] = set()
 
 
+class StoredError(Exception):
+    """Stands in, after a store's round trip, for an error au does not rebuild
+    as itself: any class but a builtin ``Exception`` one, or one whose rebuilt
+    message would differ. Its class is named after the original and shown as
+    ``au.stored.<module>.<name>`` (``type_name`` holds the original's full
+    name); its message is the original's. ``except`` the original class does
+    not match it: test ``isinstance(error.__cause__, au.StoredError)`` on what
+    ``get_result`` raises.
+    """
+
+    type_name: str = ""
+
+    def __reduce__(self):
+        if not self.type_name:  # a plain StoredError: pickles as any exception
+            return super().__reduce__()
+        # A stand-in's class is made at run time: pickle the recipe, which
+        # keeps its type name and message (not other arguments or attributes).
+        return _stand_in, (self.type_name, str(self))
+
+
+#: Where stand-in classes say they come from, so a traceback shows one for what it is.
+_STAND_IN_MODULE = "au.stored"
+#: Distinct stand-in classes kept; past that a type name gets a fresh class.
+_STAND_IN_CACHE_SIZE = 1024
+
+
+def _error_identity(error: BaseException | None) -> dict[str, Any]:
+    """What a store keeps, besides the message, to rebuild ``error``: its
+    class's full name, and its arguments when they survive JSON."""
+    if error is None:
+        return {}
+    cls = type(error)
+    identity: dict[str, Any] = {"error_type": f"{cls.__module__}.{cls.__qualname__}"}
+    try:
+        json.dumps(error.args)
+    except (TypeError, ValueError):
+        return identity
+    return {**identity, "error_args": list(error.args)}
+
+
+def _rebuilt_error(message: str, type_name: Any, args: Any) -> BaseException:
+    """The error a stored record describes (i2mint/au#24 item 4).
+
+    A builtin ``Exception`` class (``ValueError``, ``KeyError``...) is rebuilt
+    as itself, from its arguments or else its message, when that gives back
+    the stored message; anything else is a :class:`StoredError` named after it
+    (importing a class a stored record names is not safe, and rebuilding a
+    ``SystemExit`` would make ``raise result.error`` exit). A record from before
+    ``error_type`` was kept, or a malformed one, reads as ``Exception(message)``.
+    """
+    if not isinstance(type_name, str) or not type_name:
+        return Exception(message)
+    module, _, name = type_name.rpartition(".")
+    cls = getattr(builtins, name, None) if module == "builtins" else None
+    if isinstance(cls, type) and issubclass(cls, Exception):
+        attempts = ([args] if isinstance(args, list) else []) + [[message]]
+        for attempt in attempts:
+            try:
+                error = cls(*attempt)
+            except Exception:
+                continue
+            if (str(error) or type(error).__name__) == message:
+                return error
+    return _stand_in(type_name, message)
+
+
+def _stand_in(type_name: str, message: str) -> StoredError:
+    return _stand_in_class(type_name)(message)
+
+
+@functools.lru_cache(maxsize=_STAND_IN_CACHE_SIZE)
+def _stand_in_class(type_name: str) -> type[StoredError]:
+    return type(
+        type_name.rpartition(".")[2],
+        (StoredError,),
+        {
+            "type_name": type_name,
+            "__module__": _STAND_IN_MODULE,
+            "__qualname__": type_name,
+        },
+    )
+
+
 class FileSystemStore(ComputationStore):
     """
     Store computation results in the filesystem with automatic cleanup.
@@ -599,6 +684,7 @@ class FileSystemStore(ComputationStore):
             "metadata": result.metadata,
             "terminal_reason": result.terminal_reason,
             "started_at": result.started_at and result.started_at.isoformat(),
+            **_error_identity(result.error),
         }
 
         if self.serialization == SerializationFormat.JSON:
@@ -616,7 +702,13 @@ class FileSystemStore(ComputationStore):
         result = ComputationResult(
             value=obj.get("value"),
             status=ComputationStatus(obj["status"]),
-            error=Exception(obj["error"]) if obj.get("error") else None,
+            error=(
+                _rebuilt_error(
+                    obj["error"], obj.get("error_type"), obj.get("error_args")
+                )
+                if obj.get("error")
+                else None
+            ),
             created_at=datetime.fromisoformat(obj["created_at"]),
             metadata=obj.get("metadata", {}),
             terminal_reason=obj.get("terminal_reason"),
@@ -1292,11 +1384,11 @@ class ComputationHandle(Generic[T]):
             if result.status == ComputationStatus.COMPLETED:
                 return result.value
             elif result.status == ComputationStatus.FAILED:
-                error_msg = result.error or "Computation failed"
-                cause = (
-                    result.error if isinstance(result.error, BaseException) else None
-                )
-                raise RuntimeError(error_msg) from cause
+                error = result.error
+                # str() of a bare KeyboardInterrupt or CancelledError is empty
+                error_msg = (str(error) or type(error).__name__) if error else None
+                cause = error if isinstance(error, BaseException) else None
+                raise RuntimeError(error_msg or "Computation failed") from cause
             elif result.status == ComputationStatus.CANCELLED:
                 reason = result.terminal_reason or "Computation cancelled"
                 raise ComputationCancelledError(reason)
