@@ -200,7 +200,7 @@ data-aria-dark="Switch to auto color mode">
 <tr class="row-even"><td><p><a class="reference internal" href="#au.testing.TaskCallRecord" title="au.testing.TaskCallRecord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskCallRecord</span></code></a>(func_name, args, kwargs[, ...])</p></td>
 <td><p>Record of a task call for testing/mocking.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.TrackingTestBackend" title="au.testing.TrackingTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a>([middleware])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.testing.TrackingTestBackend" title="au.testing.TrackingTestBackend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackingTestBackend</span></code></a>([middleware, tracker])</p></td>
 <td><p>Test backend that tracks all executions.</p></td>
 </tr>
 </tbody>
@@ -451,7 +451,7 @@ recorded FAILED, then re-raised to the caller.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.testing.TrackingTestBackend">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">TrackingTestBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#TrackingTestBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.TrackingTestBackend" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">TrackingTestBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#TrackingTestBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.TrackingTestBackend" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#au.testing.SyncTestBackend" title="au.testing.SyncTestBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">SyncTestBackend</span></code></a></p>
 <p>Test backend that tracks all executions.</p>
 <p>Extends SyncTestBackend with detailed tracking for testing/debugging.</p>
@@ -518,7 +518,11 @@ recorded FAILED, then re-raised to the caller.</p>
 <span class="sig-prename descclassname"><span class="pre">au.testing.</span></span><span class="sig-name descname"><span class="pre">mock_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/testing.html#mock_async"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.testing.mock_async" title="Link to this definition">#</a></dt>
 <dd><p>Run every task launched inside the block on a synchronous test backend.</p>
 <p>It becomes the default backend of <a class="reference internal" href="au.html#au.async_compute" title="au.async_compute"><code class="xref py py-func docutils literal notranslate"><span class="pre">au.async_compute()</span></code></a> and of the
-simple API (<code class="docutils literal notranslate"><span class="pre">au.submit_task</span></code>, …). The simple API’s results go to
+simple API (<code class="docutils literal notranslate"><span class="pre">au.submit_task</span></code>, …), and wins over a
+<code class="docutils literal notranslate"><span class="pre">set_default_backend</span></code> made inside the block, which is undone on exit.
+The default mock runs the middleware each surface was given (the simple
+API’s comes from the settings); a <code class="docutils literal notranslate"><span class="pre">backend</span></code> you pass runs as you built
+it, and the decorator’s middleware is then dropped, with a warning. The simple API’s results go to
 <code class="docutils literal notranslate"><span class="pre">store</span></code> (a fresh InMemoryStore by default), which is restored on exit:
 read them inside the block, or pass a store you keep.</p>
 <p>Usage:</p>
@@ -587,7 +591,7 @@ read them inside the block, or pass a store you keep.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=297ad043"></script>
+      <script src="../_static/documentation_options.js?v=8d02545a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

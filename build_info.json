@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T11:34:40Z",
+  "built_at": "2026-11-02T11:44:13Z",
   "package": {
     "name": "au",
-    "version": "0.1.12",
+    "version": "0.1.13",
     "display_name": "au",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "0884710944d6fde2bc950444bb9105ec4dd7c3d1",
-    "short_commit": "0884710",
+    "commit": "f19a2832d03e918d849da2bf4c5c06fb298872a3",
+    "short_commit": "f19a283",
     "branch": "master",
     "tags": [
-      "0.1.12"
+      "0.1.13"
     ],
     "dirty": false,
     "remote_url": "https://github.com/i2mint/au",
-    "commit_url": "https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1",
+    "commit_url": "https://github.com/i2mint/au/commit/f19a2832d03e918d849da2bf4c5c06fb298872a3",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "i2mint/au",
-    "sha": "af53cbfe382627cf02f93df930fca6fe3176b044",
+    "sha": "925c60666a200c6656ef6bedbac823ed74418716",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "41437626495",
-    "run_url": "https://github.com/i2mint/au/actions/runs/41437626495",
+    "run_id": "41438864774",
+    "run_url": "https://github.com/i2mint/au/actions/runs/41438864774",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -58,15 +58,15 @@
   },
   "site": {
     "modules_documented": 12,
-    "objects_documented": 344
+    "objects_documented": 345
   },
   "pypi": {
     "checked": true,
-    "latest": "0.1.12",
+    "latest": "0.1.13",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout 0884710944d6fde2bc950444bb9105ec4dd7c3d1\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout f19a2832d03e918d849da2bf4c5c06fb298872a3\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

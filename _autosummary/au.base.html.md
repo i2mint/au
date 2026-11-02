@@ -57,6 +57,11 @@ Shared infrastructure:
 True
 ```
 
+### Module Attributes
+
+| [`BackendFactory`](#au.base.BackendFactory)   | how a surface given no backend builds one.   |
+|-------------------------------------------------------------------|----------------------------------------------|
+
 ### Functions
 
 | [`async_compute`](#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
@@ -88,6 +93,15 @@ True
 
 | [`ComputationCancelledError`](#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](#au.base.ComputationHandle.get_result) when a computation was cancelled.   |
 |------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+
+### au.base.BackendFactory
+
+how a surface given no backend builds one.
+
+* **Type:**
+  `(store, middleware) -> backend`
+
+alias of [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`ComputationStore`](#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[Middleware]], ComputationBackend]
 
 ### *class* au.base.ComputationBackend(middleware=None)
 
@@ -582,9 +596,9 @@ It does not read the au settings (`AU_RETRY_*` and the like): those
 configure the simple API ([`au.submit_task()`](au.html.md#au.submit_task)).
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
-    `_default_backend`, else ProcessBackend). `@async_compute` may
-    also be used bare, without parentheses.
+  * **backend** ([`ComputationBackend`](#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: a ProcessBackend,
+    or what `_backend_factory` builds when one is set).
+    `@async_compute` may also be used bare, without parentheses.
   * **store** ([`ComputationStore`](#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)

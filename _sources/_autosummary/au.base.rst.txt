@@ -4,6 +4,12 @@ au.base
 .. automodule:: au.base
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BackendFactory
+   
    .. rubric:: Functions
 
    .. autosummary::

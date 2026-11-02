@@ -18,7 +18,7 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 | [`MockTaskTracker`](#au.testing.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                 |
 | [`SyncTestBackend`](#au.testing.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately. |
 | [`TaskCallRecord`](#au.testing.TaskCallRecord)(func_name, args, kwargs[, ...])    | Record of a task call for testing/mocking.          |
-| [`TrackingTestBackend`](#au.testing.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.            |
+| [`TrackingTestBackend`](#au.testing.TrackingTestBackend)([middleware, tracker])        | Test backend that tracks all executions.            |
 
 ### *class* au.testing.InMemoryStore(ttl_seconds=3600)
 
@@ -182,7 +182,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Record of a task call for testing/mocking.
 
-### *class* au.testing.TrackingTestBackend(middleware=None)
+### *class* au.testing.TrackingTestBackend(middleware=None, , tracker=None)
 
 Bases: [`SyncTestBackend`](#au.testing.SyncTestBackend)
 
@@ -230,7 +230,11 @@ Create a test store with optional configuration.
 Run every task launched inside the block on a synchronous test backend.
 
 It becomes the default backend of [`au.async_compute()`](au.html.md#au.async_compute) and of the
-simple API (`au.submit_task`, …). The simple API’s results go to
+simple API (`au.submit_task`, …), and wins over a
+`set_default_backend` made inside the block, which is undone on exit.
+The default mock runs the middleware each surface was given (the simple
+API’s comes from the settings); a `backend` you pass runs as you built
+it, and the decorator’s middleware is then dropped, with a warning. The simple API’s results go to
 `store` (a fresh InMemoryStore by default), which is restored on exit:
 read them inside the block, or pass a store you keep.
 

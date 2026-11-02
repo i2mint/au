@@ -1,4 +1,4 @@
-> built 2026-11-02 11:34 UTC from 0884710 (master) · au 0.1.12. Details: build_info.json
+> built 2026-11-02 11:44 UTC from f19a283 (master) · au 0.1.13. Details: build_info.json
 
 # index.html.md
 
@@ -1033,6 +1033,11 @@ Shared infrastructure:
 True
 ```
 
+### Module Attributes
+
+| [`BackendFactory`](_autosummary/au.base.html.md#au.base.BackendFactory)   | how a surface given no backend builds one.   |
+|-------------------------------------------------------------------|----------------------------------------------|
+
 ### Functions
 
 | [`async_compute`](_autosummary/au.base.html.md#au.base.async_compute)([backend, store, base_path, ...])   | Decorator to make functions asynchronous with status tracking.           |
@@ -1064,6 +1069,15 @@ True
 
 | [`ComputationCancelledError`](_autosummary/au.base.html.md#au.base.ComputationCancelledError)   | Raised by [`ComputationHandle.get_result()`](_autosummary/au.base.html.md#au.base.ComputationHandle.get_result) when a computation was cancelled.   |
 |------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+
+### au.base.BackendFactory
+
+how a surface given no backend builds one.
+
+* **Type:**
+  `(store, middleware) -> backend`
+
+alias of [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None), [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[Middleware]], ComputationBackend]
 
 ### *class* au.base.ComputationBackend(middleware=None)
 
@@ -1558,9 +1572,9 @@ It does not read the au settings (`AU_RETRY_*` and the like): those
 configure the simple API ([`au.submit_task()`](_autosummary/au.html.md#au.submit_task)).
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
-    `_default_backend`, else ProcessBackend). `@async_compute` may
-    also be used bare, without parentheses.
+  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: a ProcessBackend,
+    or what `_backend_factory` builds when one is set).
+    `@async_compute` may also be used bare, without parentheses.
   * **store** ([`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -2051,7 +2065,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryState`](_autosummary/au.html.md#au.RetryState)([attempt_count, last_error, ...])      | State tracking for retries.                                                           |
 | [`InMemoryStore`](_autosummary/au.html.md#au.InMemoryStore)([ttl_seconds])                      | In-memory store for testing.                                                          |
 | [`SyncTestBackend`](_autosummary/au.html.md#au.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately.                                   |
-| [`TrackingTestBackend`](_autosummary/au.html.md#au.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.                                              |
+| [`TrackingTestBackend`](_autosummary/au.html.md#au.TrackingTestBackend)([middleware, tracker])        | Test backend that tracks all executions.                                              |
 | [`MockTaskTracker`](_autosummary/au.html.md#au.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                                                   |
 | [`TaskGraph`](_autosummary/au.html.md#au.TaskGraph)([backend, store])                       | Directed Acyclic Graph (DAG) for task execution.                                      |
 | [`WorkflowTask`](_autosummary/au.html.md#au.WorkflowTask)(func[, args, kwargs, ...])           | A task in a workflow with dependencies.                                               |
@@ -3070,7 +3084,7 @@ Mark span as failed (base.Middleware protocol).
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.TrackingTestBackend(middleware=None)
+### *class* au.TrackingTestBackend(middleware=None, , tracker=None)
 
 Bases: [`SyncTestBackend`](_autosummary/au.testing.html.md#au.testing.SyncTestBackend)
 
@@ -3213,9 +3227,9 @@ It does not read the au settings (`AU_RETRY_*` and the like): those
 configure the simple API ([`au.submit_task()`](_autosummary/au.html.md#au.submit_task)).
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
-    `_default_backend`, else ProcessBackend). `@async_compute` may
-    also be used bare, without parentheses.
+  * **backend** ([`ComputationBackend`](_autosummary/au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: a ProcessBackend,
+    or what `_backend_factory` builds when one is set).
+    `@async_compute` may also be used bare, without parentheses.
   * **store** ([`ComputationStore`](_autosummary/au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -3556,7 +3570,11 @@ Create a FastAPI application for task management.
 Run every task launched inside the block on a synchronous test backend.
 
 It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) and of the
-simple API (`au.submit_task`, …). The simple API’s results go to
+simple API (`au.submit_task`, …), and wins over a
+`set_default_backend` made inside the block, which is undone on exit.
+The default mock runs the middleware each surface was given (the simple
+API’s comes from the settings); a `backend` you pass runs as you built
+it, and the decorator’s middleware is then dropped, with a warning. The simple API’s results go to
 `store` (a fresh InMemoryStore by default), which is restored on exit:
 read them inside the block, or pass a store you keep.
 
@@ -4085,7 +4103,7 @@ Provides test backends, mocking utilities, and helpers for testing async code.
 | [`MockTaskTracker`](_autosummary/au.testing.html.md#au.testing.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                 |
 | [`SyncTestBackend`](_autosummary/au.testing.html.md#au.testing.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately. |
 | [`TaskCallRecord`](_autosummary/au.testing.html.md#au.testing.TaskCallRecord)(func_name, args, kwargs[, ...])    | Record of a task call for testing/mocking.          |
-| [`TrackingTestBackend`](_autosummary/au.testing.html.md#au.testing.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.            |
+| [`TrackingTestBackend`](_autosummary/au.testing.html.md#au.testing.TrackingTestBackend)([middleware, tracker])        | Test backend that tracks all executions.            |
 
 ### *class* au.testing.InMemoryStore(ttl_seconds=3600)
 
@@ -4249,7 +4267,7 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Record of a task call for testing/mocking.
 
-### *class* au.testing.TrackingTestBackend(middleware=None)
+### *class* au.testing.TrackingTestBackend(middleware=None, , tracker=None)
 
 Bases: [`SyncTestBackend`](_autosummary/au.testing.html.md#au.testing.SyncTestBackend)
 
@@ -4297,7 +4315,11 @@ Create a test store with optional configuration.
 Run every task launched inside the block on a synchronous test backend.
 
 It becomes the default backend of [`au.async_compute()`](_autosummary/au.html.md#au.async_compute) and of the
-simple API (`au.submit_task`, …). The simple API’s results go to
+simple API (`au.submit_task`, …), and wins over a
+`set_default_backend` made inside the block, which is undone on exit.
+The default mock runs the middleware each surface was given (the simple
+API’s comes from the settings); a `backend` you pass runs as you built
+it, and the decorator’s middleware is then dropped, with a warning. The simple API’s results go to
 `store` (a fresh InMemoryStore by default), which is restored on exit:
 read them inside the block, or pass a store you keep.
 
@@ -4579,7 +4601,7 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 11:34 UTC** from commit <a href="https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1"><code>0884710</code></a> on branch <code>master</code>, for **au 0.1.12** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 11:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/f19a2832d03e918d849da2bf4c5c06fb298872a3"><code>f19a283</code></a> on branch <code>master</code>, for **au 0.1.13** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -4588,9 +4610,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/0884710944d6fde2bc950444bb9105ec4dd7c3d1"><code>0884710944d6fde2bc950444bb9105ec4dd7c3d1</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/f19a2832d03e918d849da2bf4c5c06fb298872a3"><code>f19a2832d03e918d849da2bf4c5c06fb298872a3</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.12</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.13</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4599,9 +4621,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41437626495">41437626495</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41438864774">41438864774</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>af53cbfe382627cf02f93df930fca6fe3176b044</code> (in the history of the built commit) |
+| Event commit | <code>925c60666a200c6656ef6bedbac823ed74418716</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4626,13 +4648,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.12/">0.1.12</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.13/">0.1.13</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 0884710944d6fde2bc950444bb9105ec4dd7c3d1
+git checkout f19a2832d03e918d849da2bf4c5c06fb298872a3
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

@@ -56,7 +56,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryState`](#au.RetryState)([attempt_count, last_error, ...])      | State tracking for retries.                                                           |
 | [`InMemoryStore`](#au.InMemoryStore)([ttl_seconds])                      | In-memory store for testing.                                                          |
 | [`SyncTestBackend`](#au.SyncTestBackend)([middleware])                     | Synchronous test backend that executes immediately.                                   |
-| [`TrackingTestBackend`](#au.TrackingTestBackend)([middleware])                 | Test backend that tracks all executions.                                              |
+| [`TrackingTestBackend`](#au.TrackingTestBackend)([middleware, tracker])        | Test backend that tracks all executions.                                              |
 | [`MockTaskTracker`](#au.MockTaskTracker)([task_count, tasks_by_name, ...]) | Tracks task executions for testing.                                                   |
 | [`TaskGraph`](#au.TaskGraph)([backend, store])                       | Directed Acyclic Graph (DAG) for task execution.                                      |
 | [`WorkflowTask`](#au.WorkflowTask)(func[, args, kwargs, ...])           | A task in a workflow with dependencies.                                               |
@@ -1075,7 +1075,7 @@ Mark span as failed (base.Middleware protocol).
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
-### *class* au.TrackingTestBackend(middleware=None)
+### *class* au.TrackingTestBackend(middleware=None, , tracker=None)
 
 Bases: [`SyncTestBackend`](au.testing.html.md#au.testing.SyncTestBackend)
 
@@ -1218,9 +1218,9 @@ It does not read the au settings (`AU_RETRY_*` and the like): those
 configure the simple API ([`au.submit_task()`](#au.submit_task)).
 
 * **Parameters:**
-  * **backend** ([`ComputationBackend`](au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: the module’s
-    `_default_backend`, else ProcessBackend). `@async_compute` may
-    also be used bare, without parentheses.
+  * **backend** ([`ComputationBackend`](au.base.html.md#au.base.ComputationBackend) | [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Backend to execute computations (default: a ProcessBackend,
+    or what `_backend_factory` builds when one is set).
+    `@async_compute` may also be used bare, without parentheses.
   * **store** ([`ComputationStore`](au.base.html.md#au.base.ComputationStore) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Store for results (default: FileSystemStore)
   * **base_path** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path for FileSystemStore if no store provided
   * **ttl_seconds** ([`int`](https://docs.python.org/3/builtins/functions.html#int) | [`None`](https://docs.python.org/3/builtins/constants.html#None)) – Time-to-live for results (default: 1 hour)
@@ -1561,7 +1561,11 @@ Create a FastAPI application for task management.
 Run every task launched inside the block on a synchronous test backend.
 
 It becomes the default backend of [`au.async_compute()`](#au.async_compute) and of the
-simple API (`au.submit_task`, …). The simple API’s results go to
+simple API (`au.submit_task`, …), and wins over a
+`set_default_backend` made inside the block, which is undone on exit.
+The default mock runs the middleware each surface was given (the simple
+API’s comes from the settings); a `backend` you pass runs as you built
+it, and the decorator’s middleware is then dropped, with a warning. The simple API’s results go to
 `store` (a fresh InMemoryStore by default), which is restored on exit:
 read them inside the block, or pass a store you keep.
 

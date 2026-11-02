@@ -97,6 +97,7 @@ data-aria-dark="Switch to auto color mode">
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#architecture-overview">Architecture Overview:</a></li>
 <li><a class="reference internal" href="#usage-patterns">Usage Patterns:</a></li>
+<li><a class="reference internal" href="#au.base.BackendFactory"><code class="docutils literal notranslate"><span class="pre">BackendFactory</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ComputationBackend"><code class="docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a><ul>
 <li><a class="reference internal" href="#au.base.ComputationBackend.launch"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.launch()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ComputationBackend.terminate"><code class="docutils literal notranslate"><span class="pre">ComputationBackend.terminate()</span></code></a></li>
@@ -273,6 +274,16 @@ and retrieve results later.</p>
 </span><span data-line="13"><span class="go">True</span>
 </span></pre></div>
 </div>
+<p class="rubric">Module Attributes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.base.BackendFactory" title="au.base.BackendFactory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackendFactory</span></code></a></p></td>
+<td><p>how a surface given no backend builds one.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Functions</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
@@ -355,6 +366,18 @@ and retrieve results later.</p>
 </table>
 </div>
 </section>
+<dl class="py data">
+<dt class="sig sig-object py" id="au.base.BackendFactory">
+<span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">BackendFactory</span></span><a class="headerlink" href="#au.base.BackendFactory" title="Link to this definition">#</a></dt>
+<dd><p>how a surface given no backend builds one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">(store,</span> <span class="pre">middleware)</span> <span class="pre">-&gt;</span> <span class="pre">backend</span></code></p>
+</dd>
+</dl>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[Middleware]], ComputationBackend]</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="au.base.ComputationBackend">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">ComputationBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">middleware</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationBackend" title="Link to this definition">#</a></dt>
@@ -1017,9 +1040,9 @@ configure the simple API (<a class="reference internal" href="au.html#au.submit_
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Backend to execute computations (default: the module’s
-<code class="docutils literal notranslate"><span class="pre">_default_backend</span></code>, else ProcessBackend). <code class="docutils literal notranslate"><span class="pre">&#64;async_compute</span></code> may
-also be used bare, without parentheses.</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationBackend" title="au.base.ComputationBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationBackend</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Backend to execute computations (default: a ProcessBackend,
+or what <code class="docutils literal notranslate"><span class="pre">_backend_factory</span></code> builds when one is set).
+<code class="docutils literal notranslate"><span class="pre">&#64;async_compute</span></code> may also be used bare, without parentheses.</p></li>
 <li><p><strong>store</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.base.ComputationStore" title="au.base.ComputationStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationStore</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Store for results (default: FileSystemStore)</p></li>
 <li><p><strong>base_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path for FileSystemStore if no store provided</p></li>
 <li><p><strong>ttl_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span>) – Time-to-live for results (default: 1 hour)</p></li>
@@ -1137,7 +1160,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=297ad043"></script>
+      <script src="../_static/documentation_options.js?v=8d02545a"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
