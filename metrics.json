@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 6.27510666847229,
-  "commit_message": "Merge f649369064e0ef0695ae4a856bcfb697880fda71 into f19a2832d03e918d849da2bf4c5c06fb298872a3",
-  "commit_sha": "9d997a2a95dd0168df5bc0ad3f29f55f52781635",
+  "collection_duration_seconds": 6.317776679992676,
+  "commit_message": "fix(au): a stored error keeps its type through FileSystemStore (#24 item 4)\n\nRecords keep error_type (and error_args when JSON-safe). A builtin Exception\nclass is rebuilt as itself when that gives back the stored message; any other\nbecomes an au.StoredError stand-in named after it. Old records read as before.\nget_result names a silent cause.",
+  "commit_sha": "f649369064e0ef0695ae4a856bcfb697880fda71",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -22,7 +22,7 @@
       "mean_lines_per_function": 15.971350480745766,
       "num_classes": 3043,
       "num_functions": 20489,
-      "pypi_version": "0.1.13",
+      "pypi_version": "0.1.12",
       "total_lines": 545079
     },
     "wily": {
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T11:51:34.593868Z",
+  "timestamp": "2026-11-02T11:51:40.699227Z",
   "workflow_status": {}
 }
