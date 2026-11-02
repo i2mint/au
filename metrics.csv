@@ -1,29 +1,30 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-02T12:03:58.100928Z
-commit_sha,5d9d9848692cffea467486d07aec0579c2157a12
-commit_message,"fix(au): submit_task reserves an idempotency key in one compare-and-set (#31) (#37)
+timestamp,2026-11-02T12:10:44.097359Z
+commit_sha,5cc3bd7a8803c51dd82fb489092c4198f1a2bb06
+commit_message,"fix(au): cancel restates CANCELLED after terminate only where it is needed (#30)
 
-Two concurrent submits of one key could both read ""not in flight"" and both
-launch. The reservation now goes through the store's compare-and-set (#32)."
+The unconditional re-write could clobber a job resubmitted under the key while
+ProcessBackend's terminate waited. It now runs only when the store's
+compare-and-set does not span its writers (new compare_and_set_spans_writers)."
 python_version,3.10
-metrics.umpyre_stats.num_functions,20392
-metrics.umpyre_stats.num_classes,3028
-metrics.umpyre_stats.total_lines,542758
-metrics.umpyre_stats.empty_lines,71105
-metrics.umpyre_stats.comment_lines,35495
-metrics.umpyre_stats.docs_lines,42923
-metrics.umpyre_stats.function_lines,325634
-metrics.umpyre_stats.empty_lines_ratio,0.13100682071936295
-metrics.umpyre_stats.comment_lines_ratio,0.06539746995898725
-metrics.umpyre_stats.function_lines_ratio,0.599961677211575
-metrics.umpyre_stats.mean_lines_per_function,15.96871322087093
-metrics.umpyre_stats.files_analyzed,1333
+metrics.umpyre_stats.num_functions,20491
+metrics.umpyre_stats.num_classes,3043
+metrics.umpyre_stats.total_lines,545086
+metrics.umpyre_stats.empty_lines,71445
+metrics.umpyre_stats.comment_lines,35629
+metrics.umpyre_stats.docs_lines,42974
+metrics.umpyre_stats.function_lines,327234
+metrics.umpyre_stats.empty_lines_ratio,0.13107106034644075
+metrics.umpyre_stats.comment_lines_ratio,0.06536399760771695
+metrics.umpyre_stats.function_lines_ratio,0.6003346260956987
+metrics.umpyre_stats.mean_lines_per_function,15.969645210092235
+metrics.umpyre_stats.files_analyzed,1348
 metrics.umpyre_stats.pypi_version,0.1.14
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-11-02T12:02:21Z
+metrics.workflow_status.last_success_timestamp,2026-11-02T12:05:45Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41441261603
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/41441800970
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -39,4 +40,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,6.137591361999512
+collection_duration_seconds,4.745197057723999
