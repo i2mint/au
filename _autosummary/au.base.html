@@ -120,13 +120,16 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.base.ComputationStore"><code class="docutils literal notranslate"><span class="pre">ComputationStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.base.ComputationStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.cleanup_expired()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ComputationStore.create_key"><code class="docutils literal notranslate"><span class="pre">ComputationStore.create_key()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore.exclusive"><code class="docutils literal notranslate"><span class="pre">ComputationStore.exclusive()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ComputationStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">ComputationStore.get_reconstruction_info()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.ComputationStore.is_expired"><code class="docutils literal notranslate"><span class="pre">ComputationStore.is_expired()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.ComputationStore.write_unless"><code class="docutils literal notranslate"><span class="pre">ComputationStore.write_unless()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#au.base.FileSystemStore"><code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a><ul>
 <li><a class="reference internal" href="#au.base.FileSystemStore.cleanup_expired"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.cleanup_expired()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.FileSystemStore.create_key"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.create_key()</span></code></a></li>
+<li><a class="reference internal" href="#au.base.FileSystemStore.exclusive"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.exclusive()</span></code></a></li>
 <li><a class="reference internal" href="#au.base.FileSystemStore.get_reconstruction_info"><code class="docutils literal notranslate"><span class="pre">FileSystemStore.get_reconstruction_info()</span></code></a></li>
 </ul>
 </li>
@@ -437,8 +440,10 @@ a genuine failure via <a class="reference internal" href="#au.base.ComputationHa
 <p>A thread, or a pool task that is already running, cannot be
 stopped; the au workers keep CANCELLED final anyway by not writing
 their outcome over it. <code class="docutils literal notranslate"><span class="pre">after_compute</span></code> then receives the CANCELLED
-result. A worker finishing in the instant between its check and its
-write can still overwrite it (no compare-and-set).</p>
+result. Each of those writes is a compare-and-set
+(<a class="reference internal" href="#au.base.ComputationStore.write_unless" title="au.base.ComputationStore.write_unless"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ComputationStore.write_unless()</span></code></a>), as is this one: across
+processes that holds only for a store whose compare-and-set spans
+them (<code class="docutils literal notranslate"><span class="pre">FileSystemStore</span></code> where the filesystem has record locks).</p>
 </div>
 </dd></dl>
 
@@ -556,6 +561,18 @@ write can still overwrite it (no compare-and-set).</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.exclusive">
+<span class="sig-name descname"><span class="pre">exclusive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.exclusive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.exclusive" title="Link to this definition">#</a></dt>
+<dd><p>Hold off every other au writer of <code class="docutils literal notranslate"><span class="pre">key</span></code> while the block runs.</p>
+<p>The default excludes writers in this process only, which covers a store
+living in one process. A store written from several processes, or
+several machines, overrides this with a lock they all share
+(<a class="reference internal" href="#au.base.FileSystemStore" title="au.base.FileSystemStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSystemStore</span></code></a> does). Not reentrant.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="au.base.ComputationStore.get_reconstruction_info">
 <span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_reconstruction_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.get_reconstruction_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.get_reconstruction_info" title="Link to this definition">#</a></dt>
 <dd><p>Get information needed to reconstruct this store in a worker process.</p>
@@ -573,6 +590,36 @@ write can still overwrite it (no compare-and-set).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.ComputationStore.write_unless">
+<span class="sig-name descname"><span class="pre">write_unless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.write_unless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.write_unless" title="Link to this definition">#</a></dt>
+<dd><p>Write <code class="docutils literal notranslate"><span class="pre">result</span></code> under <code class="docutils literal notranslate"><span class="pre">key</span></code> unless the status stored there is in
+<code class="docutils literal notranslate"><span class="pre">keep</span></code>; return whether it wrote, and what the store now holds.</p>
+<p>A compare-and-set: au’s conditional writes (a worker’s RUNNING and
+outcome, a caller’s CANCELLED) go through it, so none lands between
+another’s read and write (i2mint/au#28). This default reads (with
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">_read()</span></code>) and writes under <a class="reference internal" href="#au.base.ComputationStore.exclusive" title="au.base.ComputationStore.exclusive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">exclusive()</span></code></a>. A store with an
+atomic conditional write of its own (one <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">...</span> <span class="pre">WHERE</span> <span class="pre">status</span> <span class="pre">NOT</span>
+<span class="pre">IN</span> <span class="pre">...</span></code> on a database) overrides this method whole instead. A read
+that fails raises.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">au.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">InMemoryStore</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">InMemoryStore</span><span class="p">()</span>
+</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">done</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
+</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="o">.</span><span class="n">write_unless</span><span class="p">(</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">_CANCELLED</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span data-line="5"><span class="go">True</span>
+</span><span data-line="6"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">[</span><span class="s2">"k"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">)</span>
+</span><span data-line="7"><span class="gp">&gt;&gt;&gt; </span><span class="n">wrote</span><span class="p">,</span> <span class="n">held</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">write_unless</span><span class="p">(</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">_CANCELLED</span><span class="p">)</span>
+</span><span data-line="8"><span class="gp">&gt;&gt;&gt; </span><span class="n">wrote</span><span class="p">,</span> <span class="n">held</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span>
+</span><span data-line="9"><span class="go">(False, 'cancelled')</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference internal" href="#au.base.ComputationResult" title="au.base.ComputationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputationResult</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -614,6 +661,23 @@ write can still overwrite it (no compare-and-set).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.base.FileSystemStore.exclusive">
+<span class="sig-name descname"><span class="pre">exclusive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#FileSystemStore.exclusive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.FileSystemStore.exclusive" title="Link to this definition">#</a></dt>
+<dd><p>Exclude every au writer of this directory, in any process, where
+POSIX record locks exist; elsewhere (Windows, or a filesystem without
+locks), the writers in this process.</p>
+<p>A record lock (<code class="docutils literal notranslate"><span class="pre">lockf</span></code>), not <code class="docutils literal notranslate"><span class="pre">flock</span></code>: a forked child does not
+inherit it, where it shares an <code class="docutils literal notranslate"><span class="pre">flock</span></code> held by the parent at the fork
+and then blocks on it for good. Record locks do not exclude the threads
+of one process, hence the in-process lock around it, which also keeps
+one thread’s close of the lock file from releasing another’s lock. The
+lock file, one per directory, sits in the writing subdirectory so it
+never looks like a key; a process killed holding it releases it.</p>
+<dl class="field-list simple">
 </dl>
 </dd></dl>
 
@@ -1071,7 +1135,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../_static/documentation_options.js?v=1e825a29"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

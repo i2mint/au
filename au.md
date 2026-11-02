@@ -1,4 +1,4 @@
-> built 2026-10-27 14:33 UTC from 71dfa49 (master) · au 0.1.10. Details: build_info.json
+> built 2026-11-02 11:21 UTC from c3336c5 (master) · au 0.1.11. Details: build_info.json
 
 # index.html.md
 
@@ -1124,8 +1124,10 @@ a genuine failure via [`get_status()`](_autosummary/au.base.html.md#au.base.Comp
 A thread, or a pool task that is already running, cannot be
 stopped; the au workers keep CANCELLED final anyway by not writing
 their outcome over it. `after_compute` then receives the CANCELLED
-result. A worker finishing in the instant between its check and its
-write can still overwrite it (no compare-and-set).
+result. Each of those writes is a compare-and-set
+([`ComputationStore.write_unless()`](_autosummary/au.base.html.md#au.base.ComputationStore.write_unless)), as is this one: across
+processes that holds only for a store whose compare-and-set spans
+them (`FileSystemStore` where the filesystem has record locks).
 
 #### get_result(, timeout=None)
 
@@ -1205,6 +1207,15 @@ Generate a unique key for a new computation.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### exclusive(key)
+
+Hold off every other au writer of `key` while the block runs.
+
+The default excludes writers in this process only, which covers a store
+living in one process. A store written from several processes, or
+several machines, overrides this with a lock they all share
+([`FileSystemStore`](_autosummary/au.base.html.md#au.base.FileSystemStore) does). Not reentrant.
+
 #### *abstractmethod* get_reconstruction_info()
 
 Get information needed to reconstruct this store in a worker process.
@@ -1218,6 +1229,34 @@ Check if a result has expired based on TTL.
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### write_unless(key, result, , keep)
+
+Write `result` under `key` unless the status stored there is in
+`keep`; return whether it wrote, and what the store now holds.
+
+A compare-and-set: au’s conditional writes (a worker’s RUNNING and
+outcome, a caller’s CANCELLED) go through it, so none lands between
+another’s read and write (i2mint/au#28). This default reads (with
+`_read()`) and writes under [`exclusive()`](_autosummary/au.base.html.md#au.base.ComputationStore.exclusive). A store with an
+atomic conditional write of its own (one `UPDATE ... WHERE status NOT
+IN ...` on a database) overrides this method whole instead. A read
+that fails raises.
+
+```pycon
+>>> from au.testing import InMemoryStore
+>>> store = InMemoryStore()
+>>> done = ComputationResult(1, ComputationStatus.COMPLETED)
+>>> store.write_unless("k", done, keep=_CANCELLED)[0]
+True
+>>> store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+>>> wrote, held = store.write_unless("k", done, keep=_CANCELLED)
+>>> wrote, held.status.value
+(False, 'cancelled')
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool), [`ComputationResult`](_autosummary/au.base.html.md#au.base.ComputationResult)]
 
 ### *class* au.base.FileSystemStore(base_path, , suffix='.json', ttl_seconds=None, serialization=SerializationFormat.JSON, auto_cleanup=True, cleanup_probability=0.1)
 
@@ -1248,6 +1287,20 @@ Generate a unique filename.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### exclusive(key)
+
+Exclude every au writer of this directory, in any process, where
+POSIX record locks exist; elsewhere (Windows, or a filesystem without
+locks), the writers in this process.
+
+A record lock (`lockf`), not `flock`: a forked child does not
+inherit it, where it shares an `flock` held by the parent at the fork
+and then blocks on it for good. Record locks do not exclude the threads
+of one process, hence the in-process lock around it, which also keeps
+one thread’s close of the lock file from releasing another’s lock. The
+lock file, one per directory, sits in the writing subdirectory so it
+never looks like a key; a process killed holding it releases it.
 
 #### get_reconstruction_info()
 
@@ -2067,8 +2120,10 @@ a genuine failure via [`get_status()`](_autosummary/au.html.md#au.get_status) wi
 A thread, or a pool task that is already running, cannot be
 stopped; the au workers keep CANCELLED final anyway by not writing
 their outcome over it. `after_compute` then receives the CANCELLED
-result. A worker finishing in the instant between its check and its
-write can still overwrite it (no compare-and-set).
+result. Each of those writes is a compare-and-set
+([`ComputationStore.write_unless()`](_autosummary/au.html.md#au.ComputationStore.write_unless)), as is this one: across
+processes that holds only for a store whose compare-and-set spans
+them (`FileSystemStore` where the filesystem has record locks).
 
 #### get_result(, timeout=None)
 
@@ -2148,6 +2203,15 @@ Generate a unique key for a new computation.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### exclusive(key)
+
+Hold off every other au writer of `key` while the block runs.
+
+The default excludes writers in this process only, which covers a store
+living in one process. A store written from several processes, or
+several machines, overrides this with a lock they all share
+([`FileSystemStore`](_autosummary/au.html.md#au.FileSystemStore) does). Not reentrant.
+
 #### *abstractmethod* get_reconstruction_info()
 
 Get information needed to reconstruct this store in a worker process.
@@ -2161,6 +2225,34 @@ Check if a result has expired based on TTL.
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### write_unless(key, result, , keep)
+
+Write `result` under `key` unless the status stored there is in
+`keep`; return whether it wrote, and what the store now holds.
+
+A compare-and-set: au’s conditional writes (a worker’s RUNNING and
+outcome, a caller’s CANCELLED) go through it, so none lands between
+another’s read and write (i2mint/au#28). This default reads (with
+`_read()`) and writes under [`exclusive()`](_autosummary/au.html.md#au.ComputationStore.exclusive). A store with an
+atomic conditional write of its own (one `UPDATE ... WHERE status NOT
+IN ...` on a database) overrides this method whole instead. A read
+that fails raises.
+
+```pycon
+>>> from au.testing import InMemoryStore
+>>> store = InMemoryStore()
+>>> done = ComputationResult(1, ComputationStatus.COMPLETED)
+>>> store.write_unless("k", done, keep=_CANCELLED)[0]
+True
+>>> store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+>>> wrote, held = store.write_unless("k", done, keep=_CANCELLED)
+>>> wrote, held.status.value
+(False, 'cancelled')
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool), [`ComputationResult`](_autosummary/au.base.html.md#au.base.ComputationResult)]
 
 ### *class* au.FileSystemStore(base_path, , suffix='.json', ttl_seconds=None, serialization=SerializationFormat.JSON, auto_cleanup=True, cleanup_probability=0.1)
 
@@ -2191,6 +2283,20 @@ Generate a unique filename.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### exclusive(key)
+
+Exclude every au writer of this directory, in any process, where
+POSIX record locks exist; elsewhere (Windows, or a filesystem without
+locks), the writers in this process.
+
+A record lock (`lockf`), not `flock`: a forked child does not
+inherit it, where it shares an `flock` held by the parent at the fork
+and then blocks on it for good. Record locks do not exclude the threads
+of one process, hence the in-process lock around it, which also keeps
+one thread’s close of the lock file from releasing another’s lock. The
+lock file, one per directory, sits in the writing subdirectory so it
+never looks like a key; a process killed holding it releases it.
 
 #### get_reconstruction_info()
 
@@ -4411,20 +4517,18 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-10-27 14:33 UTC** from commit <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49</code></a> on branch <code>master</code>, for **au 0.1.10** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 11:21 UTC** from commit <a href="https://github.com/i2mint/au/commit/c3336c5a897bf9c04271175dd9748522ee24b0a1"><code>c3336c5</code></a> on branch <code>master</code>, for **au 0.1.11** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.1.10) is ahead of the latest release on PyPI (0.1.9): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/71dfa49402747b1d635f98d83e89606ac9942b23"><code>71dfa49402747b1d635f98d83e89606ac9942b23</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/c3336c5a897bf9c04271175dd9748522ee24b0a1"><code>c3336c5a897bf9c04271175dd9748522ee24b0a1</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.10</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.11</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4433,9 +4537,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/40521898213">40521898213</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41435947099">41435947099</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>d6f398c8a8ba041848ac1f59fd47414984805a2d</code> (in the history of the built commit) |
+| Event commit | <code>89a0b3d49d6b3af3829ac794af05e5ba2e987937</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4460,13 +4564,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.9/">0.1.9</a>, older than the documented version (0.1.10).
+Latest release: <a href="https://pypi.org/project/au/0.1.11/">0.1.11</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 71dfa49402747b1d635f98d83e89606ac9942b23
+git checkout c3336c5a897bf9c04271175dd9748522ee24b0a1
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

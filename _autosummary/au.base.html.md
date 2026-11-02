@@ -161,8 +161,10 @@ a genuine failure via [`get_status()`](#au.base.ComputationHandle.get_status) wi
 A thread, or a pool task that is already running, cannot be
 stopped; the au workers keep CANCELLED final anyway by not writing
 their outcome over it. `after_compute` then receives the CANCELLED
-result. A worker finishing in the instant between its check and its
-write can still overwrite it (no compare-and-set).
+result. Each of those writes is a compare-and-set
+([`ComputationStore.write_unless()`](#au.base.ComputationStore.write_unless)), as is this one: across
+processes that holds only for a store whose compare-and-set spans
+them (`FileSystemStore` where the filesystem has record locks).
 
 #### get_result(, timeout=None)
 
@@ -242,6 +244,15 @@ Generate a unique key for a new computation.
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
+#### exclusive(key)
+
+Hold off every other au writer of `key` while the block runs.
+
+The default excludes writers in this process only, which covers a store
+living in one process. A store written from several processes, or
+several machines, overrides this with a lock they all share
+([`FileSystemStore`](#au.base.FileSystemStore) does). Not reentrant.
+
 #### *abstractmethod* get_reconstruction_info()
 
 Get information needed to reconstruct this store in a worker process.
@@ -255,6 +266,34 @@ Check if a result has expired based on TTL.
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+#### write_unless(key, result, , keep)
+
+Write `result` under `key` unless the status stored there is in
+`keep`; return whether it wrote, and what the store now holds.
+
+A compare-and-set: au’s conditional writes (a worker’s RUNNING and
+outcome, a caller’s CANCELLED) go through it, so none lands between
+another’s read and write (i2mint/au#28). This default reads (with
+`_read()`) and writes under [`exclusive()`](#au.base.ComputationStore.exclusive). A store with an
+atomic conditional write of its own (one `UPDATE ... WHERE status NOT
+IN ...` on a database) overrides this method whole instead. A read
+that fails raises.
+
+```pycon
+>>> from au.testing import InMemoryStore
+>>> store = InMemoryStore()
+>>> done = ComputationResult(1, ComputationStatus.COMPLETED)
+>>> store.write_unless("k", done, keep=_CANCELLED)[0]
+True
+>>> store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+>>> wrote, held = store.write_unless("k", done, keep=_CANCELLED)
+>>> wrote, held.status.value
+(False, 'cancelled')
+```
+
+* **Return type:**
+  [`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[`bool`](https://docs.python.org/3/builtins/functions.html#bool), [`ComputationResult`](#au.base.ComputationResult)]
 
 ### *class* au.base.FileSystemStore(base_path, , suffix='.json', ttl_seconds=None, serialization=SerializationFormat.JSON, auto_cleanup=True, cleanup_probability=0.1)
 
@@ -285,6 +324,20 @@ Generate a unique filename.
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
+
+#### exclusive(key)
+
+Exclude every au writer of this directory, in any process, where
+POSIX record locks exist; elsewhere (Windows, or a filesystem without
+locks), the writers in this process.
+
+A record lock (`lockf`), not `flock`: a forked child does not
+inherit it, where it shares an `flock` held by the parent at the fork
+and then blocks on it for good. Record locks do not exclude the threads
+of one process, hence the in-process lock around it, which also keeps
+one thread’s close of the lock file from releasing another’s lock. The
+lock file, one per directory, sits in the writing subdirectory so it
+never looks like a key; a process killed holding it releases it.
 
 #### get_reconstruction_info()
 
