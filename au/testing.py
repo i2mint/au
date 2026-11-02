@@ -236,14 +236,21 @@ class TrackingTestBackend(SyncTestBackend):
     Extends SyncTestBackend with detailed tracking for testing/debugging.
     """
 
-    def __init__(self, middleware: Optional[list[Middleware]] = None):
+    def __init__(
+        self,
+        middleware: Optional[list[Middleware]] = None,
+        *,
+        tracker: Optional["MockTaskTracker"] = None,
+    ):
         """Initialize tracking test backend.
 
         Args:
             middleware: Optional list of middleware
+            tracker: Where calls are recorded (default: a tracker of its own);
+                share one to count across several backends
         """
         super().__init__(middleware=middleware)
-        self.tracker = MockTaskTracker()
+        self.tracker = tracker if tracker is not None else MockTaskTracker()
 
     def launch(
         self,
@@ -278,7 +285,11 @@ def mock_async(
     """Run every task launched inside the block on a synchronous test backend.
 
     It becomes the default backend of :func:`au.async_compute` and of the
-    simple API (``au.submit_task``, ...). The simple API's results go to
+    simple API (``au.submit_task``, ...), and wins over a
+    ``set_default_backend`` made inside the block, which is undone on exit.
+    The default mock runs the middleware each surface was given (the simple
+    API's comes from the settings); a ``backend`` you pass runs as you built
+    it, and the decorator's middleware is then dropped, with a warning. The simple API's results go to
     ``store`` (a fresh InMemoryStore by default), which is restored on exit:
     read them inside the block, or pass a store you keep.
 
@@ -303,22 +314,29 @@ def mock_async(
     import au.base
 
     if backend is None:
-        backend = TrackingTestBackend()
+        tracker = MockTaskTracker()
+
+        def factory(store, middleware):
+            return TrackingTestBackend(middleware, tracker=tracker)
+
+    else:
+        tracker = getattr(backend, "tracker", None) or MockTaskTracker()
+
+        def factory(store, middleware):
+            return backend  # as given: its own middleware, not the surface's
+
     originals = (
-        au.base._default_backend,
+        au.base._backend_factory,
         au.api._default_backend,
         au.api._default_store,
     )
-    au.base._default_backend = au.api._default_backend = backend
+    au.base._backend_factory = factory
     au.api._default_store = store if store is not None else InMemoryStore()
     try:
-        if isinstance(backend, TrackingTestBackend):
-            yield backend.tracker
-        else:
-            yield MockTaskTracker()
+        yield tracker
     finally:
         (
-            au.base._default_backend,
+            au.base._backend_factory,
             au.api._default_backend,
             au.api._default_store,
         ) = originals

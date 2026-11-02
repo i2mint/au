@@ -1083,7 +1083,7 @@ def test_mock_async_runs_every_default_backed_task_synchronously():
     import au.base
     from au.testing import InMemoryStore, mock_async
 
-    before = (au.base._default_backend, au.api._default_backend)
+    before = (au.base._backend_factory, au.api._default_backend)
     with mock_async() as mock:
 
         @async_compute(store=InMemoryStore())
@@ -1095,7 +1095,73 @@ def test_mock_async_runs_every_default_backed_task_synchronously():
         assert _decorated_at_import(1).get_result(timeout=1) == 101
         assert au.api.submit_task(_double, 4, store=InMemoryStore())
         assert mock.task_count == 3
-    assert (au.base._default_backend, au.api._default_backend) == before
+    assert (au.base._backend_factory, au.api._default_backend) == before
+
+
+class _Seen(Middleware):
+    """Records the keys it saw start and end."""
+
+    def __init__(self):
+        self.started, self.ended = [], []
+
+    def before_compute(self, func, args, kwargs, key):
+        self.started.append(key)
+
+    def after_compute(self, key, result):
+        self.ended.append(key)
+
+    def on_error(self, key, error):
+        self.ended.append(key)
+
+
+def test_middleware_given_to_async_compute_runs_under_mock_async():
+    """i2mint/au#24: the mock replaced the backend whole, so the decorator's
+    middleware was dropped (with a warning)."""
+    from au.testing import InMemoryStore, mock_async
+
+    seen = _Seen()
+    with mock_async() as mock:
+
+        @async_compute(store=InMemoryStore(), middleware=[seen])
+        def task(x):
+            return x + 1
+
+        handle = task(1)
+        assert handle.get_result() == 2
+    assert seen.started == seen.ended == [handle.key]
+    assert mock.task_count == 1
+
+
+def test_mock_async_wins_over_a_simple_api_backend_already_built():
+    """The simple API caches its backend; under the mock it must not use it."""
+    import au.api
+    from au.testing import mock_async
+
+    from au.base import ThreadBackend
+
+    previous = au.api._default_backend
+    au.api._default_backend = ThreadBackend()
+    try:
+        with mock_async() as mock:
+            task_id = au.api.submit_task(_double, 4)
+            assert au.api.get_result(task_id) == 8  # ran synchronously
+            assert mock.task_count == 1
+    finally:
+        au.api._default_backend = previous
+
+
+def test_a_backend_given_to_mock_async_runs_as_given_and_says_so():
+    from au.testing import InMemoryStore, SyncTestBackend, mock_async
+
+    given = SyncTestBackend()
+    with mock_async(given):
+
+        @async_compute(store=InMemoryStore(), middleware=[_Seen()])
+        def task(x):
+            return x
+
+        with pytest.warns(UserWarning, match="does not run"):
+            assert task(3).get_result() == 3
 
 
 def test_a_backend_that_is_callable_is_not_taken_for_the_function():
@@ -1198,3 +1264,42 @@ def test_a_computation_can_be_cancelled_before_its_first_write():
     handle = ComputationHandle("not-yet", InMemoryStore())
     assert handle.cancel() is True
     assert handle.get_status() == ComputationStatus.CANCELLED
+
+
+def test_a_backend_given_to_mock_async_does_not_warn_on_the_simple_api():
+    """The settings' logging middleware is not "middleware given to
+    async_compute": no warning there."""
+    import warnings
+
+    import au.api
+    from au.testing import SyncTestBackend, mock_async
+
+    with mock_async(SyncTestBackend()), warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert au.api.get_result(au.api.submit_task(_double, 3)) == 6
+
+
+def test_a_default_backend_set_inside_mock_async_is_undone_on_exit():
+    import au.api
+    from au.base import ThreadBackend
+    from au.testing import mock_async
+
+    before = au.api._default_backend
+    with mock_async() as mock:
+        au.api.set_default_backend(ThreadBackend())
+        assert au.api.get_result(au.api.submit_task(_double, 2)) == 4
+        assert mock.task_count == 1  # the mock wins inside the block
+    assert au.api._default_backend is before
+
+
+def test_mock_async_does_not_hide_a_broken_logging_setting(monkeypatch):
+    import au.api
+    from au.config import AUConfig, reset_global_config, set_global_config
+    from au.testing import mock_async
+
+    set_global_config(AUConfig(logging_level="NOPE"))
+    try:
+        with mock_async(), pytest.raises(ValueError, match="AU_LOGGING_LEVEL"):
+            au.api.submit_task(_double, 1)
+    finally:
+        reset_global_config()
