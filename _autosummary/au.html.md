@@ -76,7 +76,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryableError`](#au.RetryableError)              | Base class for errors that should be retried.                                                                                                                          |
 | [`NonRetryableError`](#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                                                                      |
 
-### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, reservation_lease_seconds=None, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -277,19 +277,28 @@ Check if a result has expired based on TTL.
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
-#### write_unless(key, result, , keep)
+#### write_unless(key, result, , keep, stale_after=None)
 
 Write `result` under `key` unless the status stored there is in
 `keep`; return whether it wrote, and what the store now holds.
+
+With `stale_after`, a record whose status is in `keep` is still
+overwritten once it began (`started_at`, else `created_at`) at least
+that long ago, compared in UTC (a naive time is taken as local): a
+lease. For a reservation not yet started, it counts from the
+reservation, so time spent queued counts too. Nothing fences the old
+record’s writer: one still running past the lease may later write over
+the new record (no per-submission token yet: i2mint/au#30).
 
 A compare-and-set: au’s conditional writes (a worker’s RUNNING and
 outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](#au.ComputationStore.exclusive). A store with an
-atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead, and
-answers True to [`compare_and_set_spans_writers`](#au.ComputationStore.compare_and_set_spans_writers). A read that
-fails raises.
+atomic conditional write of its own overrides this method whole
+instead, and answers True to [`compare_and_set_spans_writers`](#au.ComputationStore.compare_and_set_spans_writers): on
+a database, one `UPDATE ... WHERE status NOT IN (:keep) OR
+coalesce(started_at, created_at) <= now() - :stale_after` (the `OR`
+only with `stale_after`). A read that fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore

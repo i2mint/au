@@ -24,7 +24,7 @@ Supports configuration cascade:
 | [`AUConfig`](#au.config.AUConfig)([backend, redis_url, supabase_url, ...])   | Configuration for AU with smart defaults.   |
 |------------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, reservation_lease_seconds=None, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -82,6 +82,8 @@ Environment variables:
 - AU_RETRY_MAX_ATTEMPTS: Maximum attempts
 - AU_RETRY_BACKOFF: exponential, linear or constant
 - AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+- AU_RESERVATION_LEASE_SECONDS: How long a RUNNING record holds its
+  idempotency key against a resubmit (unset: for good)
 - AU_LOGGING_ENABLED: The simple API logs each task’s start and end
 - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
   (a level name or number; not a filter: configure logging for that)

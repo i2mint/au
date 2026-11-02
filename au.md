@@ -1,4 +1,4 @@
-> built 2026-11-02 12:13 UTC from 76bdab3 (master) · au 0.1.16. Details: build_info.json
+> built 2026-11-02 12:28 UTC from 28fafd7 (master) · au 0.1.17. Details: build_info.json
 
 # index.html.md
 
@@ -1266,19 +1266,28 @@ Check if a result has expired based on TTL.
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
-#### write_unless(key, result, , keep)
+#### write_unless(key, result, , keep, stale_after=None)
 
 Write `result` under `key` unless the status stored there is in
 `keep`; return whether it wrote, and what the store now holds.
+
+With `stale_after`, a record whose status is in `keep` is still
+overwritten once it began (`started_at`, else `created_at`) at least
+that long ago, compared in UTC (a naive time is taken as local): a
+lease. For a reservation not yet started, it counts from the
+reservation, so time spent queued counts too. Nothing fences the old
+record’s writer: one still running past the lease may later write over
+the new record (no per-submission token yet: i2mint/au#30).
 
 A compare-and-set: au’s conditional writes (a worker’s RUNNING and
 outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](_autosummary/au.base.html.md#au.base.ComputationStore.exclusive). A store with an
-atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead, and
-answers True to [`compare_and_set_spans_writers`](_autosummary/au.base.html.md#au.base.ComputationStore.compare_and_set_spans_writers). A read that
-fails raises.
+atomic conditional write of its own overrides this method whole
+instead, and answers True to [`compare_and_set_spans_writers`](_autosummary/au.base.html.md#au.base.ComputationStore.compare_and_set_spans_writers): on
+a database, one `UPDATE ... WHERE status NOT IN (:keep) OR
+coalesce(started_at, created_at) <= now() - :stale_after` (the `OR`
+only with `stale_after`). A read that fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore
@@ -1700,7 +1709,7 @@ Supports configuration cascade:
 | [`AUConfig`](_autosummary/au.config.html.md#au.config.AUConfig)([backend, redis_url, supabase_url, ...])   | Configuration for AU with smart defaults.   |
 |------------------------------------------------------------------------------------------------------|---------------------------------------------|
 
-### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.config.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, reservation_lease_seconds=None, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -1758,6 +1767,8 @@ Environment variables:
 - AU_RETRY_MAX_ATTEMPTS: Maximum attempts
 - AU_RETRY_BACKOFF: exponential, linear or constant
 - AU_RETRY_INITIAL_DELAY: Seconds before the first retry
+- AU_RESERVATION_LEASE_SECONDS: How long a RUNNING record holds its
+  idempotency key against a resubmit (unset: for good)
 - AU_LOGGING_ENABLED: The simple API logs each task’s start and end
 - AU_LOGGING_LEVEL: Level the simple API logs task start/completion at
   (a level name or number; not a filter: configure logging for that)
@@ -2114,7 +2125,7 @@ A lightweight, convention-over-configuration async framework for Python.
 | [`RetryableError`](_autosummary/au.html.md#au.RetryableError)              | Base class for errors that should be retried.                                                                                                                          |
 | [`NonRetryableError`](_autosummary/au.html.md#au.NonRetryableError)           | Base class for errors that should not be retried.                                                                                                                      |
 
-### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
+### *class* au.AUConfig(backend='thread', redis_url=None, supabase_url=None, supabase_key=None, max_workers=4, storage='filesystem', storage_path='/tmp/au_tasks', ttl_seconds=3600, serialization='json', retry_enabled=False, retry_max_attempts=3, retry_backoff='exponential', retry_initial_delay=1.0, reservation_lease_seconds=None, logging_enabled=True, logging_level='INFO', http_host='127.0.0.1', http_port=8000, http_framework='fastapi')
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -2315,19 +2326,28 @@ Check if a result has expired based on TTL.
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
-#### write_unless(key, result, , keep)
+#### write_unless(key, result, , keep, stale_after=None)
 
 Write `result` under `key` unless the status stored there is in
 `keep`; return whether it wrote, and what the store now holds.
+
+With `stale_after`, a record whose status is in `keep` is still
+overwritten once it began (`started_at`, else `created_at`) at least
+that long ago, compared in UTC (a naive time is taken as local): a
+lease. For a reservation not yet started, it counts from the
+reservation, so time spent queued counts too. Nothing fences the old
+record’s writer: one still running past the lease may later write over
+the new record (no per-submission token yet: i2mint/au#30).
 
 A compare-and-set: au’s conditional writes (a worker’s RUNNING and
 outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 `_read()`) and writes under [`exclusive()`](_autosummary/au.html.md#au.ComputationStore.exclusive). A store with an
-atomic conditional write of its own (one `UPDATE ... WHERE status NOT
-IN ...` on a database) overrides this method whole instead, and
-answers True to [`compare_and_set_spans_writers`](_autosummary/au.html.md#au.ComputationStore.compare_and_set_spans_writers). A read that
-fails raises.
+atomic conditional write of its own overrides this method whole
+instead, and answers True to [`compare_and_set_spans_writers`](_autosummary/au.html.md#au.ComputationStore.compare_and_set_spans_writers): on
+a database, one `UPDATE ... WHERE status NOT IN (:keep) OR
+coalesce(started_at, created_at) <= now() - :stale_after` (the `OR`
+only with `stale_after`). A read that fails raises.
 
 ```pycon
 >>> from au.testing import InMemoryStore
@@ -4673,20 +4693,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 12:13 UTC** from commit <a href="https://github.com/i2mint/au/commit/76bdab32333c73387d903e07f1b7d7f94ce3f22c"><code>76bdab3</code></a> on branch <code>master</code>, for **au 0.1.16** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-02 12:28 UTC** from commit <a href="https://github.com/i2mint/au/commit/28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896"><code>28fafd7</code></a> on branch <code>master</code>, for **au 0.1.17** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.1.16) is ahead of the latest release on PyPI (0.1.15): these docs describe unreleased code.
+- The documented version (0.1.17) is ahead of the latest release on PyPI (0.1.16): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/76bdab32333c73387d903e07f1b7d7f94ce3f22c"><code>76bdab32333c73387d903e07f1b7d7f94ce3f22c</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896"><code>28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.16</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.17</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4695,9 +4715,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41442667747">41442667747</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/41444657697">41444657697</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>1c8362d01b35e3651a6f6aec7435ff78072afed4</code> (in the history of the built commit) |
+| Event commit | <code>81cf702450fbd26b6099996dc46fdaad22a29e1c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4722,13 +4742,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.15/">0.1.15</a>, older than the documented version (0.1.16).
+Latest release: <a href="https://pypi.org/project/au/0.1.16/">0.1.16</a>, older than the documented version (0.1.17).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 76bdab32333c73387d903e07f1b7d7f94ce3f22c
+git checkout 28fafd7590cb25d1fdd5fc8f9abc3fffc0b5c896
 pip install "epythet==0.2.22"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

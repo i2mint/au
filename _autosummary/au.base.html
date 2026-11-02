@@ -635,17 +635,25 @@ several machines, overrides this with a lock they all share
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.ComputationStore.write_unless">
-<span class="sig-name descname"><span class="pre">write_unless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.write_unless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.write_unless" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">write_unless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stale_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ComputationStore.write_unless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.ComputationStore.write_unless" title="Link to this definition">#</a></dt>
 <dd><p>Write <code class="docutils literal notranslate"><span class="pre">result</span></code> under <code class="docutils literal notranslate"><span class="pre">key</span></code> unless the status stored there is in
 <code class="docutils literal notranslate"><span class="pre">keep</span></code>; return whether it wrote, and what the store now holds.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">stale_after</span></code>, a record whose status is in <code class="docutils literal notranslate"><span class="pre">keep</span></code> is still
+overwritten once it began (<code class="docutils literal notranslate"><span class="pre">started_at</span></code>, else <code class="docutils literal notranslate"><span class="pre">created_at</span></code>) at least
+that long ago, compared in UTC (a naive time is taken as local): a
+lease. For a reservation not yet started, it counts from the
+reservation, so time spent queued counts too. Nothing fences the old
+record’s writer: one still running past the lease may later write over
+the new record (no per-submission token yet: i2mint/au#30).</p>
 <p>A compare-and-set: au’s conditional writes (a worker’s RUNNING and
 outcome, a caller’s CANCELLED) go through it, so none lands between
 another’s read and write (i2mint/au#28). This default reads (with
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">_read()</span></code>) and writes under <a class="reference internal" href="#au.base.ComputationStore.exclusive" title="au.base.ComputationStore.exclusive"><code class="xref py py-meth docutils literal notranslate"><span class="pre">exclusive()</span></code></a>. A store with an
-atomic conditional write of its own (one <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">...</span> <span class="pre">WHERE</span> <span class="pre">status</span> <span class="pre">NOT</span>
-<span class="pre">IN</span> <span class="pre">...</span></code> on a database) overrides this method whole instead, and
-answers True to <a class="reference internal" href="#au.base.ComputationStore.compare_and_set_spans_writers" title="au.base.ComputationStore.compare_and_set_spans_writers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">compare_and_set_spans_writers</span></code></a>. A read that
-fails raises.</p>
+atomic conditional write of its own overrides this method whole
+instead, and answers True to <a class="reference internal" href="#au.base.ComputationStore.compare_and_set_spans_writers" title="au.base.ComputationStore.compare_and_set_spans_writers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">compare_and_set_spans_writers</span></code></a>: on
+a database, one <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">...</span> <span class="pre">WHERE</span> <span class="pre">status</span> <span class="pre">NOT</span> <span class="pre">IN</span> <span class="pre">(:keep)</span> <span class="pre">OR</span>
+<span class="pre">coalesce(started_at,</span> <span class="pre">created_at)</span> <span class="pre">&lt;=</span> <span class="pre">now()</span> <span class="pre">-</span> <span class="pre">:stale_after</span></code> (the <code class="docutils literal notranslate"><span class="pre">OR</span></code>
+only with <code class="docutils literal notranslate"><span class="pre">stale_after</span></code>). A read that fails raises.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">au.testing</span><span class="w"> </span><span class="kn">import</span> <span class="n">InMemoryStore</span>
 </span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">InMemoryStore</span><span class="p">()</span>
 </span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">done</span> <span class="o">=</span> <span class="n">ComputationResult</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">)</span>
@@ -1199,7 +1207,7 @@ then re-raised (i2mint/au#12). A cancellation already recorded is final.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=d50bcae4"></script>
+      <script src="../_static/documentation_options.js?v=71734efd"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
