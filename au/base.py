@@ -51,7 +51,7 @@ Shared infrastructure:
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Hashable, Mapping, MutableMapping
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from functools import wraps
 from pathlib import Path
@@ -318,18 +318,28 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         result: ComputationResult,
         *,
         keep: frozenset[ComputationStatus],
+        stale_after: timedelta | None = None,
     ) -> tuple[bool, ComputationResult]:
         """Write ``result`` under ``key`` unless the status stored there is in
         ``keep``; return whether it wrote, and what the store now holds.
+
+        With ``stale_after``, a record whose status is in ``keep`` is still
+        overwritten once it began (``started_at``, else ``created_at``) at least
+        that long ago, compared in UTC (a naive time is taken as local): a
+        lease. For a reservation not yet started, it counts from the
+        reservation, so time spent queued counts too. Nothing fences the old
+        record's writer: one still running past the lease may later write over
+        the new record (no per-submission token yet: i2mint/au#30).
 
         A compare-and-set: au's conditional writes (a worker's RUNNING and
         outcome, a caller's CANCELLED) go through it, so none lands between
         another's read and write (i2mint/au#28). This default reads (with
         :meth:`_read`) and writes under :meth:`exclusive`. A store with an
-        atomic conditional write of its own (one ``UPDATE ... WHERE status NOT
-        IN ...`` on a database) overrides this method whole instead, and
-        answers True to :attr:`compare_and_set_spans_writers`. A read that
-        fails raises.
+        atomic conditional write of its own overrides this method whole
+        instead, and answers True to :attr:`compare_and_set_spans_writers`: on
+        a database, one ``UPDATE ... WHERE status NOT IN (:keep) OR
+        coalesce(started_at, created_at) <= now() - :stale_after`` (the ``OR``
+        only with ``stale_after``). A read that fails raises.
 
         >>> from au.testing import InMemoryStore
         >>> store = InMemoryStore()
@@ -342,7 +352,9 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         (False, 'cancelled')
         """
         with self.exclusive(key):
-            return _set_unless(self, key, result, keep=keep, read=self._read)
+            return _set_unless(
+                self, key, result, keep=keep, stale_after=stale_after, read=self._read
+            )
 
     def _read(self, key: str) -> ComputationResult | None:
         """The record under ``key`` (None if nothing is), read with no side
@@ -418,11 +430,19 @@ def _set_unless(
     result: ComputationResult,
     *,
     keep: frozenset[ComputationStatus],
+    stale_after: timedelta | None = None,
     read: Callable[[str], ComputationResult | None],
 ) -> tuple[bool, ComputationResult]:
     """The compare-and-set's body, for a caller already holding the lock."""
+
+    def is_stale(record: ComputationResult) -> bool:
+        if stale_after is None:
+            return False
+        began = (record.started_at or record.created_at).astimezone(timezone.utc)
+        return datetime.now(timezone.utc) - began >= stale_after
+
     current = read(key)
-    if current is not None and current.status in keep:
+    if current is not None and current.status in keep and not is_stale(current):
         return False, current
     store[key] = result
     return True, result
@@ -434,6 +454,7 @@ def _write_unless(
     result: ComputationResult,
     *,
     keep: frozenset[ComputationStatus],
+    stale_after: timedelta | None = None,
 ) -> tuple[bool, ComputationResult]:
     """:meth:`ComputationStore.write_unless` for any mapping au writes to: the
     store's own for a :class:`ComputationStore`; for a plain mapping, the same
@@ -448,9 +469,14 @@ def _write_unless(
     'cancelled'
     """
     if isinstance(store, ComputationStore):
-        return store.write_unless(key, result, keep=keep)
+        # Only when set: a store overriding write_unless from before stale_after
+        # existed keeps working where no lease is used.
+        lease = {} if stale_after is None else {"stale_after": stale_after}
+        return store.write_unless(key, result, keep=keep, **lease)
     with _in_process_lock(id(store)):
-        return _set_unless(store, key, result, keep=keep, read=store.get)
+        return _set_unless(
+            store, key, result, keep=keep, stale_after=stale_after, read=store.get
+        )
 
 
 #: On Windows a file another handle has open cannot be replaced (``os.replace``)

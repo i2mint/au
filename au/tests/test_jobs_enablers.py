@@ -10,8 +10,9 @@ Grouped by fix:
 * **au-3** — caller-supplied idempotency ``key=`` on ``submit_task``.
 """
 
+import math
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -463,6 +464,143 @@ def test_concurrent_submits_of_one_key_launch_once(tmp_path):
         thread.join(5)
     assert not any(thread.is_alive() for thread in threads)
     assert launched == ["once"]
+
+
+# --- i2mint/au#36: a reservation lease ----------------------------------------
+
+
+@pytest.fixture
+def lease():
+    """Set ``reservation_lease_seconds`` for the test, then restore the default."""
+    from au.config import AUConfig, reset_global_config, set_global_config
+
+    yield lambda seconds: set_global_config(AUConfig(reservation_lease_seconds=seconds))
+    reset_global_config()
+
+
+def _running(*, began_ago, started_ago=None):
+    record = ComputationResult(None, ComputationStatus.RUNNING)
+    record.created_at = datetime.now() - timedelta(seconds=began_ago)
+    if started_ago is not None:
+        record.started_at = datetime.now() - timedelta(seconds=started_ago)
+    return record
+
+
+def test_without_a_lease_a_stale_reservation_holds_its_key(lease):
+    lease(None)
+    store, backend = InMemoryStore(), SyncTestBackend()
+    store["k"] = _running(began_ago=10**6)
+    submit_task(_mul, 3, 2, key="k", backend=backend, store=store)
+    assert store["k"].status == ComputationStatus.RUNNING  # deduped, as before
+
+
+def test_a_reservation_older_than_its_lease_no_longer_holds_its_key(lease):
+    lease(60)
+    store, backend = InMemoryStore(), SyncTestBackend()
+    store["stale"] = _running(began_ago=120)
+    store["fresh"] = _running(began_ago=1)
+    store["started"] = _running(began_ago=120, started_ago=1)  # began: started_at
+    for key in store.keys():
+        submit_task(_mul, 3, 2, key=key, backend=backend, store=store)
+    assert store["stale"].value == 6  # re-ran
+    assert store["fresh"].status == store["started"].status == ComputationStatus.RUNNING
+
+
+def test_a_lease_compares_aware_and_naive_times_as_instants(lease):
+    """A naive time is local, an aware one any zone: each is compared in UTC."""
+    lease(60)
+    local = datetime.now().astimezone().utcoffset()
+    behind = timezone(local - timedelta(hours=10))  # wall clock behind local
+    fresh = datetime.now(timezone.utc) - timedelta(seconds=1)
+    store, backend = InMemoryStore(), SyncTestBackend()
+    for key, began in {
+        "naive": fresh.astimezone().replace(tzinfo=None),
+        "aware": fresh.astimezone(behind),  # same instant: read naive, 10 h old
+        "aware stale": (fresh - timedelta(seconds=120)).astimezone(behind),
+    }.items():
+        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
+        store[key].created_at = began
+    for key in list(store.keys()):
+        submit_task(_mul, 3, 2, key=key, backend=backend, store=store)
+    assert store["naive"].status == store["aware"].status == ComputationStatus.RUNNING
+    assert store["aware stale"].value == 6  # re-ran, no TypeError
+
+
+def test_concurrent_resubmits_of_a_stale_key_launch_once(lease, tmp_path):
+    lease(60)
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    store["k"] = _running(began_ago=120)
+    launched = []
+
+    class _Counting(SyncTestBackend):
+        def launch(self, func, args, kwargs, key, store=None):
+            launched.append(key)
+
+    backend, start = _Counting(), threading.Barrier(8)
+
+    def submit():
+        start.wait()
+        submit_task(_mul, 1, 2, key="k", backend=backend, store=store)
+
+    threads = [threading.Thread(target=submit) for _ in range(8)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(5)
+    assert not any(thread.is_alive() for thread in threads)
+    assert launched == ["k"]
+
+
+@pytest.mark.parametrize("seconds", [0, -5, 1e-9, 1e20, math.nan, math.inf, "60", True])
+def test_a_lease_that_is_not_a_positive_finite_number_is_refused_by_name(
+    lease, seconds
+):
+    lease(seconds)
+    store = InMemoryStore()
+    with pytest.raises(ValueError, match="AU_RESERVATION_LEASE_SECONDS"):
+        submit_task(_mul, 1, 2, key="k", backend=SyncTestBackend(), store=store)
+    assert "k" not in store
+
+
+def test_an_unparseable_lease_in_the_environment_is_refused_not_dropped(
+    monkeypatch,
+):
+    from au.config import get_config, reset_global_config, set_global_config
+
+    monkeypatch.setenv("AU_RESERVATION_LEASE_SECONDS", "1h")
+    set_global_config(get_config())
+    try:
+        with pytest.raises(ValueError, match="AU_RESERVATION_LEASE_SECONDS"):
+            submit_task(_mul, 1, 2, key="k", backend=SyncTestBackend(), store={})
+    finally:
+        reset_global_config()
+
+
+def test_the_lease_applies_to_a_plain_mapping_store(lease):
+    lease(60)
+    store = {"stale": _running(began_ago=120)}
+    submit_task(_mul, 3, 2, key="stale", backend=SyncTestBackend(), store=store)
+    assert store["stale"].value == 6
+
+
+def test_a_store_overriding_write_unless_without_stale_after_still_works():
+    """``write_unless`` was public before ``stale_after``: without a lease, an
+    override with the old signature is called as before."""
+
+    class _OldOverride(InMemoryStore):
+        def write_unless(self, key, result, *, keep):
+            return super().write_unless(key, result, keep=keep)
+
+    store = _OldOverride()
+    submit_task(_mul, 3, 2, key="k", backend=SyncTestBackend(), store=store)
+    assert store["k"].value == 6
+
+
+def test_the_lease_is_read_from_the_environment(monkeypatch):
+    from au.config import load_config_from_env
+
+    monkeypatch.setenv("AU_RESERVATION_LEASE_SECONDS", "90.5")
+    assert load_config_from_env()["reservation_lease_seconds"] == 90.5
 
 
 if __name__ == "__main__":
