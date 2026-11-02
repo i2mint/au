@@ -49,17 +49,17 @@ Shared infrastructure:
 """
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Callable, Hashable, Mapping, MutableMapping
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from functools import wraps
 from pathlib import Path
 from typing import Any, Generic, Optional, TypeVar, Union, List, Dict
-from collections.abc import Callable
 import json
 import logging
 import multiprocessing
+import os
 import pickle
 import time
 import uuid
@@ -70,7 +70,13 @@ import random
 import shutil
 import sys
 import tempfile
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
+import weakref
+
+try:  # POSIX: lets FileSystemStore exclude writers in other processes too
+    import fcntl
+except ImportError:  # Windows
+    fcntl = None
 
 logger = logging.getLogger(__name__)
 
@@ -200,6 +206,15 @@ class ComputationStatus(Enum):
     CANCELLED = "cancelled"
 
 
+#: The statuses a computation ends in. :attr:`ComputationResult.is_ready` is
+#: membership in it, and a late worker's RUNNING must not overwrite any of them.
+_FINISHED = frozenset(
+    {ComputationStatus.COMPLETED, ComputationStatus.FAILED, ComputationStatus.CANCELLED}
+)
+#: What a worker's outcome must not overwrite: a cancellation is final.
+_CANCELLED = frozenset({ComputationStatus.CANCELLED})
+
+
 class ComputationCancelledError(Exception):
     """Raised by :meth:`ComputationHandle.get_result` when a computation was cancelled.
 
@@ -243,11 +258,7 @@ class ComputationResult:
     @property
     def is_ready(self) -> bool:
         """Check if computation reached a terminal state (success, failure, or cancellation)."""
-        return self.status in (
-            ComputationStatus.COMPLETED,
-            ComputationStatus.FAILED,
-            ComputationStatus.CANCELLED,
-        )
+        return self.status in _FINISHED
 
     @property
     def duration(self) -> timedelta | None:
@@ -299,6 +310,136 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
         """Remove expired results. Returns count of removed items."""
         pass
 
+    def write_unless(
+        self,
+        key: str,
+        result: ComputationResult,
+        *,
+        keep: frozenset[ComputationStatus],
+    ) -> tuple[bool, ComputationResult]:
+        """Write ``result`` under ``key`` unless the status stored there is in
+        ``keep``; return whether it wrote, and what the store now holds.
+
+        A compare-and-set: au's conditional writes (a worker's RUNNING and
+        outcome, a caller's CANCELLED) go through it, so none lands between
+        another's read and write (i2mint/au#28). This default reads (with
+        :meth:`_read`) and writes under :meth:`exclusive`. A store with an
+        atomic conditional write of its own (one ``UPDATE ... WHERE status NOT
+        IN ...`` on a database) overrides this method whole instead. A read
+        that fails raises.
+
+        >>> from au.testing import InMemoryStore
+        >>> store = InMemoryStore()
+        >>> done = ComputationResult(1, ComputationStatus.COMPLETED)
+        >>> store.write_unless("k", done, keep=_CANCELLED)[0]
+        True
+        >>> store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+        >>> wrote, held = store.write_unless("k", done, keep=_CANCELLED)
+        >>> wrote, held.status.value
+        (False, 'cancelled')
+        """
+        with self.exclusive(key):
+            return _set_unless(self, key, result, keep=keep, read=self._read)
+
+    def _read(self, key: str) -> ComputationResult | None:
+        """The record under ``key`` (None if nothing is), read with no side
+        effect: :meth:`write_unless` reads under the lock that holds off every
+        writer. Override where reading does more (a cleanup sweep)."""
+        return self.get(key)
+
+    def _lock_identity(self) -> Hashable:
+        """What tells stores sharing one in-process lock apart: two instances
+        over the same records must return the same thing (:class:`FileSystemStore`
+        returns its resolved directory). By default, the instance."""
+        return id(self)
+
+    @contextmanager
+    def exclusive(self, key: str):
+        """Hold off every other au writer of ``key`` while the block runs.
+
+        The default excludes writers in this process only, which covers a store
+        living in one process. A store written from several processes, or
+        several machines, overrides this with a lock they all share
+        (:class:`FileSystemStore` does). Not reentrant.
+        """
+        with _in_process_lock(self._lock_identity()):
+            yield
+
+
+#: The in-process locks, one per store identity (``_lock_identity``, or the id of
+#: a plain mapping). Weak: a lock nobody holds or waits on is dropped.
+_LOCKS: "weakref.WeakValueDictionary[Hashable, threading.Lock]" = (
+    weakref.WeakValueDictionary()
+)
+#: Guards the get-or-create in ``_LOCKS``.
+_LOCKS_GUARD = threading.Lock()
+
+
+def _in_process_lock(identity: Hashable) -> threading.Lock:
+    """The lock of the store ``identity`` names, made on first use.
+
+    A plain ``Lock``, not an ``RLock``: a nested ``FileSystemStore.exclusive`` in
+    one thread would open and close the lock file again, and that close releases
+    the outer record lock.
+    """
+    with _LOCKS_GUARD:
+        lock = _LOCKS.get(identity)
+        if lock is None:
+            lock = _LOCKS[identity] = threading.Lock()
+        return lock
+
+
+def _forget_in_process_locks() -> None:
+    """A forked child inherits each lock as it was, held if another thread of
+    the parent held it at the fork, and nothing in the child would release it."""
+    global _LOCKS, _LOCKS_GUARD
+    _LOCKS, _LOCKS_GUARD = weakref.WeakValueDictionary(), threading.Lock()
+
+
+if hasattr(os, "register_at_fork"):
+    os.register_at_fork(after_in_child=_forget_in_process_locks)
+
+
+def _set_unless(
+    store: MutableMapping[str, ComputationResult],
+    key: str,
+    result: ComputationResult,
+    *,
+    keep: frozenset[ComputationStatus],
+    read: Callable[[str], ComputationResult | None],
+) -> tuple[bool, ComputationResult]:
+    """The compare-and-set's body, for a caller already holding the lock."""
+    current = read(key)
+    if current is not None and current.status in keep:
+        return False, current
+    store[key] = result
+    return True, result
+
+
+def _write_unless(
+    store: MutableMapping[str, ComputationResult],
+    key: str,
+    result: ComputationResult,
+    *,
+    keep: frozenset[ComputationStatus],
+) -> tuple[bool, ComputationResult]:
+    """:meth:`ComputationStore.write_unless` for any mapping au writes to: the
+    store's own for a :class:`ComputationStore`; for a plain mapping, the same
+    read and write under its in-process lock.
+
+    >>> store = {}
+    >>> done = ComputationResult(1, ComputationStatus.COMPLETED)
+    >>> _write_unless(store, "k", done, keep=_CANCELLED)[0]
+    True
+    >>> store["k"] = ComputationResult(None, ComputationStatus.CANCELLED)
+    >>> _write_unless(store, "k", done, keep=_CANCELLED)[1].status.value
+    'cancelled'
+    """
+    if isinstance(store, ComputationStore):
+        return store.write_unless(key, result, keep=keep)
+    with _in_process_lock(id(store)):
+        return _set_unless(store, key, result, keep=keep, read=store.get)
+
 
 #: On Windows a file another handle has open cannot be replaced (``os.replace``)
 #: or opened while it is being replaced: both raise ``PermissionError`` for the
@@ -321,6 +462,12 @@ def _retrying_on_windows(operation: Callable[[], Any]) -> Any:
 
 #: Where ``FileSystemStore`` writes a result before renaming it into place.
 _WRITING_DIR = ".writing"
+#: The file, in ``_WRITING_DIR``, that ``FileSystemStore.exclusive`` locks.
+#: Nothing may sweep it out of ``_WRITING_DIR`` (a cleanup of stray temp files):
+#: a process that opens a new file of that name holds a lock nobody else sees.
+_LOCK_FILE = "lock"
+#: Directories already warned about having no record locks (one warning each).
+_UNLOCKABLE_DIRS: set[Path] = set()
 
 
 class FileSystemStore(ComputationStore):
@@ -357,6 +504,58 @@ class FileSystemStore(ComputationStore):
     def create_key(self) -> str:
         """Generate a unique filename."""
         return str(uuid.uuid4())
+
+    def _lock_identity(self) -> Hashable:
+        """The directory: two instances over one directory share a lock."""
+        return self.base_path.resolve()
+
+    @contextmanager
+    def exclusive(self, key: str):
+        """Exclude every au writer of this directory, in any process, where
+        POSIX record locks exist; elsewhere (Windows, or a filesystem without
+        locks), the writers in this process.
+
+        A record lock (``lockf``), not ``flock``: a forked child does not
+        inherit it, where it shares an ``flock`` held by the parent at the fork
+        and then blocks on it for good. Record locks do not exclude the threads
+        of one process, hence the in-process lock around it, which also keeps
+        one thread's close of the lock file from releasing another's lock. The
+        lock file, one per directory, sits in the writing subdirectory so it
+        never looks like a key; a process killed holding it releases it.
+        """
+        with super().exclusive(key), self._locked_file() or nullcontext():
+            yield
+
+    def _locked_file(self):
+        """The directory's lock file, opened and locked; None where it cannot
+        be (no ``fcntl``, or a filesystem that refuses record locks: NFS without
+        lockd, some FUSE mounts), which is logged once per directory."""
+        if fcntl is None:
+            return None
+        lock_dir = self.base_path / _WRITING_DIR
+        try:
+            lock_dir.mkdir(exist_ok=True)
+            handle = open(lock_dir / _LOCK_FILE, "a")
+        except OSError as error:
+            return self._unlocked(error)
+        try:
+            fcntl.lockf(handle, fcntl.LOCK_EX)
+        except OSError as error:
+            handle.close()
+            return self._unlocked(error)
+        return handle
+
+    def _unlocked(self, error: OSError) -> None:
+        """Warn, once per directory, that its writers in other processes are
+        not held off (called under the directory's in-process lock)."""
+        directory = self._lock_identity()
+        if directory not in _UNLOCKABLE_DIRS:
+            _UNLOCKABLE_DIRS.add(directory)
+            logger.warning(
+                f"No file lock in {directory} ({error}): au writes there exclude "
+                "the writers of this process only"
+            )
+        return None
 
     def get_reconstruction_info(self) -> dict[str, Any]:
         """Get information needed to reconstruct this FileSystemStore in a worker process."""
@@ -838,11 +1037,11 @@ def _record_unless_cancelled(
     "not known to be cancelled": the outcome is written rather than lost.
     """
     try:
-        current = store.get(key)
-    except Exception:
-        current = None
-    if current is not None and current.status == ComputationStatus.CANCELLED:
-        return current
+        return _write_unless(store, key, result, keep=_CANCELLED)[1]
+    except Exception as error:
+        logger.warning(
+            f"Compare-and-set of {key} failed ({error!r}); writing its outcome as is"
+        )
     store[key] = result
     return result
 
@@ -853,13 +1052,11 @@ def _mark_running(
     """Record RUNNING, unless the computation was already cancelled or finished.
 
     A worker starts after the caller may have cancelled it; writing RUNNING over
-    that CANCELLED makes the cancellation disappear (i2mint/au#6).
+    that CANCELLED makes the cancellation disappear (i2mint/au#6), and so does a
+    CANCELLED written between this read and this write (i2mint/au#28).
     """
-    current = store.get(key)  # a store may raise KeyError for a key not yet written
-    if current is None or not current.is_ready:
-        store[key] = ComputationResult(
-            None, ComputationStatus.RUNNING, started_at=started_at
-        )
+    running = ComputationResult(None, ComputationStatus.RUNNING, started_at=started_at)
+    _write_unless(store, key, running, keep=_FINISHED)
 
 
 def _explained_start_failure(error: Exception) -> Exception:
@@ -1138,29 +1335,26 @@ class ComputationHandle(Generic[T]):
             A thread, or a pool task that is already running, cannot be
             stopped; the au workers keep CANCELLED final anyway by not writing
             their outcome over it. ``after_compute`` then receives the CANCELLED
-            result. A worker finishing in the instant between its check and its
-            write can still overwrite it (no compare-and-set).
+            result. Each of those writes is a compare-and-set
+            (:meth:`ComputationStore.write_unless`), as is this one: across
+            processes that holds only for a store whose compare-and-set spans
+            them (``FileSystemStore`` where the filesystem has record locks).
         """
-        result = self._current()
-        if not result.is_ready:
-            self.store[self.key] = ComputationResult(
-                None,
-                ComputationStatus.CANCELLED,
-                terminal_reason=reason,
-            )
-            if self.backend:
-                self.backend.terminate(self.key)
-                # A worker that started between the first write and the
-                # terminate may have written RUNNING over it, and nothing writes
-                # after the terminate returns (ProcessBackend waits for the
-                # process to exit): say it again so CANCELLED is what is left.
-                self.store[self.key] = ComputationResult(
-                    None,
-                    ComputationStatus.CANCELLED,
-                    terminal_reason=reason,
-                )
-            return True
-        return False
+        cancelled = ComputationResult(
+            None, ComputationStatus.CANCELLED, terminal_reason=reason
+        )
+        wrote, _ = _write_unless(self.store, self.key, cancelled, keep=_FINISHED)
+        if not wrote:
+            return False
+        if self.backend:
+            self.backend.terminate(self.key)
+            # Matters only where the compare-and-set does not span processes (a
+            # FileSystemStore on Windows, or on a filesystem without record
+            # locks) and the backend's terminate waits for the worker process
+            # to exit (ProcessBackend): that worker may have written RUNNING
+            # over the CANCELLED, and nothing of it writes after this.
+            self.store[self.key] = cancelled
+        return True
 
     @property
     def metadata(self) -> dict[str, Any]:
