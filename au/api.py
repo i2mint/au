@@ -188,30 +188,10 @@ def set_default_store(store: ComputationStore) -> None:
     _default_store = store
 
 
-def _inflight_record(store: ComputationStore, key: str) -> Optional[ComputationResult]:
-    """Return an existing in-flight (RUNNING, non-expired) record for ``key``, else None.
-
-    Used for idempotent submission: a matching in-flight record means the work is
-    already running, so a resubmit with the same key should not launch a
-    duplicate. Missing, terminal (COMPLETED / FAILED / CANCELLED), or expired
-    records return None so the work is (re-)launched.
-
-    Note: filesystem stores synthesize a ``PENDING`` result for absent keys, so
-    only ``RUNNING`` is treated as a live claim (submit_task reserves the key
-    with a RUNNING record before launching, closing the reserve→launch race).
-    """
-    try:
-        existing = store[key]
-    except KeyError:
-        return None
-    if existing.status != ComputationStatus.RUNNING:
-        return None
-    try:
-        if store.is_expired(existing):
-            return None
-    except Exception:
-        pass
-    return existing
+#: What makes a key "in flight" for an idempotent ``submit_task``: a record
+#: that is RUNNING (missing, PENDING or terminal ones re-run). A RUNNING record
+#: never expires (``is_expired`` is for finished ones), so no TTL check.
+_IN_FLIGHT = frozenset({ComputationStatus.RUNNING})
 
 
 class _WithRetryPolicy:
@@ -274,11 +254,14 @@ def submit_task(
         # No idempotency requested: mint a fresh key per call.
         key = store.create_key()
     else:
-        # Idempotency: dedup against a live in-flight computation, otherwise
-        # reserve the key so a concurrent/sequential resubmit dedups too.
-        if _inflight_record(store, key) is not None:
+        # Idempotency: reserve the key with RUNNING unless a computation is in
+        # flight under it, in one compare-and-set, so of two concurrent
+        # submits of one key only one launches (i2mint/au#31).
+        reservation = ComputationResult(None, ComputationStatus.RUNNING)
+        # Any mapping, as the workers' writes: not only a ComputationStore.
+        reserved, _ = _base._write_unless(store, key, reservation, keep=_IN_FLIGHT)
+        if not reserved:
             return key
-        store[key] = ComputationResult(None, ComputationStatus.RUNNING)
 
     if retry_policy is not None:
         func = _WithRetryPolicy(func, retry_policy)

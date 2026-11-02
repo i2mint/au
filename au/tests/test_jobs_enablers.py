@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from au.api import submit_task, get_result, get_handle, cancel_task, _inflight_record
+from au.api import submit_task, get_result, get_handle, cancel_task
 from au.base import (
     ThreadBackend,
     StdLibQueueBackend,
@@ -414,26 +414,55 @@ def test_default_key_mints_unique_ids(tmp_path):
     assert len(ids) == 3
 
 
-def test_inflight_record_classifies_states(tmp_path):
-    """_inflight_record dedups only live RUNNING records, not terminal/expired."""
-    store = InMemoryStore(ttl_seconds=1)
-
-    # Missing key -> no live record.
-    assert _inflight_record(store, "nope") is None
-
-    # Running -> a live in-flight record.
-    store["run"] = ComputationResult(None, ComputationStatus.RUNNING)
-    assert _inflight_record(store, "run") is not None
-
-    # Completed (terminal) -> not a live record.
-    store["done"] = ComputationResult(1, ComputationStatus.COMPLETED)
-    assert _inflight_record(store, "done") is None
-
-    # Expired terminal -> not a live record.
+def test_an_idempotency_key_dedups_only_a_running_record():
+    """Only a RUNNING record is in flight; a missing, terminal or expired one
+    re-runs (what ``_inflight_record`` classified, before the reservation
+    became one compare-and-set)."""
+    store, backend = InMemoryStore(ttl_seconds=1), SyncTestBackend()
     old = ComputationResult(1, ComputationStatus.COMPLETED)
     old.created_at = datetime.now() - timedelta(seconds=10)
-    store["old"] = old
-    assert _inflight_record(store, "old") is None
+    records = {
+        "run": ComputationResult(None, ComputationStatus.RUNNING),
+        "done": ComputationResult(1, ComputationStatus.COMPLETED),
+        "old": old,
+    }
+    for key, record in records.items():
+        store[key] = record
+    for key in ["nope", "run", "done", "old"]:
+        submit_task(_mul, 3, 2, key=key, backend=backend, store=store)
+    assert store["run"].status == ComputationStatus.RUNNING  # deduped, not run
+    for key in ["nope", "done", "old"]:  # "old": a guard, as a fresh one re-runs
+        assert store[key].value == 6  # (re-)ran
+    plain = {}  # any mapping, as for the workers' writes
+    submit_task(_mul, 3, 2, key="k", backend=backend, store=plain)
+    assert plain["k"].value == 6
+
+
+def test_concurrent_submits_of_one_key_launch_once(tmp_path):
+    """i2mint/au#31: both submits read "not in flight", then both reserved and
+    launched. The reservation is now a compare-and-set."""
+    import threading
+
+    store = FileSystemStore(tmp_path, auto_cleanup=False)
+    launched = []
+
+    class _Counting(SyncTestBackend):
+        def launch(self, func, args, kwargs, key, store=None):
+            launched.append(key)  # leaves the reservation RUNNING: in flight
+
+    backend, start = _Counting(), threading.Barrier(8)
+
+    def submit():
+        start.wait()
+        submit_task(_mul, 1, 2, key="once", backend=backend, store=store)
+
+    threads = [threading.Thread(target=submit) for _ in range(8)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(5)
+    assert not any(thread.is_alive() for thread in threads)
+    assert launched == ["once"]
 
 
 if __name__ == "__main__":
