@@ -95,7 +95,6 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
-<li><a class="reference internal" href="#features">&#10024; Features</a></li>
 <li><a class="reference internal" href="#installation">&#128230; Installation</a></li>
 <li><a class="reference internal" href="#quick-start">&#128640; Quick Start</a><ul>
 <li><a class="reference internal" href="#simple-decorator-pattern">Simple Decorator Pattern</a></li>
@@ -103,6 +102,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#context-manager-pattern">Context Manager Pattern</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#features">&#10024; Features</a></li>
 <li><a class="reference internal" href="#configuration">&#127899;&#65039; Configuration</a><ul>
 <li><a class="reference internal" href="#environment-variables">1. Environment Variables</a></li>
 <li><a class="reference internal" href="#config-file-au-toml">2. Config File (au.toml)</a></li>
@@ -192,22 +192,8 @@ data-aria-dark="Switch to auto color mode">
 <section id="au-async-utils">
 <span id="au---async-utils"></span><h1>AU - Async Utils<a class="headerlink" href="#au-async-utils" title="Link to this heading">#</a></h1>
 <p><strong>A lightweight, convention-over-configuration async framework for Python.</strong></p>
-<p>AU makes async task execution simple and powerful. Transform any Python function into an async task with a single decorator, or use the simple API for even more flexibility.</p>
-<section id="features">
-<span id="-features"></span><h2>✨ Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>🎯 <strong>Convention Over Configuration</strong> - Works out of the box with smart defaults</p></li>
-<li><p>🚀 <strong>Simple APIs</strong> - Decorator pattern or direct function calls</p></li>
-<li><p>💾 <strong>Pluggable Storage</strong> - Filesystem, in-memory, Redis, databases</p></li>
-<li><p>🔄 <strong>Multiple Backends</strong> - Threads, processes, Redis Queue, Supabase</p></li>
-<li><p>🌐 <strong>HTTP Interface</strong> - Built-in REST API with FastAPI or Flask</p></li>
-<li><p>🔁 <strong>Retry Logic</strong> - Configurable retry policies with backoff</p></li>
-<li><p>🔗 <strong>Task Dependencies</strong> - DAG-based workflow orchestration</p></li>
-<li><p>🧪 <strong>Testing Utilities</strong> - Synchronous test backends and mocks</p></li>
-<li><p>📊 <strong>Observability</strong> - Logging, metrics, tracing, and hooks</p></li>
-<li><p>🛡️ <strong>Zero Dependencies</strong> - Core uses only Python stdlib</p></li>
-</ul>
-</section>
+<p>AU turns any Python function into an async task with a single decorator (or a plain function call), and runs it on threads, processes, Redis Queue or Supabase, with results stored in the filesystem, memory or a database.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">au</span></code>, then jump to the <a class="reference internal" href="#quick-start">quick start</a>.</p>
 <section id="installation">
 <span id="-installation"></span><h2>📦 Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core (no dependencies)</span>
@@ -277,6 +263,21 @@ data-aria-dark="Switch to auto color mode">
 </span></pre></div>
 </div>
 </section>
+</section>
+<section id="features">
+<span id="-features"></span><h2>✨ Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>🎯 <strong>Convention Over Configuration</strong> - Works out of the box with smart defaults</p></li>
+<li><p>🚀 <strong>Simple APIs</strong> - Decorator pattern or direct function calls</p></li>
+<li><p>💾 <strong>Pluggable Storage</strong> - Filesystem, in-memory, Redis, databases</p></li>
+<li><p>🔄 <strong>Multiple Backends</strong> - Threads, processes, Redis Queue, Supabase</p></li>
+<li><p>🌐 <strong>HTTP Interface</strong> - Built-in REST API with FastAPI or Flask</p></li>
+<li><p>🔁 <strong>Retry Logic</strong> - Configurable retry policies with backoff</p></li>
+<li><p>🔗 <strong>Task Dependencies</strong> - DAG-based workflow orchestration</p></li>
+<li><p>🧪 <strong>Testing Utilities</strong> - Synchronous test backends and mocks</p></li>
+<li><p>📊 <strong>Observability</strong> - Logging, metrics, tracing, and hooks</p></li>
+<li><p>🛡️ <strong>Zero Dependencies</strong> - Core uses only Python stdlib</p></li>
+</ul>
 </section>
 <section id="configuration">
 <span id="-configuration"></span><h2>🎛️ Configuration<a class="headerlink" href="#configuration" title="Link to this heading">#</a></h2>
@@ -773,7 +774,7 @@ data-aria-dark="Switch to auto color mode">
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 19:33 UTC from <a href="https://github.com/i2mint/au/commit/457691dfedbe78af055c2f061dbc33ccb7bfee68">457691d</a> (master) · au 0.1.20 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 23:28 UTC from <a href="https://github.com/i2mint/au/commit/5e3bf593984cd9a5ffae4685f9cee400b0f5171b">5e3bf59</a> (master) · au 0.1.21 · <a href="about-this-build.html">about this build</a></p>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
@@ -808,7 +809,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="_static/documentation_options.js?v=17aaaefc"></script>
+      <script src="_static/documentation_options.js?v=b3d22ae5"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>

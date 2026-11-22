@@ -4,20 +4,9 @@
 
 **A lightweight, convention-over-configuration async framework for Python.**
 
-AU makes async task execution simple and powerful. Transform any Python function into an async task with a single decorator, or use the simple API for even more flexibility.
+AU turns any Python function into an async task with a single decorator (or a plain function call), and runs it on threads, processes, Redis Queue or Supabase, with results stored in the filesystem, memory or a database.
 
-## ✨ Features
-
-- 🎯 **Convention Over Configuration** - Works out of the box with smart defaults
-- 🚀 **Simple APIs** - Decorator pattern or direct function calls
-- 💾 **Pluggable Storage** - Filesystem, in-memory, Redis, databases
-- 🔄 **Multiple Backends** - Threads, processes, Redis Queue, Supabase
-- 🌐 **HTTP Interface** - Built-in REST API with FastAPI or Flask
-- 🔁 **Retry Logic** - Configurable retry policies with backoff
-- 🔗 **Task Dependencies** - DAG-based workflow orchestration
-- 🧪 **Testing Utilities** - Synchronous test backends and mocks
-- 📊 **Observability** - Logging, metrics, tracing, and hooks
-- 🛡️ **Zero Dependencies** - Core uses only Python stdlib
+`pip install au`, then jump to the [quick start]().
 
 ## 📦 Installation
 
@@ -87,6 +76,19 @@ with async_task(expensive_task, 1000000) as handle:
 # Result ready here
 print(f"Result: {handle.result}")
 ```
+
+## ✨ Features
+
+- 🎯 **Convention Over Configuration** - Works out of the box with smart defaults
+- 🚀 **Simple APIs** - Decorator pattern or direct function calls
+- 💾 **Pluggable Storage** - Filesystem, in-memory, Redis, databases
+- 🔄 **Multiple Backends** - Threads, processes, Redis Queue, Supabase
+- 🌐 **HTTP Interface** - Built-in REST API with FastAPI or Flask
+- 🔁 **Retry Logic** - Configurable retry policies with backoff
+- 🔗 **Task Dependencies** - DAG-based workflow orchestration
+- 🧪 **Testing Utilities** - Synchronous test backends and mocks
+- 📊 **Observability** - Logging, metrics, tracing, and hooks
+- 🛡️ **Zero Dependencies** - Core uses only Python stdlib
 
 ## 🎛️ Configuration
 
