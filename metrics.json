@@ -1,5 +1,5 @@
 {
-  "collection_duration_seconds": 4.3764426708221436,
+  "collection_duration_seconds": 6.115813255310059,
   "commit_message": "docs: README leads with what it does, install and quick start; features follow (#45)",
   "commit_sha": "198e1ab9f9fea9b232d6caca79ad16aa3fbab6a6",
   "metrics": {
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35611,
-      "comment_lines_ratio": 0.06544852391165708,
-      "docs_lines": 43209,
-      "empty_lines": 71353,
-      "empty_lines_ratio": 0.1311378092911872,
-      "files_analyzed": 1336,
-      "function_lines": 326704,
-      "function_lines_ratio": 0.6004407221373738,
-      "mean_lines_per_function": 15.978089695309825,
-      "num_classes": 3033,
-      "num_functions": 20447,
+      "comment_lines": 35660,
+      "comment_lines_ratio": 0.06536127408661926,
+      "docs_lines": 43105,
+      "empty_lines": 71521,
+      "empty_lines_ratio": 0.13109096141192084,
+      "files_analyzed": 1348,
+      "function_lines": 327649,
+      "function_lines_ratio": 0.600548404184148,
+      "mean_lines_per_function": 15.96963493688161,
+      "num_classes": 3047,
+      "num_functions": 20517,
       "pypi_version": "0.1.20",
-      "total_lines": 544107
+      "total_lines": 545583
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -42,6 +42,6 @@
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-22T23:27:43.102736Z",
+  "timestamp": "2026-11-22T23:27:54.819411Z",
   "workflow_status": {}
 }
