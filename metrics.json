@@ -1,7 +1,7 @@
 {
-  "collection_duration_seconds": 8.0191650390625,
-  "commit_message": "fix(au): timestamps hold across time zones and daylight saving (#39) (#41)\n\nDurations, expiry and the reservation lease compare in UTC (a naive time read\nas local). FileSystemStore keeps each time naive local and adds its UTC offset\nbeside it, so a reader elsewhere reads the same instant and an older au still\nreads naive times. HTTP timing carries offsets. In-memory times stay naive.",
-  "commit_sha": "4d263d138eb36a5ac0a3cbf14920ad56b3655e5e",
+  "collection_duration_seconds": 5.0063090324401855,
+  "commit_message": "au: coverage and docstring pass (hooks, config; 13 broken doctests, 31 docstrings) [skip publish]",
+  "commit_sha": "e84690660dceac2a9fd25d9aca4fde4b14e1e2d5",
   "metrics": {
     "coverage": {
       "branch_coverage": 0.0,
@@ -11,19 +11,19 @@
       "statements_total": 0
     },
     "umpyre_stats": {
-      "comment_lines": 35645,
-      "comment_lines_ratio": 0.06537751871728373,
-      "docs_lines": 43008,
-      "empty_lines": 71468,
-      "empty_lines_ratio": 0.13108151234918877,
-      "files_analyzed": 1348,
-      "function_lines": 327332,
-      "function_lines_ratio": 0.6003690267012461,
-      "mean_lines_per_function": 15.96819357041807,
-      "num_classes": 3043,
-      "num_functions": 20499,
-      "pypi_version": "0.1.17",
-      "total_lines": 545218
+      "comment_lines": 35611,
+      "comment_lines_ratio": 0.06544852391165708,
+      "docs_lines": 43209,
+      "empty_lines": 71353,
+      "empty_lines_ratio": 0.1311378092911872,
+      "files_analyzed": 1336,
+      "function_lines": 326704,
+      "function_lines_ratio": 0.6004407221373738,
+      "mean_lines_per_function": 15.978089695309825,
+      "num_classes": 3033,
+      "num_functions": 20447,
+      "pypi_version": "0.1.18",
+      "total_lines": 544107
     },
     "wily": {
       "cyclomatic_avg": 0.0,
@@ -34,14 +34,14 @@
     },
     "workflow_status": {
       "last_run_status": "success",
-      "last_success_timestamp": "2026-11-02T12:38:21Z",
+      "last_success_timestamp": "2026-11-02T12:41:54Z",
       "recent_failure_count": 0,
-      "run_url": "https://github.com/i2mint/au/actions/runs/41446147901",
+      "run_url": "https://github.com/i2mint/au/actions/runs/41446728749",
       "total_runs_analyzed": 10
     }
   },
   "python_version": "3.10",
   "schema_version": "1.0",
-  "timestamp": "2026-11-02T12:40:06.157379Z",
+  "timestamp": "2026-11-22T17:42:22.425701Z",
   "workflow_status": {}
 }
