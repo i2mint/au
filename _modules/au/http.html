@@ -145,26 +145,41 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="18">    <span class="n">HAS_FASTAPI</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span data-line="19">
 </span><span data-line="20">    <span class="c1"># Create dummy classes for type hints</span>
+<div class="viewcode-block" id="FastAPI">
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.FastAPI">[docs]</a>
 </span><span data-line="21">    <span class="k">class</span><span class="w"> </span><span class="nc">FastAPI</span><span class="p">:</span>
-</span><span data-line="22">        <span class="k">pass</span>
+</span><span data-line="22"><span class="w">        </span><span class="sd">"""Placeholder used when FastAPI is not installed."""</span></div>
+
 </span><span data-line="23">
 <div class="viewcode-block" id="HTTPException">
 <a class="viewcode-back" href="../../_autosummary/au.http.html#au.HTTPException">[docs]</a>
 </span><span data-line="24">    <span class="k">class</span><span class="w"> </span><span class="nc">HTTPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span data-line="25">        <span class="k">pass</span></div>
+</span><span data-line="25"><span class="w">        </span><span class="sd">"""Placeholder used when FastAPI is not installed."""</span></div>
 
 </span><span data-line="26">
+<div class="viewcode-block" id="BaseModel">
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.BaseModel">[docs]</a>
 </span><span data-line="27">    <span class="k">class</span><span class="w"> </span><span class="nc">BaseModel</span><span class="p">:</span>
-</span><span data-line="28">        <span class="k">pass</span>
+</span><span data-line="28"><span class="w">        </span><span class="sd">"""Placeholder used when pydantic is not installed."""</span></div>
+
 </span><span data-line="29">
+<div class="viewcode-block" id="Field">
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.Field">[docs]</a>
 </span><span data-line="30">    <span class="k">def</span><span class="w"> </span><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span data-line="31">        <span class="k">pass</span>
+</span><span data-line="31"><span class="w">        </span><span class="sd">"""Placeholder for ``pydantic.Field`` when it is not installed."""</span></div>
+
 </span><span data-line="32">
+<div class="viewcode-block" id="Query">
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.Query">[docs]</a>
 </span><span data-line="33">    <span class="k">def</span><span class="w"> </span><span class="nf">Query</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span data-line="34">        <span class="k">pass</span>
+</span><span data-line="34"><span class="w">        </span><span class="sd">"""Placeholder for ``fastapi.Query`` when it is not installed."""</span></div>
+
 </span><span data-line="35">
+<div class="viewcode-block" id="Body">
+<a class="viewcode-back" href="../../_autosummary/au.http.html#au.Body">[docs]</a>
 </span><span data-line="36">    <span class="k">def</span><span class="w"> </span><span class="nf">Body</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span data-line="37">        <span class="k">pass</span>
+</span><span data-line="37"><span class="w">        </span><span class="sd">"""Placeholder for ``fastapi.Body`` when it is not installed."""</span></div>
+
 </span><span data-line="38">
 </span><span data-line="39">
 </span><span data-line="40"><span class="kn">from</span><span class="w"> </span><span class="nn">au.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -309,13 +324,13 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="159"><span class="sd">    Raises:</span>
 </span><span data-line="160"><span class="sd">        ImportError: If FastAPI is not installed</span>
 </span><span data-line="161">
-</span><span data-line="162"><span class="sd">    Example:</span>
-</span><span data-line="163"><span class="sd">        &gt;&gt;&gt; @async_compute</span>
-</span><span data-line="164"><span class="sd">        &gt;&gt;&gt; def my_func(n: int) -&gt; int:</span>
-</span><span data-line="165"><span class="sd">        &gt;&gt;&gt;     return n * 2</span>
-</span><span data-line="166"><span class="sd">        &gt;&gt;&gt;</span>
-</span><span data-line="167"><span class="sd">        &gt;&gt;&gt; app = mk_http_interface([my_func])</span>
-</span><span data-line="168"><span class="sd">        &gt;&gt;&gt; # Run with: uvicorn main:app --reload</span>
+</span><span data-line="162"><span class="sd">    Example::</span>
+</span><span data-line="163"><span class="sd">        @async_compute</span>
+</span><span data-line="164"><span class="sd">        def my_func(n: int) -&gt; int:</span>
+</span><span data-line="165"><span class="sd">            return n * 2</span>
+</span><span data-line="166">
+</span><span data-line="167"><span class="sd">        app = mk_http_interface([my_func])</span>
+</span><span data-line="168"><span class="sd">        # Run with: uvicorn main:app --reload</span>
 </span><span data-line="169"><span class="sd">    """</span>
 </span><span data-line="170">    <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_FASTAPI</span><span class="p">:</span>
 </span><span data-line="171">        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
@@ -746,7 +761,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../../_static/documentation_options.js?v=3d116926"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

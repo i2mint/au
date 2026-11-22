@@ -514,7 +514,7 @@ with [`SharedMetricsMiddleware`](#au.base.SharedMetricsMiddleware); a plain one 
 
 #### terminate(key)
 
-Attempt to terminate the computation. Default: do nothing.
+Terminate the process computing `key`, if it is still running.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -556,15 +556,26 @@ Metrics middleware using shared memory for multiprocessing.
 
 #### after_compute(key, result)
 
-Called after computation completes.
+Count one more completion and add its duration.
 
 #### before_compute(func, args, kwargs, key)
 
-Called before computation starts.
+Count one more computation.
+
+#### get_shared_state()
+
+The shared counters and lock, to pass to another process’s middleware.
+
+#### get_stats()
+
+Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 #### on_error(key, error)
 
-Called when computation fails (`error` may be a BaseException).
+Count one more failure.
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 

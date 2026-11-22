@@ -219,6 +219,8 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#au.SharedMetricsMiddleware"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware</span></code></a><ul>
 <li><a class="reference internal" href="#au.SharedMetricsMiddleware.after_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.after_compute()</span></code></a></li>
 <li><a class="reference internal" href="#au.SharedMetricsMiddleware.before_compute"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.before_compute()</span></code></a></li>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware.get_shared_state"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.get_shared_state()</span></code></a></li>
+<li><a class="reference internal" href="#au.SharedMetricsMiddleware.get_stats"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.get_stats()</span></code></a></li>
 <li><a class="reference internal" href="#au.SharedMetricsMiddleware.on_error"><code class="docutils literal notranslate"><span class="pre">SharedMetricsMiddleware.on_error()</span></code></a></li>
 </ul>
 </li>
@@ -1403,7 +1405,7 @@ with <a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.
 <dl class="py method">
 <dt class="sig sig-object py" id="au.ProcessBackend.terminate">
 <span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#ProcessBackend.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.ProcessBackend.terminate" title="Link to this definition">#</a></dt>
-<dd><p>Attempt to terminate the computation. Default: do nothing.</p>
+<dd><p>Terminate the process computing <code class="docutils literal notranslate"><span class="pre">key</span></code>, if it is still running.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -1637,19 +1639,36 @@ with <a class="reference internal" href="#au.SharedMetricsMiddleware" title="au.
 <dl class="py method">
 <dt class="sig sig-object py" id="au.SharedMetricsMiddleware.after_compute">
 <span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
-<dd><p>Called after computation completes.</p>
+<dd><p>Count one more completion and add its duration.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.SharedMetricsMiddleware.before_compute">
 <span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.before_compute" title="Link to this definition">#</a></dt>
-<dd><p>Called before computation starts.</p>
+<dd><p>Count one more computation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware.get_shared_state">
+<span class="sig-name descname"><span class="pre">get_shared_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.get_shared_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.get_shared_state" title="Link to this definition">#</a></dt>
+<dd><p>The shared counters and lock, to pass to another process’s middleware.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="au.SharedMetricsMiddleware.get_stats">
+<span class="sig-name descname"><span class="pre">get_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.get_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.get_stats" title="Link to this definition">#</a></dt>
+<dd><p>Totals so far: <code class="docutils literal notranslate"><span class="pre">total</span></code>, <code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">failed</span></code> and <code class="docutils literal notranslate"><span class="pre">avg_duration</span></code> (seconds).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.SharedMetricsMiddleware.on_error">
 <span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.SharedMetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
-<dd><p>Called when computation fails (<code class="docutils literal notranslate"><span class="pre">error</span></code> may be a BaseException).</p>
+<dd><p>Count one more failure.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1858,13 +1877,13 @@ recorded FAILED, then re-raised to the caller.</p>
 <dd class="field-odd"><p>Task ID</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step3</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">])</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>graph = TaskGraph()
+t1 = graph.add_task(step1, 5)
+t2 = graph.add_task(step2, 10)
+t3 = graph.add_task(step3, depends_on=[t1, t2])</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1888,14 +1907,14 @@ recorded FAILED, then re-raised to the caller.</p>
 </ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">])</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">t2</span><span class="p">])</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>graph = TaskGraph()
+t1 = graph.add_task(step1, 5)
+t2 = graph.add_task(step2, depends_on=[t1])
+results = graph.execute()
+print(results[t2])</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -2050,15 +2069,17 @@ recorded FAILED, then re-raised to the caller.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.</span></span><span class="sig-name descname"><span class="pre">WorkflowBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.WorkflowBuilder" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Fluent interface for building workflows.</p>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">workflow</span> <span class="o">=</span> <span class="p">(</span><span class="n">WorkflowBuilder</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step1'</span><span class="p">,</span> <span class="n">process_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step2'</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">'step1'</span><span class="p">])</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step3'</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">'step2'</span><span class="p">])</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">build</span><span class="p">())</span>
-</span><span data-line="6"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>workflow = (WorkflowBuilder()</dt><dd><p>.add_task(‘step1’, process_data, data)
+.add_task(‘step2’, transform, depends_on=[‘step1’])
+.add_task(‘step3’, aggregate, depends_on=[‘step2’])
+.build())</p>
+</dd>
+</dl>
+<p>results = workflow.execute()</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
@@ -2275,14 +2296,16 @@ processes.</p>
 <dd class="field-even"><p>ComputationHandle for the task</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">async_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">multiplier</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Do other work while task runs</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Working..."</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Result is ready here</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>with async_task(my_func, 5, multiplier=2) as handle:</dt><dd><p># Do other work while task runs
+print(“Working…”)</p>
+</dd>
+</dl>
+<p># Result is ready here
+print(f”Result: {handle.result}”)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2304,11 +2327,11 @@ processes.</p>
 <dd class="field-odd"><p>True if cancellation was attempted, False otherwise</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">long_running_func</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">cancel_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(long_running_func)
+cancel_task(task_id)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2327,7 +2350,7 @@ processes.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.http.html#au.http.FastAPI" title="au.http.FastAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FastAPI application instance</p>
@@ -2485,12 +2508,12 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p>ComputationHandle instance</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">get_handle</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+handle = get_handle(task_id)
+result = handle.get_result(timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2512,11 +2535,11 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p>List of results</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_ids</span> <span class="o">=</span> <span class="n">submit_many</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">get_many</span><span class="p">(</span><span class="n">task_ids</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_ids = submit_many(tasks)
+results = get_many(task_ids, timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2544,11 +2567,11 @@ require integration with the async_compute decorator.</p>
 </ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+result = get_result(task_id, timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2569,13 +2592,15 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p>Task status (PENDING, RUNNING, COMPLETED, FAILED)</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+status = get_status(task_id)
+if status == ComputationStatus.COMPLETED:</p>
+<blockquote>
+<div><p>result = get_result(task_id)</p>
+</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2596,13 +2621,15 @@ require integration with the async_compute decorator.</p>
 <dd class="field-odd"><p>True if task is complete, False otherwise</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="ow">not</span> <span class="n">is_ready</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+while not is_ready(task_id):</p>
+<blockquote>
+<div><p>time.sleep(0.1)</p>
+</div></blockquote>
+<p>result = get_result(task_id)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2645,7 +2672,7 @@ require integration with the async_compute decorator.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="au.http.html#au.http.FastAPI" title="au.http.FastAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FastAPI application instance</p>
@@ -2654,15 +2681,16 @@ require integration with the async_compute decorator.</p>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.15)"><strong>ImportError</strong></a> – If FastAPI is not installed</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt;</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">mk_http_interface</span><span class="p">([</span><span class="n">my_func</span><span class="p">])</span>
-</span><span data-line="6"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run with: uvicorn main:app --reload</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>&#64;async_compute
+def my_func(n: int) -&gt; int:</p>
+<blockquote>
+<div><p>return n * 2</p>
+</div></blockquote>
+<p>app = mk_http_interface([my_func])
+# Run with: uvicorn main:app –reload</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2798,14 +2826,16 @@ read them inside the block, or pass a store you keep.</p>
 <dd class="field-odd"><p>List of task IDs</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">func1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="p">{}),</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">func2</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="p">{</span><span class="s1">'multiplier'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="p">]</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_ids</span> <span class="o">=</span> <span class="n">submit_many</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>tasks = [</dt><dd><p>(func1, (1,), {}),
+(func2, (2,), {‘multiplier’: 3}),</p>
+</dd>
+</dl>
+<p>]
+task_ids = submit_many(tasks)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2838,17 +2868,15 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
 <dd class="field-odd"><p>Task ID (key) for retrieving results</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">multiplier</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Idempotent submission: resubmitting the same key while in flight</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># returns the running task rather than launching a duplicate.</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"my-job"</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">same_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"my-job"</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5, multiplier=2)
+result = get_result(task_id, timeout=10)</p>
+<p># Idempotent submission: resubmitting the same key while in flight
+# returns the running task rather than launching a duplicate.
+&gt;&gt;&gt; task_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
+&gt;&gt;&gt; same_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2942,7 +2970,7 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../_static/documentation_options.js?v=3d116926"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

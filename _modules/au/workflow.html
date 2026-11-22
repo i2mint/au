@@ -244,11 +244,11 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="104"><span class="sd">        Returns:</span>
 </span><span data-line="105"><span class="sd">            Task ID</span>
 </span><span data-line="106">
-</span><span data-line="107"><span class="sd">        Example:</span>
-</span><span data-line="108"><span class="sd">            &gt;&gt;&gt; graph = TaskGraph()</span>
-</span><span data-line="109"><span class="sd">            &gt;&gt;&gt; t1 = graph.add_task(step1, 5)</span>
-</span><span data-line="110"><span class="sd">            &gt;&gt;&gt; t2 = graph.add_task(step2, 10)</span>
-</span><span data-line="111"><span class="sd">            &gt;&gt;&gt; t3 = graph.add_task(step3, depends_on=[t1, t2])</span>
+</span><span data-line="107"><span class="sd">        Example::</span>
+</span><span data-line="108"><span class="sd">            graph = TaskGraph()</span>
+</span><span data-line="109"><span class="sd">            t1 = graph.add_task(step1, 5)</span>
+</span><span data-line="110"><span class="sd">            t2 = graph.add_task(step2, 10)</span>
+</span><span data-line="111"><span class="sd">            t3 = graph.add_task(step3, depends_on=[t1, t2])</span>
 </span><span data-line="112"><span class="sd">        """</span>
 </span><span data-line="113">        <span class="k">if</span> <span class="n">task_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="114">            <span class="bp">self</span><span class="o">.</span><span class="n">_task_counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -312,12 +312,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="169"><span class="sd">            ValueError: If circular dependencies detected</span>
 </span><span data-line="170"><span class="sd">            TimeoutError: If overall timeout exceeded</span>
 </span><span data-line="171">
-</span><span data-line="172"><span class="sd">        Example:</span>
-</span><span data-line="173"><span class="sd">            &gt;&gt;&gt; graph = TaskGraph()</span>
-</span><span data-line="174"><span class="sd">            &gt;&gt;&gt; t1 = graph.add_task(step1, 5)</span>
-</span><span data-line="175"><span class="sd">            &gt;&gt;&gt; t2 = graph.add_task(step2, depends_on=[t1])</span>
-</span><span data-line="176"><span class="sd">            &gt;&gt;&gt; results = graph.execute()</span>
-</span><span data-line="177"><span class="sd">            &gt;&gt;&gt; print(results[t2])</span>
+</span><span data-line="172"><span class="sd">        Example::</span>
+</span><span data-line="173"><span class="sd">            graph = TaskGraph()</span>
+</span><span data-line="174"><span class="sd">            t1 = graph.add_task(step1, 5)</span>
+</span><span data-line="175"><span class="sd">            t2 = graph.add_task(step2, depends_on=[t1])</span>
+</span><span data-line="176"><span class="sd">            results = graph.execute()</span>
+</span><span data-line="177"><span class="sd">            print(results[t2])</span>
 </span><span data-line="178"><span class="sd">        """</span>
 </span><span data-line="179">        <span class="c1"># Check for cycles</span>
 </span><span data-line="180">        <span class="bp">self</span><span class="o">.</span><span class="n">_check_for_cycles</span><span class="p">()</span>
@@ -469,13 +469,13 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="313"><span class="k">class</span><span class="w"> </span><span class="nc">WorkflowBuilder</span><span class="p">:</span>
 </span><span data-line="314"><span class="w">    </span><span class="sd">"""Fluent interface for building workflows.</span>
 </span><span data-line="315">
-</span><span data-line="316"><span class="sd">    Example:</span>
-</span><span data-line="317"><span class="sd">        &gt;&gt;&gt; workflow = (WorkflowBuilder()</span>
-</span><span data-line="318"><span class="sd">        &gt;&gt;&gt;     .add_task('step1', process_data, data)</span>
-</span><span data-line="319"><span class="sd">        &gt;&gt;&gt;     .add_task('step2', transform, depends_on=['step1'])</span>
-</span><span data-line="320"><span class="sd">        &gt;&gt;&gt;     .add_task('step3', aggregate, depends_on=['step2'])</span>
-</span><span data-line="321"><span class="sd">        &gt;&gt;&gt;     .build())</span>
-</span><span data-line="322"><span class="sd">        &gt;&gt;&gt; results = workflow.execute()</span>
+</span><span data-line="316"><span class="sd">    Example::</span>
+</span><span data-line="317"><span class="sd">        workflow = (WorkflowBuilder()</span>
+</span><span data-line="318"><span class="sd">            .add_task('step1', process_data, data)</span>
+</span><span data-line="319"><span class="sd">            .add_task('step2', transform, depends_on=['step1'])</span>
+</span><span data-line="320"><span class="sd">            .add_task('step3', aggregate, depends_on=['step2'])</span>
+</span><span data-line="321"><span class="sd">            .build())</span>
+</span><span data-line="322"><span class="sd">        results = workflow.execute()</span>
 </span><span data-line="323"><span class="sd">    """</span>
 </span><span data-line="324">
 </span><span data-line="325">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -557,7 +557,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../../_static/documentation_options.js?v=3d116926"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

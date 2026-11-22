@@ -5,21 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-02 12:41 UTC** from commit <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d598676</code></a> on branch <code>master</code>, for **au 0.1.18** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 17:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28f</code></a> on branch <code>master</code>, for **au 0.1.19** (from <code>pyproject.toml</code>).
 
-:::{warning}
-The documentation and the package may be misaligned:
-
-- The documented version (0.1.18) is ahead of the latest release on PyPI (0.1.17): these docs describe unreleased code.
+:::{note}
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d5986761913191995152f97cb2960560eb4fbe0a</code></a> |
+| Commit | <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28fef4133657ef804f8eb1ab486321957e45</code></a> |
 | Branch | <code>master</code> |
-| Tags at this commit | <code>0.1.18</code> |
+| Tags at this commit | <code>0.1.19</code> |
 | Working tree | clean |
 | Remote | <code>https://github.com/i2mint/au</code> |
 
@@ -28,18 +26,18 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>i2mint/au</code> |
-| Run | <a href="https://github.com/i2mint/au/actions/runs/41446386942">41446386942</a> |
+| Run | <a href="https://github.com/i2mint/au/actions/runs/45050984206">45050984206</a> |
 | Ref | <code>refs/heads/master</code> |
-| Event commit | <code>4d263d138eb36a5ac0a3cbf14920ad56b3655e5e</code> (in the history of the built commit) |
+| Event commit | <code>c61c090904b50cad9f1a546785ed121dc7ffb41c</code> (in the history of the built commit) |
 
 ## Tools
 
 | | |
 |---|---|
-| epythet | 0.2.22 |
+| epythet | 0.2.23 |
 | Sphinx | 9.1.1 |
 | docutils | 0.22.4 |
-| Python | 3.12.15 |
+| Python | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -55,14 +53,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.17/">0.1.17</a>, older than the documented version (0.1.18).
+Latest release: <a href="https://pypi.org/project/au/0.1.19/">0.1.19</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout d5986761913191995152f97cb2960560eb4fbe0a
-pip install "epythet==0.2.22"
+git checkout 33db28fef4133657ef804f8eb1ab486321957e45
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

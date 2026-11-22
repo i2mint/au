@@ -221,13 +221,13 @@ data-aria-dark="Switch to auto color mode">
 <dd class="field-odd"><p>Task ID</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step3</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">])</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>graph = TaskGraph()
+t1 = graph.add_task(step1, 5)
+t2 = graph.add_task(step2, 10)
+t3 = graph.add_task(step3, depends_on=[t1, t2])</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -251,14 +251,14 @@ data-aria-dark="Switch to auto color mode">
 </ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">graph</span> <span class="o">=</span> <span class="n">TaskGraph</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">step2</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="n">t1</span><span class="p">])</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">t2</span><span class="p">])</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>graph = TaskGraph()
+t1 = graph.add_task(step1, 5)
+t2 = graph.add_task(step2, depends_on=[t1])
+results = graph.execute()
+print(results[t2])</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -315,15 +315,17 @@ data-aria-dark="Switch to auto color mode">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.workflow.</span></span><span class="sig-name descname"><span class="pre">WorkflowBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/workflow.html#WorkflowBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.workflow.WorkflowBuilder" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Fluent interface for building workflows.</p>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">workflow</span> <span class="o">=</span> <span class="p">(</span><span class="n">WorkflowBuilder</span><span class="p">()</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step1'</span><span class="p">,</span> <span class="n">process_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step2'</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">'step1'</span><span class="p">])</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s1">'step3'</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">'step2'</span><span class="p">])</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span>    <span class="o">.</span><span class="n">build</span><span class="p">())</span>
-</span><span data-line="6"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>workflow = (WorkflowBuilder()</dt><dd><p>.add_task(‘step1’, process_data, data)
+.add_task(‘step2’, transform, depends_on=[‘step1’])
+.add_task(‘step3’, aggregate, depends_on=[‘step2’])
+.build())</p>
+</dd>
+</dl>
+<p>results = workflow.execute()</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
@@ -545,7 +547,7 @@ require integration with the async_compute decorator.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../_static/documentation_options.js?v=3d116926"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

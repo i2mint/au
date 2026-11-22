@@ -1,41 +1,41 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-02T12:41:02Z",
+  "built_at": "2026-11-22T17:44:50Z",
   "package": {
     "name": "au",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "display_name": "au",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "d5986761913191995152f97cb2960560eb4fbe0a",
-    "short_commit": "d598676",
+    "commit": "33db28fef4133657ef804f8eb1ab486321957e45",
+    "short_commit": "33db28f",
     "branch": "master",
     "tags": [
-      "0.1.18"
+      "0.1.19"
     ],
     "dirty": false,
     "remote_url": "https://github.com/i2mint/au",
-    "commit_url": "https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a",
+    "commit_url": "https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "i2mint/au",
-    "sha": "4d263d138eb36a5ac0a3cbf14920ad56b3655e5e",
+    "sha": "c61c090904b50cad9f1a546785ed121dc7ffb41c",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "41446386942",
-    "run_url": "https://github.com/i2mint/au/actions/runs/41446386942",
+    "run_id": "45050984206",
+    "run_url": "https://github.com/i2mint/au/actions/runs/45050984206",
     "server_url": "https://github.com"
   },
   "tools": {
-    "epythet": "0.2.22",
+    "epythet": "0.2.23",
     "sphinx": "9.1.1",
     "docutils": "0.22.4",
-    "python": "3.12.15"
+    "python": "3.12.16"
   },
   "config": {
     "theme": "auto",
@@ -58,20 +58,18 @@
   },
   "site": {
     "modules_documented": 12,
-    "objects_documented": 354
+    "objects_documented": 363
   },
   "pypi": {
     "checked": true,
-    "latest": "0.1.17",
-    "relation": "ahead",
+    "latest": "0.1.19",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout d5986761913191995152f97cb2960560eb4fbe0a\npip install \"epythet==0.2.22\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/i2mint/au && cd au\ngit checkout 33db28fef4133657ef804f8eb1ab486321957e45\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.1.18) is ahead of the latest release on PyPI (0.1.17): these docs describe unreleased code."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

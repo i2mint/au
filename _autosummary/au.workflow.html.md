@@ -40,14 +40,11 @@ Add a task to the graph.
 * **Returns:**
   Task ID
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, 10)
->>> t3 = graph.add_task(step3, depends_on=[t1, t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, 10)
+  t3 = graph.add_task(step3, depends_on=[t1, t2])
 
 #### execute(timeout=None)
 
@@ -63,15 +60,12 @@ Execute all tasks in dependency order.
   * [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – If circular dependencies detected
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If overall timeout exceeded
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, depends_on=[t1])
->>> results = graph.execute()
->>> print(results[t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, depends_on=[t1])
+  results = graph.execute()
+  print(results[t2])
 
 #### get_task(task_id)
 
@@ -111,16 +105,14 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Fluent interface for building workflows.
 
-### Example
-
-```pycon
->>> workflow = (WorkflowBuilder()
->>>     .add_task('step1', process_data, data)
->>>     .add_task('step2', transform, depends_on=['step1'])
->>>     .add_task('step3', aggregate, depends_on=['step2'])
->>>     .build())
->>> results = workflow.execute()
-```
+Example::
+: workflow = (WorkflowBuilder()
+  : .add_task(‘step1’, process_data, data)
+    .add_task(‘step2’, transform, depends_on=[‘step1’])
+    .add_task(‘step3’, aggregate, depends_on=[‘step2’])
+    .build())
+  <br/>
+  results = workflow.execute()
 
 #### add_task(task_id, func, \*args, depends_on=None, \*\*kwargs)
 

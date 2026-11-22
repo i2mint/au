@@ -400,12 +400,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="265"><span class="sd">    Returns:</span>
 </span><span data-line="266"><span class="sd">        Task ID (key) for retrieving results</span>
 </span><span data-line="267">
-</span><span data-line="268"><span class="sd">    Example:</span>
-</span><span data-line="269"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, multiplier=2)</span>
-</span><span data-line="270"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
+</span><span data-line="268"><span class="sd">    Example::</span>
+</span><span data-line="269"><span class="sd">        task_id = submit_task(my_func, 5, multiplier=2)</span>
+</span><span data-line="270"><span class="sd">        result = get_result(task_id, timeout=10)</span>
 </span><span data-line="271">
-</span><span data-line="272"><span class="sd">        &gt;&gt;&gt; # Idempotent submission: resubmitting the same key while in flight</span>
-</span><span data-line="273"><span class="sd">        &gt;&gt;&gt; # returns the running task rather than launching a duplicate.</span>
+</span><span data-line="272"><span class="sd">        # Idempotent submission: resubmitting the same key while in flight</span>
+</span><span data-line="273"><span class="sd">        # returns the running task rather than launching a duplicate.</span>
 </span><span data-line="274"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
 </span><span data-line="275"><span class="sd">        &gt;&gt;&gt; same_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP</span>
 </span><span data-line="276"><span class="sd">    """</span>
@@ -468,9 +468,9 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="330"><span class="sd">        TimeoutError: If timeout exceeded</span>
 </span><span data-line="331"><span class="sd">        Exception: If task failed</span>
 </span><span data-line="332">
-</span><span data-line="333"><span class="sd">    Example:</span>
-</span><span data-line="334"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="335"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id, timeout=10)</span>
+</span><span data-line="333"><span class="sd">    Example::</span>
+</span><span data-line="334"><span class="sd">        task_id = submit_task(my_func, 5)</span>
+</span><span data-line="335"><span class="sd">        result = get_result(task_id, timeout=10)</span>
 </span><span data-line="336"><span class="sd">    """</span>
 </span><span data-line="337">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
 </span><span data-line="338">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
@@ -493,11 +493,11 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="352"><span class="sd">    Returns:</span>
 </span><span data-line="353"><span class="sd">        Task status (PENDING, RUNNING, COMPLETED, FAILED)</span>
 </span><span data-line="354">
-</span><span data-line="355"><span class="sd">    Example:</span>
-</span><span data-line="356"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="357"><span class="sd">        &gt;&gt;&gt; status = get_status(task_id)</span>
-</span><span data-line="358"><span class="sd">        &gt;&gt;&gt; if status == ComputationStatus.COMPLETED:</span>
-</span><span data-line="359"><span class="sd">        &gt;&gt;&gt;     result = get_result(task_id)</span>
+</span><span data-line="355"><span class="sd">    Example::</span>
+</span><span data-line="356"><span class="sd">        task_id = submit_task(my_func, 5)</span>
+</span><span data-line="357"><span class="sd">        status = get_status(task_id)</span>
+</span><span data-line="358"><span class="sd">        if status == ComputationStatus.COMPLETED:</span>
+</span><span data-line="359"><span class="sd">            result = get_result(task_id)</span>
 </span><span data-line="360"><span class="sd">    """</span>
 </span><span data-line="361">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
 </span><span data-line="362">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
@@ -520,11 +520,11 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="376"><span class="sd">    Returns:</span>
 </span><span data-line="377"><span class="sd">        True if task is complete, False otherwise</span>
 </span><span data-line="378">
-</span><span data-line="379"><span class="sd">    Example:</span>
-</span><span data-line="380"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="381"><span class="sd">        &gt;&gt;&gt; while not is_ready(task_id):</span>
-</span><span data-line="382"><span class="sd">        &gt;&gt;&gt;     time.sleep(0.1)</span>
-</span><span data-line="383"><span class="sd">        &gt;&gt;&gt; result = get_result(task_id)</span>
+</span><span data-line="379"><span class="sd">    Example::</span>
+</span><span data-line="380"><span class="sd">        task_id = submit_task(my_func, 5)</span>
+</span><span data-line="381"><span class="sd">        while not is_ready(task_id):</span>
+</span><span data-line="382"><span class="sd">            time.sleep(0.1)</span>
+</span><span data-line="383"><span class="sd">        result = get_result(task_id)</span>
 </span><span data-line="384"><span class="sd">    """</span>
 </span><span data-line="385">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
 </span><span data-line="386">    <span class="n">handle</span> <span class="o">=</span> <span class="n">ComputationHandle</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">store</span><span class="p">)</span>
@@ -549,9 +549,9 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="402"><span class="sd">    Returns:</span>
 </span><span data-line="403"><span class="sd">        True if cancellation was attempted, False otherwise</span>
 </span><span data-line="404">
-</span><span data-line="405"><span class="sd">    Example:</span>
-</span><span data-line="406"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(long_running_func)</span>
-</span><span data-line="407"><span class="sd">        &gt;&gt;&gt; cancel_task(task_id)</span>
+</span><span data-line="405"><span class="sd">    Example::</span>
+</span><span data-line="406"><span class="sd">        task_id = submit_task(long_running_func)</span>
+</span><span data-line="407"><span class="sd">        cancel_task(task_id)</span>
 </span><span data-line="408"><span class="sd">    """</span>
 </span><span data-line="409">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
 </span><span data-line="410">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
@@ -586,12 +586,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="436"><span class="sd">    Yields:</span>
 </span><span data-line="437"><span class="sd">        ComputationHandle for the task</span>
 </span><span data-line="438">
-</span><span data-line="439"><span class="sd">    Example:</span>
-</span><span data-line="440"><span class="sd">        &gt;&gt;&gt; with async_task(my_func, 5, multiplier=2) as handle:</span>
-</span><span data-line="441"><span class="sd">        &gt;&gt;&gt;     # Do other work while task runs</span>
-</span><span data-line="442"><span class="sd">        &gt;&gt;&gt;     print("Working...")</span>
-</span><span data-line="443"><span class="sd">        &gt;&gt;&gt; # Result is ready here</span>
-</span><span data-line="444"><span class="sd">        &gt;&gt;&gt; print(f"Result: {handle.result}")</span>
+</span><span data-line="439"><span class="sd">    Example::</span>
+</span><span data-line="440"><span class="sd">        with async_task(my_func, 5, multiplier=2) as handle:</span>
+</span><span data-line="441"><span class="sd">            # Do other work while task runs</span>
+</span><span data-line="442"><span class="sd">            print("Working...")</span>
+</span><span data-line="443"><span class="sd">        # Result is ready here</span>
+</span><span data-line="444"><span class="sd">        print(f"Result: {handle.result}")</span>
 </span><span data-line="445"><span class="sd">    """</span>
 </span><span data-line="446">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
 </span><span data-line="447">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
@@ -631,10 +631,10 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="478"><span class="sd">    Returns:</span>
 </span><span data-line="479"><span class="sd">        ComputationHandle instance</span>
 </span><span data-line="480">
-</span><span data-line="481"><span class="sd">    Example:</span>
-</span><span data-line="482"><span class="sd">        &gt;&gt;&gt; task_id = submit_task(my_func, 5)</span>
-</span><span data-line="483"><span class="sd">        &gt;&gt;&gt; handle = get_handle(task_id)</span>
-</span><span data-line="484"><span class="sd">        &gt;&gt;&gt; result = handle.get_result(timeout=10)</span>
+</span><span data-line="481"><span class="sd">    Example::</span>
+</span><span data-line="482"><span class="sd">        task_id = submit_task(my_func, 5)</span>
+</span><span data-line="483"><span class="sd">        handle = get_handle(task_id)</span>
+</span><span data-line="484"><span class="sd">        result = handle.get_result(timeout=10)</span>
 </span><span data-line="485"><span class="sd">    """</span>
 </span><span data-line="486">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
 </span><span data-line="487">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
@@ -659,12 +659,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="503"><span class="sd">    Returns:</span>
 </span><span data-line="504"><span class="sd">        List of task IDs</span>
 </span><span data-line="505">
-</span><span data-line="506"><span class="sd">    Example:</span>
-</span><span data-line="507"><span class="sd">        &gt;&gt;&gt; tasks = [</span>
-</span><span data-line="508"><span class="sd">        &gt;&gt;&gt;     (func1, (1,), {}),</span>
-</span><span data-line="509"><span class="sd">        &gt;&gt;&gt;     (func2, (2,), {'multiplier': 3}),</span>
-</span><span data-line="510"><span class="sd">        &gt;&gt;&gt; ]</span>
-</span><span data-line="511"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
+</span><span data-line="506"><span class="sd">    Example::</span>
+</span><span data-line="507"><span class="sd">        tasks = [</span>
+</span><span data-line="508"><span class="sd">            (func1, (1,), {}),</span>
+</span><span data-line="509"><span class="sd">            (func2, (2,), {'multiplier': 3}),</span>
+</span><span data-line="510"><span class="sd">        ]</span>
+</span><span data-line="511"><span class="sd">        task_ids = submit_many(tasks)</span>
 </span><span data-line="512"><span class="sd">    """</span>
 </span><span data-line="513">    <span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_backend</span><span class="p">()</span>
 </span><span data-line="514">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
@@ -695,9 +695,9 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="536"><span class="sd">    Returns:</span>
 </span><span data-line="537"><span class="sd">        List of results</span>
 </span><span data-line="538">
-</span><span data-line="539"><span class="sd">    Example:</span>
-</span><span data-line="540"><span class="sd">        &gt;&gt;&gt; task_ids = submit_many(tasks)</span>
-</span><span data-line="541"><span class="sd">        &gt;&gt;&gt; results = get_many(task_ids, timeout=10)</span>
+</span><span data-line="539"><span class="sd">    Example::</span>
+</span><span data-line="540"><span class="sd">        task_ids = submit_many(tasks)</span>
+</span><span data-line="541"><span class="sd">        results = get_many(task_ids, timeout=10)</span>
 </span><span data-line="542"><span class="sd">    """</span>
 </span><span data-line="543">    <span class="n">store</span> <span class="o">=</span> <span class="n">store</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_get_default_store</span><span class="p">()</span>
 </span><span data-line="544">
@@ -735,7 +735,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../../_static/documentation_options.js?v=3d116926"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

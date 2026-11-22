@@ -50,15 +50,13 @@ The task is submitted on enter and result retrieved on exit.
 * **Yields:**
   ComputationHandle for the task
 
-### Example
-
-```pycon
->>> with async_task(my_func, 5, multiplier=2) as handle:
->>>     # Do other work while task runs
->>>     print("Working...")
->>> # Result is ready here
->>> print(f"Result: {handle.result}")
-```
+Example::
+: with async_task(my_func, 5, multiplier=2) as handle:
+  : # Do other work while task runs
+    print(“Working…”)
+  <br/>
+  # Result is ready here
+  print(f”Result: {handle.result}”)
 
 ### au.api.cancel_task(task_id, backend=None, store=None)
 
@@ -73,12 +71,9 @@ Cancel a running task.
 * **Returns:**
   True if cancellation was attempted, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(long_running_func)
->>> cancel_task(task_id)
-```
+Example::
+: task_id = submit_task(long_running_func)
+  cancel_task(task_id)
 
 ### au.api.get_handle(task_id, backend=None, store=None)
 
@@ -93,13 +88,10 @@ Get a handle for a task ID.
 * **Returns:**
   ComputationHandle instance
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> handle = get_handle(task_id)
->>> result = handle.get_result(timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  handle = get_handle(task_id)
+  result = handle.get_result(timeout=10)
 
 ### au.api.get_many(task_ids, timeout=None, store=None)
 
@@ -114,12 +106,9 @@ Get results for multiple tasks.
 * **Returns:**
   List of results
 
-### Example
-
-```pycon
->>> task_ids = submit_many(tasks)
->>> results = get_many(task_ids, timeout=10)
-```
+Example::
+: task_ids = submit_many(tasks)
+  results = get_many(task_ids, timeout=10)
 
 ### au.api.get_result(task_id, timeout=None, store=None)
 
@@ -137,12 +126,9 @@ Get result for a task ID.
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If timeout exceeded
   * [**Exception**](https://docs.python.org/3/builtins/exceptions.html#Exception) – If task failed
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> result = get_result(task_id, timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  result = get_result(task_id, timeout=10)
 
 ### au.api.get_status(task_id, store=None)
 
@@ -156,14 +142,12 @@ Get status for a task ID.
 * **Returns:**
   Task status (PENDING, RUNNING, COMPLETED, FAILED)
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> status = get_status(task_id)
->>> if status == ComputationStatus.COMPLETED:
->>>     result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  status = get_status(task_id)
+  if status == ComputationStatus.COMPLETED:
+  <br/>
+  > result = get_result(task_id)
 
 ### au.api.is_ready(task_id, store=None)
 
@@ -177,14 +161,13 @@ Check if task is ready (completed or failed).
 * **Returns:**
   True if task is complete, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> while not is_ready(task_id):
->>>     time.sleep(0.1)
->>> result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  while not is_ready(task_id):
+  <br/>
+  > time.sleep(0.1)
+  <br/>
+  result = get_result(task_id)
 
 ### au.api.set_default_backend(backend)
 
@@ -217,15 +200,13 @@ Submit multiple tasks at once.
 * **Returns:**
   List of task IDs
 
-### Example
-
-```pycon
->>> tasks = [
->>>     (func1, (1,), {}),
->>>     (func2, (2,), {'multiplier': 3}),
->>> ]
->>> task_ids = submit_many(tasks)
-```
+Example::
+: tasks = [
+  : (func1, (1,), {}),
+    (func2, (2,), {‘multiplier’: 3}),
+  <br/>
+  ]
+  task_ids = submit_many(tasks)
 
 ### au.api.submit_task(func, \*args, key=None, backend=None, store=None, retry_policy=None, \*\*kwargs)
 
@@ -251,16 +232,11 @@ Submit a task for async execution without decorator.
 * **Returns:**
   Task ID (key) for retrieving results
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5, multiplier=2)
->>> result = get_result(task_id, timeout=10)
-```
-
-```pycon
->>> # Idempotent submission: resubmitting the same key while in flight
->>> # returns the running task rather than launching a duplicate.
->>> task_id = submit_task(my_func, 5, key="my-job")
->>> same_id = submit_task(my_func, 5, key="my-job")
-```
+Example::
+: task_id = submit_task(my_func, 5, multiplier=2)
+  result = get_result(task_id, timeout=10)
+  <br/>
+  # Idempotent submission: resubmitting the same key while in flight
+  # returns the running task rather than launching a duplicate.
+  >>> task_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
+  >>> same_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP

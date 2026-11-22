@@ -1,4 +1,4 @@
-> built 2026-11-02 12:41 UTC from d598676 (master) · au 0.1.18. Details: build_info.json
+> built 2026-11-22 17:44 UTC from 33db28f (master) · au 0.1.19. Details: build_info.json
 
 # index.html.md
 
@@ -630,15 +630,13 @@ The task is submitted on enter and result retrieved on exit.
 * **Yields:**
   ComputationHandle for the task
 
-### Example
-
-```pycon
->>> with async_task(my_func, 5, multiplier=2) as handle:
->>>     # Do other work while task runs
->>>     print("Working...")
->>> # Result is ready here
->>> print(f"Result: {handle.result}")
-```
+Example::
+: with async_task(my_func, 5, multiplier=2) as handle:
+  : # Do other work while task runs
+    print(“Working…”)
+  <br/>
+  # Result is ready here
+  print(f”Result: {handle.result}”)
 
 ### au.api.cancel_task(task_id, backend=None, store=None)
 
@@ -653,12 +651,9 @@ Cancel a running task.
 * **Returns:**
   True if cancellation was attempted, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(long_running_func)
->>> cancel_task(task_id)
-```
+Example::
+: task_id = submit_task(long_running_func)
+  cancel_task(task_id)
 
 ### au.api.get_handle(task_id, backend=None, store=None)
 
@@ -673,13 +668,10 @@ Get a handle for a task ID.
 * **Returns:**
   ComputationHandle instance
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> handle = get_handle(task_id)
->>> result = handle.get_result(timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  handle = get_handle(task_id)
+  result = handle.get_result(timeout=10)
 
 ### au.api.get_many(task_ids, timeout=None, store=None)
 
@@ -694,12 +686,9 @@ Get results for multiple tasks.
 * **Returns:**
   List of results
 
-### Example
-
-```pycon
->>> task_ids = submit_many(tasks)
->>> results = get_many(task_ids, timeout=10)
-```
+Example::
+: task_ids = submit_many(tasks)
+  results = get_many(task_ids, timeout=10)
 
 ### au.api.get_result(task_id, timeout=None, store=None)
 
@@ -717,12 +706,9 @@ Get result for a task ID.
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If timeout exceeded
   * [**Exception**](https://docs.python.org/3/builtins/exceptions.html#Exception) – If task failed
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> result = get_result(task_id, timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  result = get_result(task_id, timeout=10)
 
 ### au.api.get_status(task_id, store=None)
 
@@ -736,14 +722,12 @@ Get status for a task ID.
 * **Returns:**
   Task status (PENDING, RUNNING, COMPLETED, FAILED)
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> status = get_status(task_id)
->>> if status == ComputationStatus.COMPLETED:
->>>     result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  status = get_status(task_id)
+  if status == ComputationStatus.COMPLETED:
+  <br/>
+  > result = get_result(task_id)
 
 ### au.api.is_ready(task_id, store=None)
 
@@ -757,14 +741,13 @@ Check if task is ready (completed or failed).
 * **Returns:**
   True if task is complete, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> while not is_ready(task_id):
->>>     time.sleep(0.1)
->>> result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  while not is_ready(task_id):
+  <br/>
+  > time.sleep(0.1)
+  <br/>
+  result = get_result(task_id)
 
 ### au.api.set_default_backend(backend)
 
@@ -797,15 +780,13 @@ Submit multiple tasks at once.
 * **Returns:**
   List of task IDs
 
-### Example
-
-```pycon
->>> tasks = [
->>>     (func1, (1,), {}),
->>>     (func2, (2,), {'multiplier': 3}),
->>> ]
->>> task_ids = submit_many(tasks)
-```
+Example::
+: tasks = [
+  : (func1, (1,), {}),
+    (func2, (2,), {‘multiplier’: 3}),
+  <br/>
+  ]
+  task_ids = submit_many(tasks)
 
 ### au.api.submit_task(func, \*args, key=None, backend=None, store=None, retry_policy=None, \*\*kwargs)
 
@@ -831,19 +812,14 @@ Submit a task for async execution without decorator.
 * **Returns:**
   Task ID (key) for retrieving results
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5, multiplier=2)
->>> result = get_result(task_id, timeout=10)
-```
-
-```pycon
->>> # Idempotent submission: resubmitting the same key while in flight
->>> # returns the running task rather than launching a duplicate.
->>> task_id = submit_task(my_func, 5, key="my-job")
->>> same_id = submit_task(my_func, 5, key="my-job")
-```
+Example::
+: task_id = submit_task(my_func, 5, multiplier=2)
+  result = get_result(task_id, timeout=10)
+  <br/>
+  # Idempotent submission: resubmitting the same key while in flight
+  # returns the running task rather than launching a duplicate.
+  >>> task_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
+  >>> same_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
 
 
 # _autosummary/au.backends.html.md
@@ -1490,7 +1466,7 @@ with [`SharedMetricsMiddleware`](_autosummary/au.base.html.md#au.base.SharedMetr
 
 #### terminate(key)
 
-Attempt to terminate the computation. Default: do nothing.
+Terminate the process computing `key`, if it is still running.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -1532,15 +1508,26 @@ Metrics middleware using shared memory for multiprocessing.
 
 #### after_compute(key, result)
 
-Called after computation completes.
+Count one more completion and add its duration.
 
 #### before_compute(func, args, kwargs, key)
 
-Called before computation starts.
+Count one more computation.
+
+#### get_shared_state()
+
+The shared counters and lock, to pass to another process’s middleware.
+
+#### get_stats()
+
+Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 #### on_error(key, error)
 
-Called when computation fails (`error` may be a BaseException).
+Count one more failure.
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -2757,7 +2744,7 @@ with [`SharedMetricsMiddleware`](_autosummary/au.html.md#au.SharedMetricsMiddlew
 
 #### terminate(key)
 
-Attempt to terminate the computation. Default: do nothing.
+Terminate the process computing `key`, if it is still running.
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -2910,15 +2897,26 @@ Metrics middleware using shared memory for multiprocessing.
 
 #### after_compute(key, result)
 
-Called after computation completes.
+Count one more completion and add its duration.
 
 #### before_compute(func, args, kwargs, key)
 
-Called before computation starts.
+Count one more computation.
+
+#### get_shared_state()
+
+The shared counters and lock, to pass to another process’s middleware.
+
+#### get_stats()
+
+Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
 #### on_error(key, error)
 
-Called when computation fails (`error` may be a BaseException).
+Count one more failure.
 
 ### *class* au.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -3065,14 +3063,11 @@ Add a task to the graph.
 * **Returns:**
   Task ID
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, 10)
->>> t3 = graph.add_task(step3, depends_on=[t1, t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, 10)
+  t3 = graph.add_task(step3, depends_on=[t1, t2])
 
 #### execute(timeout=None)
 
@@ -3088,15 +3083,12 @@ Execute all tasks in dependency order.
   * [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – If circular dependencies detected
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If overall timeout exceeded
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, depends_on=[t1])
->>> results = graph.execute()
->>> print(results[t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, depends_on=[t1])
+  results = graph.execute()
+  print(results[t2])
 
 #### get_task(task_id)
 
@@ -3205,16 +3197,14 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Fluent interface for building workflows.
 
-### Example
-
-```pycon
->>> workflow = (WorkflowBuilder()
->>>     .add_task('step1', process_data, data)
->>>     .add_task('step2', transform, depends_on=['step1'])
->>>     .add_task('step3', aggregate, depends_on=['step2'])
->>>     .build())
->>> results = workflow.execute()
-```
+Example::
+: workflow = (WorkflowBuilder()
+  : .add_task(‘step1’, process_data, data)
+    .add_task(‘step2’, transform, depends_on=[‘step1’])
+    .add_task(‘step3’, aggregate, depends_on=[‘step2’])
+    .build())
+  <br/>
+  results = workflow.execute()
 
 #### add_task(task_id, func, \*args, depends_on=None, \*\*kwargs)
 
@@ -3367,15 +3357,13 @@ The task is submitted on enter and result retrieved on exit.
 * **Yields:**
   ComputationHandle for the task
 
-### Example
-
-```pycon
->>> with async_task(my_func, 5, multiplier=2) as handle:
->>>     # Do other work while task runs
->>>     print("Working...")
->>> # Result is ready here
->>> print(f"Result: {handle.result}")
-```
+Example::
+: with async_task(my_func, 5, multiplier=2) as handle:
+  : # Do other work while task runs
+    print(“Working…”)
+  <br/>
+  # Result is ready here
+  print(f”Result: {handle.result}”)
 
 ### au.cancel_task(task_id, backend=None, store=None)
 
@@ -3390,12 +3378,9 @@ Cancel a running task.
 * **Returns:**
   True if cancellation was attempted, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(long_running_func)
->>> cancel_task(task_id)
-```
+Example::
+: task_id = submit_task(long_running_func)
+  cancel_task(task_id)
 
 ### au.create_app_from_decorator(title='AU Task API', description='Async task management API')
 
@@ -3408,7 +3393,7 @@ This requires functions to be imported/registered before app creation.
   * **title** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API title
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](_autosummary/au.http.html.md#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 
@@ -3522,13 +3507,10 @@ Get a handle for a task ID.
 * **Returns:**
   ComputationHandle instance
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> handle = get_handle(task_id)
->>> result = handle.get_result(timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  handle = get_handle(task_id)
+  result = handle.get_result(timeout=10)
 
 ### au.get_many(task_ids, timeout=None, store=None)
 
@@ -3543,12 +3525,9 @@ Get results for multiple tasks.
 * **Returns:**
   List of results
 
-### Example
-
-```pycon
->>> task_ids = submit_many(tasks)
->>> results = get_many(task_ids, timeout=10)
-```
+Example::
+: task_ids = submit_many(tasks)
+  results = get_many(task_ids, timeout=10)
 
 ### au.get_result(task_id, timeout=None, store=None)
 
@@ -3566,12 +3545,9 @@ Get result for a task ID.
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If timeout exceeded
   * [**Exception**](https://docs.python.org/3/builtins/exceptions.html#Exception) – If task failed
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> result = get_result(task_id, timeout=10)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  result = get_result(task_id, timeout=10)
 
 ### au.get_status(task_id, store=None)
 
@@ -3585,14 +3561,12 @@ Get status for a task ID.
 * **Returns:**
   Task status (PENDING, RUNNING, COMPLETED, FAILED)
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> status = get_status(task_id)
->>> if status == ComputationStatus.COMPLETED:
->>>     result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  status = get_status(task_id)
+  if status == ComputationStatus.COMPLETED:
+  <br/>
+  > result = get_result(task_id)
 
 ### au.is_ready(task_id, store=None)
 
@@ -3606,14 +3580,13 @@ Check if task is ready (completed or failed).
 * **Returns:**
   True if task is complete, False otherwise
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5)
->>> while not is_ready(task_id):
->>>     time.sleep(0.1)
->>> result = get_result(task_id)
-```
+Example::
+: task_id = submit_task(my_func, 5)
+  while not is_ready(task_id):
+  <br/>
+  > time.sleep(0.1)
+  <br/>
+  result = get_result(task_id)
 
 ### au.mk_flask_interface(functions=None, backend=None, store=None)
 
@@ -3642,22 +3615,20 @@ Create a FastAPI application for task management.
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
   * **version** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API version
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](_autosummary/au.http.html.md#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 * **Raises:**
   [**ImportError**](https://docs.python.org/3/builtins/exceptions.html#ImportError) – If FastAPI is not installed
 
-### Example
-
-```pycon
->>> @async_compute
->>> def my_func(n: int) -> int:
->>>     return n * 2
->>>
->>> app = mk_http_interface([my_func])
->>> # Run with: uvicorn main:app --reload
-```
+Example::
+: @async_compute
+  def my_func(n: int) -> int:
+  <br/>
+  > return n \* 2
+  <br/>
+  app = mk_http_interface([my_func])
+  # Run with: uvicorn main:app –reload
 
 ### au.mock_async(backend=None, , store=None)
 
@@ -3754,15 +3725,13 @@ Submit multiple tasks at once.
 * **Returns:**
   List of task IDs
 
-### Example
-
-```pycon
->>> tasks = [
->>>     (func1, (1,), {}),
->>>     (func2, (2,), {'multiplier': 3}),
->>> ]
->>> task_ids = submit_many(tasks)
-```
+Example::
+: tasks = [
+  : (func1, (1,), {}),
+    (func2, (2,), {‘multiplier’: 3}),
+  <br/>
+  ]
+  task_ids = submit_many(tasks)
 
 ### au.submit_task(func, \*args, key=None, backend=None, store=None, retry_policy=None, \*\*kwargs)
 
@@ -3788,19 +3757,14 @@ Submit a task for async execution without decorator.
 * **Returns:**
   Task ID (key) for retrieving results
 
-### Example
-
-```pycon
->>> task_id = submit_task(my_func, 5, multiplier=2)
->>> result = get_result(task_id, timeout=10)
-```
-
-```pycon
->>> # Idempotent submission: resubmitting the same key while in flight
->>> # returns the running task rather than launching a duplicate.
->>> task_id = submit_task(my_func, 5, key="my-job")
->>> same_id = submit_task(my_func, 5, key="my-job")
-```
+Example::
+: task_id = submit_task(my_func, 5, multiplier=2)
+  result = get_result(task_id, timeout=10)
+  <br/>
+  # Idempotent submission: resubmitting the same key while in flight
+  # returns the running task rather than launching a duplicate.
+  >>> task_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
+  >>> same_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
 
 ### au.temporary_async_compute(\*\*kwargs)
 
@@ -3841,10 +3805,10 @@ Provides REST API endpoints for async task management using FastAPI.
 
 ### Functions
 
-| `Body`(\*args, \*\*kwargs)                                                                       |                                                                              |
+| [`Body`](_autosummary/au.http.html.md#au.http.Body)(\*args, \*\*kwargs)                        | Placeholder for `fastapi.Body` when it is not installed.                     |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| `Field`(\*args, \*\*kwargs)                                                                      |                                                                              |
-| `Query`(\*args, \*\*kwargs)                                                                      |                                                                              |
+| [`Field`](_autosummary/au.http.html.md#au.http.Field)(\*args, \*\*kwargs)                       | Placeholder for `pydantic.Field` when it is not installed.                   |
+| [`Query`](_autosummary/au.http.html.md#au.http.Query)(\*args, \*\*kwargs)                       | Placeholder for `fastapi.Query` when it is not installed.                    |
 | [`create_app_from_decorator`](_autosummary/au.http.html.md#au.http.create_app_from_decorator)([title, description]) | Create a FastAPI app that auto-discovers @async_compute decorated functions. |
 | [`mk_flask_interface`](_autosummary/au.http.html.md#au.http.mk_flask_interface)([functions, backend, store]) | Create a Flask application for task management.                              |
 | [`mk_http_interface`](_autosummary/au.http.html.md#au.http.mk_http_interface)([functions, backend, ...])    | Create a FastAPI application for task management.                            |
@@ -3852,58 +3816,84 @@ Provides REST API endpoints for async task management using FastAPI.
 
 ### Classes
 
-| `BaseModel`()                                                         |                                       |
-|-----------------------------------------------------------------------|---------------------------------------|
-| `FastAPI`()                                                           |                                       |
-| [`TaskCancelResponse`](_autosummary/au.http.html.md#au.http.TaskCancelResponse)() | Response model for task cancellation. |
-| [`TaskListResponse`](_autosummary/au.http.html.md#au.http.TaskListResponse)()   | Response model for task list.         |
-| [`TaskResultResponse`](_autosummary/au.http.html.md#au.http.TaskResultResponse)() | Response model for task result.       |
-| [`TaskStatusResponse`](_autosummary/au.http.html.md#au.http.TaskStatusResponse)() | Response model for task status.       |
-| [`TaskSubmitRequest`](_autosummary/au.http.html.md#au.http.TaskSubmitRequest)()  | Request model for task submission.    |
-| [`TaskSubmitResponse`](_autosummary/au.http.html.md#au.http.TaskSubmitResponse)() | Response model for task submission.   |
+| [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)()          | Placeholder used when pydantic is not installed.   |
+|-----------------------------------------------------------------------|----------------------------------------------------|
+| [`FastAPI`](_autosummary/au.http.html.md#au.http.FastAPI)()            | Placeholder used when FastAPI is not installed.    |
+| [`TaskCancelResponse`](_autosummary/au.http.html.md#au.http.TaskCancelResponse)() | Response model for task cancellation.              |
+| [`TaskListResponse`](_autosummary/au.http.html.md#au.http.TaskListResponse)()   | Response model for task list.                      |
+| [`TaskResultResponse`](_autosummary/au.http.html.md#au.http.TaskResultResponse)() | Response model for task result.                    |
+| [`TaskStatusResponse`](_autosummary/au.http.html.md#au.http.TaskStatusResponse)() | Response model for task status.                    |
+| [`TaskSubmitRequest`](_autosummary/au.http.html.md#au.http.TaskSubmitRequest)()  | Request model for task submission.                 |
+| [`TaskSubmitResponse`](_autosummary/au.http.html.md#au.http.TaskSubmitResponse)() | Response model for task submission.                |
 
 ### Exceptions
 
-| [`HTTPException`](_autosummary/au.http.html.md#au.http.HTTPException)   |    |
-|------------------------------------------------------------------|----|
+| [`HTTPException`](_autosummary/au.http.html.md#au.http.HTTPException)   | Placeholder used when FastAPI is not installed.   |
+|------------------------------------------------------------------|---------------------------------------------------|
+
+### *class* au.http.BaseModel
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Placeholder used when pydantic is not installed.
+
+### au.http.Body(\*args, \*\*kwargs)
+
+Placeholder for `fastapi.Body` when it is not installed.
+
+### *class* au.http.FastAPI
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Placeholder used when FastAPI is not installed.
+
+### au.http.Field(\*args, \*\*kwargs)
+
+Placeholder for `pydantic.Field` when it is not installed.
 
 ### *exception* au.http.HTTPException
 
 Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
 
+Placeholder used when FastAPI is not installed.
+
+### au.http.Query(\*args, \*\*kwargs)
+
+Placeholder for `fastapi.Query` when it is not installed.
+
 ### *class* au.http.TaskCancelResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Response model for task cancellation.
 
 ### *class* au.http.TaskListResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Response model for task list.
 
 ### *class* au.http.TaskResultResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Response model for task result.
 
 ### *class* au.http.TaskStatusResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Response model for task status.
 
 ### *class* au.http.TaskSubmitRequest
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Request model for task submission.
 
 ### *class* au.http.TaskSubmitResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](_autosummary/au.http.html.md#au.http.BaseModel)
 
 Response model for task submission.
 
@@ -3918,7 +3908,7 @@ This requires functions to be imported/registered before app creation.
   * **title** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API title
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](_autosummary/au.http.html.md#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 
@@ -3949,22 +3939,20 @@ Create a FastAPI application for task management.
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
   * **version** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API version
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](_autosummary/au.http.html.md#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 * **Raises:**
   [**ImportError**](https://docs.python.org/3/builtins/exceptions.html#ImportError) – If FastAPI is not installed
 
-### Example
-
-```pycon
->>> @async_compute
->>> def my_func(n: int) -> int:
->>>     return n * 2
->>>
->>> app = mk_http_interface([my_func])
->>> # Run with: uvicorn main:app --reload
-```
+Example::
+: @async_compute
+  def my_func(n: int) -> int:
+  <br/>
+  > return n \* 2
+  <br/>
+  app = mk_http_interface([my_func])
+  # Run with: uvicorn main:app –reload
 
 ### au.http.serve(functions=None, , host=None, port=None, framework=None, backend=None, store=None, run=None)
 
@@ -4488,14 +4476,11 @@ Add a task to the graph.
 * **Returns:**
   Task ID
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, 10)
->>> t3 = graph.add_task(step3, depends_on=[t1, t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, 10)
+  t3 = graph.add_task(step3, depends_on=[t1, t2])
 
 #### execute(timeout=None)
 
@@ -4511,15 +4496,12 @@ Execute all tasks in dependency order.
   * [**ValueError**](https://docs.python.org/3/builtins/exceptions.html#ValueError) – If circular dependencies detected
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If overall timeout exceeded
 
-### Example
-
-```pycon
->>> graph = TaskGraph()
->>> t1 = graph.add_task(step1, 5)
->>> t2 = graph.add_task(step2, depends_on=[t1])
->>> results = graph.execute()
->>> print(results[t2])
-```
+Example::
+: graph = TaskGraph()
+  t1 = graph.add_task(step1, 5)
+  t2 = graph.add_task(step2, depends_on=[t1])
+  results = graph.execute()
+  print(results[t2])
 
 #### get_task(task_id)
 
@@ -4559,16 +4541,14 @@ Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
 Fluent interface for building workflows.
 
-### Example
-
-```pycon
->>> workflow = (WorkflowBuilder()
->>>     .add_task('step1', process_data, data)
->>>     .add_task('step2', transform, depends_on=['step1'])
->>>     .add_task('step3', aggregate, depends_on=['step2'])
->>>     .build())
->>> results = workflow.execute()
-```
+Example::
+: workflow = (WorkflowBuilder()
+  : .add_task(‘step1’, process_data, data)
+    .add_task(‘step2’, transform, depends_on=[‘step1’])
+    .add_task(‘step3’, aggregate, depends_on=[‘step2’])
+    .build())
+  <br/>
+  results = workflow.execute()
 
 #### add_task(task_id, func, \*args, depends_on=None, \*\*kwargs)
 
@@ -4702,20 +4682,18 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-02 12:41 UTC** from commit <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d598676</code></a> on branch <code>master</code>, for **au 0.1.18** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 17:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28f</code></a> on branch <code>master</code>, for **au 0.1.19** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.1.18) is ahead of the latest release on PyPI (0.1.17): these docs describe unreleased code.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/d5986761913191995152f97cb2960560eb4fbe0a"><code>d5986761913191995152f97cb2960560eb4fbe0a</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28fef4133657ef804f8eb1ab486321957e45</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.18</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.19</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4724,18 +4702,18 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/41446386942">41446386942</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/45050984206">45050984206</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>4d263d138eb36a5ac0a3cbf14920ad56b3655e5e</code> (in the history of the built commit) |
+| Event commit | <code>c61c090904b50cad9f1a546785ed121dc7ffb41c</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.22  |
+| epythet  | 0.2.23  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
-| Python   | 3.12.15 |
+| Python   | 3.12.16 |
 
 ## Configuration as resolved
 
@@ -4751,14 +4729,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.17/">0.1.17</a>, older than the documented version (0.1.18).
+Latest release: <a href="https://pypi.org/project/au/0.1.19/">0.1.19</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout d5986761913191995152f97cb2960560eb4fbe0a
-pip install "epythet==0.2.22"
+git checkout 33db28fef4133657ef804f8eb1ab486321957e45
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

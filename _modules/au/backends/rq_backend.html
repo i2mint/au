@@ -185,57 +185,58 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="56">        <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">"Queue | None"</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="57">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Middleware"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="58">    <span class="p">):</span>
-</span><span data-line="59">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
-</span><span data-line="60">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_RQ</span><span class="p">:</span>
-</span><span data-line="61">            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-</span><span data-line="62">                <span class="s2">"RQBackend requires 'rq' and 'redis' packages. "</span>
-</span><span data-line="63">                <span class="s2">"Please install them with: pip install rq redis"</span>
-</span><span data-line="64">            <span class="p">)</span>
-</span><span data-line="65">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
-</span><span data-line="66">        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span> <span class="o">=</span> <span class="n">rq_queue</span>
-</span><span data-line="67">
+</span><span data-line="59"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
+</span><span data-line="60">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
+</span><span data-line="61">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_RQ</span><span class="p">:</span>
+</span><span data-line="62">            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+</span><span data-line="63">                <span class="s2">"RQBackend requires 'rq' and 'redis' packages. "</span>
+</span><span data-line="64">                <span class="s2">"Please install them with: pip install rq redis"</span>
+</span><span data-line="65">            <span class="p">)</span>
+</span><span data-line="66">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+</span><span data-line="67">        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span> <span class="o">=</span> <span class="n">rq_queue</span>
+</span><span data-line="68">
 <div class="viewcode-block" id="RQBackend.launch">
 <a class="viewcode-back" href="../../../_autosummary/au.backends.rq_backend.html#au.backends.rq_backend.RQBackend.launch">[docs]</a>
-</span><span data-line="68">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
-</span><span data-line="69">        <span class="bp">self</span><span class="p">,</span>
-</span><span data-line="70">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-</span><span data-line="71">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
-</span><span data-line="72">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-</span><span data-line="73">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="74">        <span class="n">store</span><span class="p">:</span> <span class="s2">"ComputationStore | None"</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="75">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="76"><span class="w">        </span><span class="sd">"""Enqueue computation task to RQ."""</span>
-</span><span data-line="77">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-</span><span data-line="78">        <span class="c1"># Serialize task data</span>
-</span><span data-line="79">        <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">_queue_payload</span><span class="p">(</span>
-</span><span data-line="80">            <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
-</span><span data-line="81">        <span class="p">)</span>
-</span><span data-line="82">
-</span><span data-line="83">        <span class="c1"># Enqueue to RQ</span>
-</span><span data-line="84">        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span>
-</span><span data-line="85">            <span class="n">_au_worker_entrypoint</span><span class="p">,</span>
-</span><span data-line="86">            <span class="n">serialized_data</span><span class="p">,</span>
-</span><span data-line="87">            <span class="n">job_id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>  <span class="c1"># Use our key as RQ job ID for easier tracking</span>
-</span><span data-line="88">            <span class="n">job_timeout</span><span class="o">=</span><span class="s2">"30m"</span><span class="p">,</span>  <span class="c1"># Default timeout</span>
-</span><span data-line="89">        <span class="p">)</span></div>
+</span><span data-line="69">    <span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">(</span>
+</span><span data-line="70">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="71">        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+</span><span data-line="72">        <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+</span><span data-line="73">        <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+</span><span data-line="74">        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="75">        <span class="n">store</span><span class="p">:</span> <span class="s2">"ComputationStore | None"</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="76">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="77"><span class="w">        </span><span class="sd">"""Enqueue computation task to RQ."""</span>
+</span><span data-line="78">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+</span><span data-line="79">        <span class="c1"># Serialize task data</span>
+</span><span data-line="80">        <span class="n">serialized_data</span> <span class="o">=</span> <span class="n">_queue_payload</span><span class="p">(</span>
+</span><span data-line="81">            <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
+</span><span data-line="82">        <span class="p">)</span>
+</span><span data-line="83">
+</span><span data-line="84">        <span class="c1"># Enqueue to RQ</span>
+</span><span data-line="85">        <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span>
+</span><span data-line="86">            <span class="n">_au_worker_entrypoint</span><span class="p">,</span>
+</span><span data-line="87">            <span class="n">serialized_data</span><span class="p">,</span>
+</span><span data-line="88">            <span class="n">job_id</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>  <span class="c1"># Use our key as RQ job ID for easier tracking</span>
+</span><span data-line="89">            <span class="n">job_timeout</span><span class="o">=</span><span class="s2">"30m"</span><span class="p">,</span>  <span class="c1"># Default timeout</span>
+</span><span data-line="90">        <span class="p">)</span></div>
 
-</span><span data-line="90">
+</span><span data-line="91">
 <div class="viewcode-block" id="RQBackend.terminate">
 <a class="viewcode-back" href="../../../_autosummary/au.backends.rq_backend.html#au.backends.rq_backend.RQBackend.terminate">[docs]</a>
-</span><span data-line="91">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="92"><span class="w">        </span><span class="sd">"""Attempt to cancel RQ job by key."""</span>
-</span><span data-line="93">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="94">            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">job_class</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
-</span><span data-line="95">                <span class="n">key</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">connection</span>
-</span><span data-line="96">            <span class="p">)</span>
-</span><span data-line="97">            <span class="k">if</span> <span class="n">job</span><span class="p">:</span>
-</span><span data-line="98">                <span class="n">job</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span data-line="99">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span data-line="100">            <span class="c1"># Job might not exist or already completed</span>
-</span><span data-line="101">            <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-</span><span data-line="102">
-</span><span data-line="103">            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-</span><span data-line="104">            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not terminate RQ job </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+</span><span data-line="92">    <span class="k">def</span><span class="w"> </span><span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="93"><span class="w">        </span><span class="sd">"""Attempt to cancel RQ job by key."""</span>
+</span><span data-line="94">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="95">            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">job_class</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span>
+</span><span data-line="96">                <span class="n">key</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rq_queue</span><span class="o">.</span><span class="n">connection</span>
+</span><span data-line="97">            <span class="p">)</span>
+</span><span data-line="98">            <span class="k">if</span> <span class="n">job</span><span class="p">:</span>
+</span><span data-line="99">                <span class="n">job</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span data-line="100">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span data-line="101">            <span class="c1"># Job might not exist or already completed</span>
+</span><span data-line="102">            <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span data-line="103">
+</span><span data-line="104">            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span data-line="105">            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not terminate RQ job </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 </div>
 
 </span></pre></div>
@@ -265,7 +266,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../../../_static/documentation_options.js?v=3d116926"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

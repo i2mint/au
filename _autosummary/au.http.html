@@ -95,7 +95,12 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#au.http.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a></li>
+<li><a class="reference internal" href="#au.http.Body"><code class="docutils literal notranslate"><span class="pre">Body()</span></code></a></li>
+<li><a class="reference internal" href="#au.http.FastAPI"><code class="docutils literal notranslate"><span class="pre">FastAPI</span></code></a></li>
+<li><a class="reference internal" href="#au.http.Field"><code class="docutils literal notranslate"><span class="pre">Field()</span></code></a></li>
 <li><a class="reference internal" href="#au.http.HTTPException"><code class="docutils literal notranslate"><span class="pre">HTTPException</span></code></a></li>
+<li><a class="reference internal" href="#au.http.Query"><code class="docutils literal notranslate"><span class="pre">Query()</span></code></a></li>
 <li><a class="reference internal" href="#au.http.TaskCancelResponse"><code class="docutils literal notranslate"><span class="pre">TaskCancelResponse</span></code></a></li>
 <li><a class="reference internal" href="#au.http.TaskListResponse"><code class="docutils literal notranslate"><span class="pre">TaskListResponse</span></code></a></li>
 <li><a class="reference internal" href="#au.http.TaskResultResponse"><code class="docutils literal notranslate"><span class="pre">TaskResultResponse</span></code></a></li>
@@ -152,14 +157,14 @@ data-aria-dark="Switch to auto color mode">
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Body</span></code>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.http.Body" title="au.http.Body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Body</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">fastapi.Body</span></code> when it is not installed.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Field</span></code>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.http.Field" title="au.http.Field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Field</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">pydantic.Field</span></code> when it is not installed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Query</span></code>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.http.Query" title="au.http.Query"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Query</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">fastapi.Query</span></code> when it is not installed.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#au.http.create_app_from_decorator" title="au.http.create_app_from_decorator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_app_from_decorator</span></code></a>([title, description])</p></td>
 <td><p>Create a FastAPI app that auto-discovers &#64;async_compute decorated functions.</p></td>
@@ -180,11 +185,11 @@ data-aria-dark="Switch to auto color mode">
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseModel</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseModel</span></code></a>()</p></td>
+<td><p>Placeholder used when pydantic is not installed.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastAPI</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#au.http.FastAPI" title="au.http.FastAPI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FastAPI</span></code></a>()</p></td>
+<td><p>Placeholder used when FastAPI is not installed.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.http.TaskCancelResponse" title="au.http.TaskCancelResponse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TaskCancelResponse</span></code></a>()</p></td>
 <td><p>Response model for task cancellation.</p></td>
@@ -212,56 +217,89 @@ data-aria-dark="Switch to auto color mode">
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#au.http.HTTPException" title="au.http.HTTPException"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HTTPException</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Placeholder used when FastAPI is not installed.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py class">
+<dt class="sig sig-object py" id="au.http.BaseModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><a class="reference internal" href="../_modules/au/http.html#BaseModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.BaseModel" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Placeholder used when pydantic is not installed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.http.Body">
+<span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">Body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/http.html#Body"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.Body" title="Link to this definition">#</a></dt>
+<dd><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">fastapi.Body</span></code> when it is not installed.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="au.http.FastAPI">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">FastAPI</span></span><a class="reference internal" href="../_modules/au/http.html#FastAPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.FastAPI" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Placeholder used when FastAPI is not installed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.http.Field">
+<span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">Field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/http.html#Field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.Field" title="Link to this definition">#</a></dt>
+<dd><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">pydantic.Field</span></code> when it is not installed.</p>
+</dd></dl>
+
 <dl class="py exception">
 <dt class="sig sig-object py" id="au.http.HTTPException">
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">HTTPException</span></span><a class="reference internal" href="../_modules/au/http.html#HTTPException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.HTTPException" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#Exception" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Placeholder used when FastAPI is not installed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="au.http.Query">
+<span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">Query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/http.html#Query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.Query" title="Link to this definition">#</a></dt>
+<dd><p>Placeholder for <code class="docutils literal notranslate"><span class="pre">fastapi.Query</span></code> when it is not installed.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskCancelResponse">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskCancelResponse</span></span><a class="reference internal" href="../_modules/au/http.html#TaskCancelResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskCancelResponse" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Response model for task cancellation.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskListResponse">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskListResponse</span></span><a class="reference internal" href="../_modules/au/http.html#TaskListResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskListResponse" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Response model for task list.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskResultResponse">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskResultResponse</span></span><a class="reference internal" href="../_modules/au/http.html#TaskResultResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskResultResponse" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Response model for task result.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskStatusResponse">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskStatusResponse</span></span><a class="reference internal" href="../_modules/au/http.html#TaskStatusResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskStatusResponse" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Response model for task status.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskSubmitRequest">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskSubmitRequest</span></span><a class="reference internal" href="../_modules/au/http.html#TaskSubmitRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskSubmitRequest" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Request model for task submission.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="au.http.TaskSubmitResponse">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.http.</span></span><span class="sig-name descname"><span class="pre">TaskSubmitResponse</span></span><a class="reference internal" href="../_modules/au/http.html#TaskSubmitResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.http.TaskSubmitResponse" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#au.http.BaseModel" title="au.http.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Response model for task submission.</p>
 </dd></dl>
 
@@ -281,7 +319,7 @@ data-aria-dark="Switch to auto color mode">
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.http.FastAPI" title="au.http.FastAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FastAPI application instance</p>
@@ -329,7 +367,7 @@ data-aria-dark="Switch to auto color mode">
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#au.http.FastAPI" title="au.http.FastAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">FastAPI</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>FastAPI application instance</p>
@@ -338,15 +376,16 @@ data-aria-dark="Switch to auto color mode">
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.15)"><strong>ImportError</strong></a> – If FastAPI is not installed</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="nd">@async_compute</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt;</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="n">app</span> <span class="o">=</span> <span class="n">mk_http_interface</span><span class="p">([</span><span class="n">my_func</span><span class="p">])</span>
-</span><span data-line="6"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Run with: uvicorn main:app --reload</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>&#64;async_compute
+def my_func(n: int) -&gt; int:</p>
+<blockquote>
+<div><p>return n * 2</p>
+</div></blockquote>
+<p>app = mk_http_interface([my_func])
+# Run with: uvicorn main:app –reload</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -411,7 +450,7 @@ runner, e.g. to serve with another ASGI server.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../_static/documentation_options.js?v=3d116926"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

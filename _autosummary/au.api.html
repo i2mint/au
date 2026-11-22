@@ -233,14 +233,16 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-even"><p>ComputationHandle for the task</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">async_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">multiplier</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="c1"># Do other work while task runs</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Working..."</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Result is ready here</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Result: </span><span class="si">{</span><span class="n">handle</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>with async_task(my_func, 5, multiplier=2) as handle:</dt><dd><p># Do other work while task runs
+print(“Working…”)</p>
+</dd>
+</dl>
+<p># Result is ready here
+print(f”Result: {handle.result}”)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -262,11 +264,11 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>True if cancellation was attempted, False otherwise</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">long_running_func</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">cancel_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(long_running_func)
+cancel_task(task_id)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -288,12 +290,12 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>ComputationHandle instance</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">get_handle</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">get_result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+handle = get_handle(task_id)
+result = handle.get_result(timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -315,11 +317,11 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>List of results</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_ids</span> <span class="o">=</span> <span class="n">submit_many</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">get_many</span><span class="p">(</span><span class="n">task_ids</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_ids = submit_many(tasks)
+results = get_many(task_ids, timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -347,11 +349,11 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 </ul>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl class="simple">
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+result = get_result(task_id, timeout=10)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -372,13 +374,15 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>Task status (PENDING, RUNNING, COMPLETED, FAILED)</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">status</span> <span class="o">=</span> <span class="n">get_status</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">ComputationStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+status = get_status(task_id)
+if status == ComputationStatus.COMPLETED:</p>
+<blockquote>
+<div><p>result = get_result(task_id)</p>
+</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -399,13 +403,15 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>True if task is complete, False otherwise</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="ow">not</span> <span class="n">is_ready</span><span class="p">(</span><span class="n">task_id</span><span class="p">):</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5)
+while not is_ready(task_id):</p>
+<blockquote>
+<div><p>time.sleep(0.1)</p>
+</div></blockquote>
+<p>result = get_result(task_id)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -455,14 +461,16 @@ warnings and errors, on <code class="docutils literal notranslate"><span class="
 <dd class="field-odd"><p>List of task IDs</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">func1</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="p">{}),</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span>    <span class="p">(</span><span class="n">func2</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="p">{</span><span class="s1">'multiplier'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}),</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="p">]</span>
-</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_ids</span> <span class="o">=</span> <span class="n">submit_many</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><dl class="simple">
+<dt>tasks = [</dt><dd><p>(func1, (1,), {}),
+(func2, (2,), {‘multiplier’: 3}),</p>
+</dd>
+</dl>
+<p>]
+task_ids = submit_many(tasks)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -495,17 +503,15 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
 <dd class="field-odd"><p>Task ID (key) for retrieving results</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">multiplier</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_result</span><span class="p">(</span><span class="n">task_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</span></pre></div>
-</div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Idempotent submission: resubmitting the same key while in flight</span>
-</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="c1"># returns the running task rather than launching a duplicate.</span>
-</span><span data-line="3"><span class="gp">&gt;&gt;&gt; </span><span class="n">task_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"my-job"</span><span class="p">)</span>
-</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">same_id</span> <span class="o">=</span> <span class="n">submit_task</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">"my-job"</span><span class="p">)</span>
-</span></pre></div>
-</div>
+<dl>
+<dt>Example::</dt><dd><p>task_id = submit_task(my_func, 5, multiplier=2)
+result = get_result(task_id, timeout=10)</p>
+<p># Idempotent submission: resubmitting the same key while in flight
+# returns the running task rather than launching a duplicate.
+&gt;&gt;&gt; task_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP
+&gt;&gt;&gt; same_id = submit_task(my_func, 5, key=”my-job”)  # doctest: +SKIP</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -550,7 +556,7 @@ pass <code class="docutils literal notranslate"><span class="pre">RetryPolicy(ma
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=9969ed3f"></script>
+      <script src="../_static/documentation_options.js?v=3d116926"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

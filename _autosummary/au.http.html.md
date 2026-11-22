@@ -6,10 +6,10 @@ Provides REST API endpoints for async task management using FastAPI.
 
 ### Functions
 
-| `Body`(\*args, \*\*kwargs)                                                                       |                                                                              |
+| [`Body`](#au.http.Body)(\*args, \*\*kwargs)                        | Placeholder for `fastapi.Body` when it is not installed.                     |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| `Field`(\*args, \*\*kwargs)                                                                      |                                                                              |
-| `Query`(\*args, \*\*kwargs)                                                                      |                                                                              |
+| [`Field`](#au.http.Field)(\*args, \*\*kwargs)                       | Placeholder for `pydantic.Field` when it is not installed.                   |
+| [`Query`](#au.http.Query)(\*args, \*\*kwargs)                       | Placeholder for `fastapi.Query` when it is not installed.                    |
 | [`create_app_from_decorator`](#au.http.create_app_from_decorator)([title, description]) | Create a FastAPI app that auto-discovers @async_compute decorated functions. |
 | [`mk_flask_interface`](#au.http.mk_flask_interface)([functions, backend, store]) | Create a Flask application for task management.                              |
 | [`mk_http_interface`](#au.http.mk_http_interface)([functions, backend, ...])    | Create a FastAPI application for task management.                            |
@@ -17,58 +17,84 @@ Provides REST API endpoints for async task management using FastAPI.
 
 ### Classes
 
-| `BaseModel`()                                                         |                                       |
-|-----------------------------------------------------------------------|---------------------------------------|
-| `FastAPI`()                                                           |                                       |
-| [`TaskCancelResponse`](#au.http.TaskCancelResponse)() | Response model for task cancellation. |
-| [`TaskListResponse`](#au.http.TaskListResponse)()   | Response model for task list.         |
-| [`TaskResultResponse`](#au.http.TaskResultResponse)() | Response model for task result.       |
-| [`TaskStatusResponse`](#au.http.TaskStatusResponse)() | Response model for task status.       |
-| [`TaskSubmitRequest`](#au.http.TaskSubmitRequest)()  | Request model for task submission.    |
-| [`TaskSubmitResponse`](#au.http.TaskSubmitResponse)() | Response model for task submission.   |
+| [`BaseModel`](#au.http.BaseModel)()          | Placeholder used when pydantic is not installed.   |
+|-----------------------------------------------------------------------|----------------------------------------------------|
+| [`FastAPI`](#au.http.FastAPI)()            | Placeholder used when FastAPI is not installed.    |
+| [`TaskCancelResponse`](#au.http.TaskCancelResponse)() | Response model for task cancellation.              |
+| [`TaskListResponse`](#au.http.TaskListResponse)()   | Response model for task list.                      |
+| [`TaskResultResponse`](#au.http.TaskResultResponse)() | Response model for task result.                    |
+| [`TaskStatusResponse`](#au.http.TaskStatusResponse)() | Response model for task status.                    |
+| [`TaskSubmitRequest`](#au.http.TaskSubmitRequest)()  | Request model for task submission.                 |
+| [`TaskSubmitResponse`](#au.http.TaskSubmitResponse)() | Response model for task submission.                |
 
 ### Exceptions
 
-| [`HTTPException`](#au.http.HTTPException)   |    |
-|------------------------------------------------------------------|----|
+| [`HTTPException`](#au.http.HTTPException)   | Placeholder used when FastAPI is not installed.   |
+|------------------------------------------------------------------|---------------------------------------------------|
+
+### *class* au.http.BaseModel
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Placeholder used when pydantic is not installed.
+
+### au.http.Body(\*args, \*\*kwargs)
+
+Placeholder for `fastapi.Body` when it is not installed.
+
+### *class* au.http.FastAPI
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+Placeholder used when FastAPI is not installed.
+
+### au.http.Field(\*args, \*\*kwargs)
+
+Placeholder for `pydantic.Field` when it is not installed.
 
 ### *exception* au.http.HTTPException
 
 Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
 
+Placeholder used when FastAPI is not installed.
+
+### au.http.Query(\*args, \*\*kwargs)
+
+Placeholder for `fastapi.Query` when it is not installed.
+
 ### *class* au.http.TaskCancelResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Response model for task cancellation.
 
 ### *class* au.http.TaskListResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Response model for task list.
 
 ### *class* au.http.TaskResultResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Response model for task result.
 
 ### *class* au.http.TaskStatusResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Response model for task status.
 
 ### *class* au.http.TaskSubmitRequest
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Request model for task submission.
 
 ### *class* au.http.TaskSubmitResponse
 
-Bases: `BaseModel`
+Bases: [`BaseModel`](#au.http.BaseModel)
 
 Response model for task submission.
 
@@ -83,7 +109,7 @@ This requires functions to be imported/registered before app creation.
   * **title** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API title
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 
@@ -114,22 +140,20 @@ Create a FastAPI application for task management.
   * **description** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API description
   * **version** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – API version
 * **Return type:**
-  `FastAPI`
+  [`FastAPI`](#au.http.FastAPI)
 * **Returns:**
   FastAPI application instance
 * **Raises:**
   [**ImportError**](https://docs.python.org/3/builtins/exceptions.html#ImportError) – If FastAPI is not installed
 
-### Example
-
-```pycon
->>> @async_compute
->>> def my_func(n: int) -> int:
->>>     return n * 2
->>>
->>> app = mk_http_interface([my_func])
->>> # Run with: uvicorn main:app --reload
-```
+Example::
+: @async_compute
+  def my_func(n: int) -> int:
+  <br/>
+  > return n \* 2
+  <br/>
+  app = mk_http_interface([my_func])
+  # Run with: uvicorn main:app –reload
 
 ### au.http.serve(functions=None, , host=None, port=None, framework=None, backend=None, store=None, run=None)
 
