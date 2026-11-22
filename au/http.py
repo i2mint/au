@@ -19,22 +19,22 @@ except ImportError:
 
     # Create dummy classes for type hints
     class FastAPI:
-        pass
+        """Placeholder used when FastAPI is not installed."""
 
     class HTTPException(Exception):
-        pass
+        """Placeholder used when FastAPI is not installed."""
 
     class BaseModel:
-        pass
+        """Placeholder used when pydantic is not installed."""
 
     def Field(*args, **kwargs):
-        pass
+        """Placeholder for ``pydantic.Field`` when it is not installed."""
 
     def Query(*args, **kwargs):
-        pass
+        """Placeholder for ``fastapi.Query`` when it is not installed."""
 
     def Body(*args, **kwargs):
-        pass
+        """Placeholder for ``fastapi.Body`` when it is not installed."""
 
 
 from au.base import (
@@ -159,13 +159,13 @@ def mk_http_interface(
     Raises:
         ImportError: If FastAPI is not installed
 
-    Example:
-        >>> @async_compute
-        >>> def my_func(n: int) -> int:
-        >>>     return n * 2
-        >>>
-        >>> app = mk_http_interface([my_func])
-        >>> # Run with: uvicorn main:app --reload
+    Example::
+        @async_compute
+        def my_func(n: int) -> int:
+            return n * 2
+
+        app = mk_http_interface([my_func])
+        # Run with: uvicorn main:app --reload
     """
     if not HAS_FASTAPI:
         raise ImportError(

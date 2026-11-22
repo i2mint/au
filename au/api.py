@@ -265,12 +265,12 @@ def submit_task(
     Returns:
         Task ID (key) for retrieving results
 
-    Example:
-        >>> task_id = submit_task(my_func, 5, multiplier=2)
-        >>> result = get_result(task_id, timeout=10)
+    Example::
+        task_id = submit_task(my_func, 5, multiplier=2)
+        result = get_result(task_id, timeout=10)
 
-        >>> # Idempotent submission: resubmitting the same key while in flight
-        >>> # returns the running task rather than launching a duplicate.
+        # Idempotent submission: resubmitting the same key while in flight
+        # returns the running task rather than launching a duplicate.
         >>> task_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP
         >>> same_id = submit_task(my_func, 5, key="my-job")  # doctest: +SKIP
     """
@@ -330,9 +330,9 @@ def get_result(
         TimeoutError: If timeout exceeded
         Exception: If task failed
 
-    Example:
-        >>> task_id = submit_task(my_func, 5)
-        >>> result = get_result(task_id, timeout=10)
+    Example::
+        task_id = submit_task(my_func, 5)
+        result = get_result(task_id, timeout=10)
     """
     store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
@@ -352,11 +352,11 @@ def get_status(
     Returns:
         Task status (PENDING, RUNNING, COMPLETED, FAILED)
 
-    Example:
-        >>> task_id = submit_task(my_func, 5)
-        >>> status = get_status(task_id)
-        >>> if status == ComputationStatus.COMPLETED:
-        >>>     result = get_result(task_id)
+    Example::
+        task_id = submit_task(my_func, 5)
+        status = get_status(task_id)
+        if status == ComputationStatus.COMPLETED:
+            result = get_result(task_id)
     """
     store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
@@ -376,11 +376,11 @@ def is_ready(
     Returns:
         True if task is complete, False otherwise
 
-    Example:
-        >>> task_id = submit_task(my_func, 5)
-        >>> while not is_ready(task_id):
-        >>>     time.sleep(0.1)
-        >>> result = get_result(task_id)
+    Example::
+        task_id = submit_task(my_func, 5)
+        while not is_ready(task_id):
+            time.sleep(0.1)
+        result = get_result(task_id)
     """
     store = store if store is not None else _get_default_store()
     handle = ComputationHandle(task_id, store)
@@ -402,9 +402,9 @@ def cancel_task(
     Returns:
         True if cancellation was attempted, False otherwise
 
-    Example:
-        >>> task_id = submit_task(long_running_func)
-        >>> cancel_task(task_id)
+    Example::
+        task_id = submit_task(long_running_func)
+        cancel_task(task_id)
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
@@ -436,12 +436,12 @@ def async_task(
     Yields:
         ComputationHandle for the task
 
-    Example:
-        >>> with async_task(my_func, 5, multiplier=2) as handle:
-        >>>     # Do other work while task runs
-        >>>     print("Working...")
-        >>> # Result is ready here
-        >>> print(f"Result: {handle.result}")
+    Example::
+        with async_task(my_func, 5, multiplier=2) as handle:
+            # Do other work while task runs
+            print("Working...")
+        # Result is ready here
+        print(f"Result: {handle.result}")
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
@@ -478,10 +478,10 @@ def get_handle(
     Returns:
         ComputationHandle instance
 
-    Example:
-        >>> task_id = submit_task(my_func, 5)
-        >>> handle = get_handle(task_id)
-        >>> result = handle.get_result(timeout=10)
+    Example::
+        task_id = submit_task(my_func, 5)
+        handle = get_handle(task_id)
+        result = handle.get_result(timeout=10)
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
@@ -503,12 +503,12 @@ def submit_many(
     Returns:
         List of task IDs
 
-    Example:
-        >>> tasks = [
-        >>>     (func1, (1,), {}),
-        >>>     (func2, (2,), {'multiplier': 3}),
-        >>> ]
-        >>> task_ids = submit_many(tasks)
+    Example::
+        tasks = [
+            (func1, (1,), {}),
+            (func2, (2,), {'multiplier': 3}),
+        ]
+        task_ids = submit_many(tasks)
     """
     backend = backend if backend is not None else _get_default_backend()
     store = store if store is not None else _get_default_store()
@@ -536,9 +536,9 @@ def get_many(
     Returns:
         List of results
 
-    Example:
-        >>> task_ids = submit_many(tasks)
-        >>> results = get_many(task_ids, timeout=10)
+    Example::
+        task_ids = submit_many(tasks)
+        results = get_many(task_ids, timeout=10)
     """
     store = store if store is not None else _get_default_store()
 

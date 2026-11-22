@@ -56,6 +56,7 @@ class RQBackend(ComputationBackend):
         rq_queue: "Queue | None" = None,
         middleware: list["Middleware"] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         if not _HAS_RQ:
             raise ImportError(
