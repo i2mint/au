@@ -1,8 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-22T17:44:04.929525Z
-commit_sha,c61c090904b50cad9f1a546785ed121dc7ffb41c
-commit_message,"au: coverage and docstring pass (hooks, config; 13 broken doctests, 31 docstrings) [skip publish] (#43)"
+timestamp,2026-11-22T19:30:37.433299Z
+commit_sha,30be3c0c4bb911cdea7e8da82f601659a905f3b3
+commit_message,Merge e9ff6c4f2afacf2c165ef31a0dbeecc78d5dbf77 into 33db28fef4133657ef804f8eb1ab486321957e45
 python_version,3.10
 metrics.umpyre_stats.num_functions,20517
 metrics.umpyre_stats.num_classes,3047
@@ -16,11 +16,11 @@ metrics.umpyre_stats.comment_lines_ratio,0.06536127408661926
 metrics.umpyre_stats.function_lines_ratio,0.600548404184148
 metrics.umpyre_stats.mean_lines_per_function,15.96963493688161
 metrics.umpyre_stats.files_analyzed,1348
-metrics.umpyre_stats.pypi_version,0.1.18
+metrics.umpyre_stats.pypi_version,0.1.19
 metrics.workflow_status.last_run_status,success
-metrics.workflow_status.last_success_timestamp,2026-11-22T17:42:37Z
+metrics.workflow_status.last_success_timestamp,2026-11-22T17:45:36Z
 metrics.workflow_status.recent_failure_count,0
-metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/45050862370
+metrics.workflow_status.run_url,https://github.com/i2mint/au/actions/runs/45051184842
 metrics.workflow_status.total_runs_analyzed,10
 metrics.wily.cyclomatic_avg,0.0
 metrics.wily.maintainability_index,0.0
@@ -36,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.40690803527832
+collection_duration_seconds,4.735568046569824
