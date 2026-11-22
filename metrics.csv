@@ -1,8 +1,8 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-22T19:30:45.326590Z
-commit_sha,e9ff6c4f2afacf2c165ef31a0dbeecc78d5dbf77
-commit_message,Type coverage pass: return annotations on public methods [skip publish]
+timestamp,2026-11-22T19:30:51.399245Z
+commit_sha,30be3c0c4bb911cdea7e8da82f601659a905f3b3
+commit_message,Merge e9ff6c4f2afacf2c165ef31a0dbeecc78d5dbf77 into 33db28fef4133657ef804f8eb1ab486321957e45
 python_version,3.10
 metrics.umpyre_stats.num_functions,20447
 metrics.umpyre_stats.num_classes,3033
@@ -36,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,7.140749931335449
+collection_duration_seconds,7.550567388534546
