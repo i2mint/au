@@ -74,7 +74,7 @@ class SupabaseQueueBackend(ComputationBackend):
         max_concurrent_tasks: int = 2,
         polling_interval_seconds: float = 1.0,
         middleware: list["Middleware"] | None = None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         if not _HAS_SUPABASE:

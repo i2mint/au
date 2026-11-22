@@ -66,7 +66,7 @@ class HooksMiddleware(Middleware):
         on_complete: Optional[TaskEventHandler] = None,
         on_error: Optional[TaskEventHandler] = None,
         on_retry: Optional[TaskEventHandler] = None,
-    ):
+    ) -> None:
         """Initialize hooks middleware.
 
         Args:
@@ -169,7 +169,7 @@ class TracingMiddleware(Middleware):
         self,
         service_name: str = "au-tasks",
         trace_backend: Optional[str] = None,
-    ):
+    ) -> None:
         """Initialize tracing middleware.
 
         Args:
@@ -227,7 +227,7 @@ class MetricsCollectorMiddleware(Middleware):
     Collects detailed metrics about task execution.
     """
 
-    def __init__(self, metrics_backend: Optional[str] = None):
+    def __init__(self, metrics_backend: Optional[str] = None) -> None:
         """Initialize metrics collector.
 
         Args:
@@ -292,7 +292,7 @@ class CompositeMiddleware(Middleware):
     Allows using multiple middleware together.
     """
 
-    def __init__(self, middlewares: list[Middleware]):
+    def __init__(self, middlewares: list[Middleware]) -> None:
         """Initialize composite middleware.
 
         Args:

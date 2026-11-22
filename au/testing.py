@@ -28,7 +28,7 @@ class InMemoryStore(ComputationStore):
     Useful for testing without filesystem dependencies.
     """
 
-    def __init__(self, ttl_seconds: int = 3600):
+    def __init__(self, ttl_seconds: int = 3600) -> None:
         """Initialize in-memory store.
 
         Args:
@@ -99,7 +99,7 @@ class SyncTestBackend(ComputationBackend):
     making it ideal for testing without the complexity of actual async execution.
     """
 
-    def __init__(self, middleware: Optional[list[Middleware]] = None):
+    def __init__(self, middleware: Optional[list[Middleware]] = None) -> None:
         """Initialize synchronous test backend.
 
         Args:
@@ -184,7 +184,7 @@ class MockTaskTracker:
     tasks_by_name: dict[str, list[TaskCallRecord]] = field(default_factory=dict)
     all_tasks: list[TaskCallRecord] = field(default_factory=list)
 
-    def record_call(self, func_name: str, args: tuple, kwargs: dict):
+    def record_call(self, func_name: str, args: tuple, kwargs: dict) -> None:
         """Record a task call.
 
         Args:
@@ -246,7 +246,7 @@ class TrackingTestBackend(SyncTestBackend):
         middleware: Optional[list[Middleware]] = None,
         *,
         tracker: Optional["MockTaskTracker"] = None,
-    ):
+    ) -> None:
         """Initialize tracking test backend.
 
         Args:

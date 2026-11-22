@@ -227,7 +227,7 @@ class _WithRetryPolicy:
     """``func`` retried under ``policy``. A class rather than a local function so
     it pickles by reference, which a spawned process needs (i2mint/au#7)."""
 
-    def __init__(self, func: Callable, policy: RetryPolicy):
+    def __init__(self, func: Callable, policy: RetryPolicy) -> None:
         self.func, self.policy = func, policy
         functools.update_wrapper(self, func)  # a name for logs and middleware
 
