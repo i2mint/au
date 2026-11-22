@@ -115,7 +115,7 @@ class RetryState:
 
     def add_attempt(
         self, error: Exception, will_retry: bool, next_retry_at: Optional[float] = None
-    ):
+    ) -> None:
         """Record a retry attempt.
 
         Args:

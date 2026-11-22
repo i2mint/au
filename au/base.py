@@ -55,7 +55,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Any, Generic, Optional, TypeVar, Union, List, Dict
+from typing import Any, Generic, Optional, TypeVar, Union, List, Dict, NoReturn
 import builtins
 import functools
 import json
@@ -254,7 +254,7 @@ def _stamp(name: str, moment: datetime | None) -> dict[str, Any]:
     return {name: moment.isoformat(), name + _UTC_OFFSET_SUFFIX: offset}
 
 
-def _missing(name: str):
+def _missing(name: str) -> NoReturn:
     """Raise for a required field a stored record lacks (read as FAILED)."""
     raise KeyError(name)
 
@@ -338,7 +338,7 @@ class ComputationStore(MutableMapping[str, ComputationResult], ABC):
     Stores should implement cleanup of expired results.
     """
 
-    def __init__(self, *, ttl_seconds: int | None = None):
+    def __init__(self, *, ttl_seconds: int | None = None) -> None:
         """
         Initialize store with optional TTL.
 
@@ -672,7 +672,7 @@ class FileSystemStore(ComputationStore):
         serialization: SerializationFormat = SerializationFormat.JSON,
         auto_cleanup: bool = True,
         cleanup_probability: float = 0.1,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(ttl_seconds=ttl_seconds)
         self.base_path = Path(base_path)
@@ -949,7 +949,7 @@ class LoggingMiddleware(Middleware):
 
     def __init__(
         self, *, level: int | str = logging.DEBUG, logger_name: str | None = None
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         if isinstance(level, str):  # a level name: exact, else case-insensitive
             resolved = logging.getLevelName(level)
@@ -995,7 +995,7 @@ class MetricsMiddleware(Middleware):
     {'total': 0, 'completed': 0, 'failed': 0, 'avg_duration': 0.0}
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create the object; the arguments are described in the class docstring."""
         self.total_computations = 0
         self.completed_computations = 0
@@ -1057,7 +1057,7 @@ class SharedMetricsMiddleware(Middleware):
         failed_computations=None,
         total_duration=None,
         lock=None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         import multiprocessing
 
@@ -1069,19 +1069,19 @@ class SharedMetricsMiddleware(Middleware):
         self.total_duration = total_duration or multiprocessing.Value("d", 0.0)
         self._lock = lock or multiprocessing.Lock()
 
-    def before_compute(self, func, args, kwargs, key):
+    def before_compute(self, func, args, kwargs, key) -> None:
         """Count one more computation."""
         with self._lock:
             self.total_computations.value += 1
 
-    def after_compute(self, key, result):
+    def after_compute(self, key, result) -> None:
         """Count one more completion and add its duration."""
         with self._lock:
             self.completed_computations.value += 1
             if result.duration:
                 self.total_duration.value += result.duration.total_seconds()
 
-    def on_error(self, key, error):
+    def on_error(self, key, error) -> None:
         """Count one more failure."""
         with self._lock:
             self.failed_computations.value += 1
@@ -1114,7 +1114,7 @@ class SharedMetricsMiddleware(Middleware):
 class ComputationBackend(ABC):
     """Abstract base for computation execution backends."""
 
-    def __init__(self, middleware: list[Middleware] | None = None):
+    def __init__(self, middleware: list[Middleware] | None = None) -> None:
         """Create the object; the arguments are described in the class docstring."""
         self.middleware = middleware or []
 
@@ -1297,7 +1297,7 @@ class ProcessBackend(ComputationBackend):
         self,
         store: ComputationStore | None = None,
         middleware: list[Middleware] | None = None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
@@ -1371,7 +1371,7 @@ class StdLibQueueBackend(ComputationBackend):
         max_workers: int = 5,
         use_processes: bool = True,
         middleware: list[Middleware] | None = None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
@@ -1699,7 +1699,7 @@ class ThreadBackend(ComputationBackend):
         self,
         store: ComputationStore | None = None,
         middleware: list[Middleware] | None = None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
@@ -1717,7 +1717,7 @@ class ThreadBackend(ComputationBackend):
 
         store = self._resolve_store(store)
 
-        def _worker():
+        def _worker() -> None:
             compute_and_record(
                 func, args, kwargs, key=key, store=store, middleware=self.middleware
             )
@@ -1741,7 +1741,7 @@ class RemoteAPIBackend(ComputationBackend):
         api_url: str,
         api_key: str = "",
         middleware: list[Middleware] | None = None,
-    ):
+    ) -> None:
         """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store

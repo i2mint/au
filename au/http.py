@@ -27,13 +27,13 @@ except ImportError:
     class BaseModel:
         """Placeholder used when pydantic is not installed."""
 
-    def Field(*args, **kwargs):
+    def Field(*args, **kwargs) -> None:
         """Placeholder for ``pydantic.Field`` when it is not installed."""
 
-    def Query(*args, **kwargs):
+    def Query(*args, **kwargs) -> None:
         """Placeholder for ``fastapi.Query`` when it is not installed."""
 
-    def Body(*args, **kwargs):
+    def Body(*args, **kwargs) -> None:
         """Placeholder for ``fastapi.Body`` when it is not installed."""
 
 

@@ -72,7 +72,7 @@ class TaskGraph:
         self,
         backend: Optional[ComputationBackend] = None,
         store: Optional[ComputationStore] = None,
-    ):
+    ) -> None:
         """Initialize task graph.
 
         Args:
@@ -326,7 +326,7 @@ class WorkflowBuilder:
         self,
         backend: Optional[ComputationBackend] = None,
         store: Optional[ComputationStore] = None,
-    ):
+    ) -> None:
         """Initialize workflow builder.
 
         Args:
