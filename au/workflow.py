@@ -104,11 +104,11 @@ class TaskGraph:
         Returns:
             Task ID
 
-        Example:
-            >>> graph = TaskGraph()
-            >>> t1 = graph.add_task(step1, 5)
-            >>> t2 = graph.add_task(step2, 10)
-            >>> t3 = graph.add_task(step3, depends_on=[t1, t2])
+        Example::
+            graph = TaskGraph()
+            t1 = graph.add_task(step1, 5)
+            t2 = graph.add_task(step2, 10)
+            t3 = graph.add_task(step3, depends_on=[t1, t2])
         """
         if task_id is None:
             self._task_counter += 1
@@ -169,12 +169,12 @@ class TaskGraph:
             ValueError: If circular dependencies detected
             TimeoutError: If overall timeout exceeded
 
-        Example:
-            >>> graph = TaskGraph()
-            >>> t1 = graph.add_task(step1, 5)
-            >>> t2 = graph.add_task(step2, depends_on=[t1])
-            >>> results = graph.execute()
-            >>> print(results[t2])
+        Example::
+            graph = TaskGraph()
+            t1 = graph.add_task(step1, 5)
+            t2 = graph.add_task(step2, depends_on=[t1])
+            results = graph.execute()
+            print(results[t2])
         """
         # Check for cycles
         self._check_for_cycles()
@@ -313,13 +313,13 @@ def depends_on(*dependency_funcs):
 class WorkflowBuilder:
     """Fluent interface for building workflows.
 
-    Example:
-        >>> workflow = (WorkflowBuilder()
-        >>>     .add_task('step1', process_data, data)
-        >>>     .add_task('step2', transform, depends_on=['step1'])
-        >>>     .add_task('step3', aggregate, depends_on=['step2'])
-        >>>     .build())
-        >>> results = workflow.execute()
+    Example::
+        workflow = (WorkflowBuilder()
+            .add_task('step1', process_data, data)
+            .add_task('step2', transform, depends_on=['step1'])
+            .add_task('step3', aggregate, depends_on=['step2'])
+            .build())
+        results = workflow.execute()
     """
 
     def __init__(

@@ -75,6 +75,7 @@ class SupabaseQueueBackend(ComputationBackend):
         polling_interval_seconds: float = 1.0,
         middleware: list["Middleware"] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         if not _HAS_SUPABASE:
             raise ImportError(

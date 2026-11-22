@@ -339,3 +339,86 @@ def test_serve_blames_an_argument_not_the_setting(configured):
     configured()
     with pytest.raises(ValueError, match="^framework is 'bottle'"):
         serve([int], framework="bottle", run=lambda app, **kw: None)
+
+
+# --- coverage pass: file loading edge cases and the TOML fallback parser -----------------
+
+
+def test_simple_toml_parser_types_and_sections(tmp_path):
+    from au.config import _simple_toml_parse
+
+    f = tmp_path / "c.toml"
+    f.write_text(
+        "# a comment\n\n"
+        "top = 1\n"  # before any section: ignored
+        "[au]\n"
+        'name = "x"\n'
+        "flag = true\n"
+        "off = FALSE\n"
+        "n = 7\n"
+        "ratio = 2.5\n"
+        "[other]\n"
+        "k = 'v'\n"
+    )
+    assert _simple_toml_parse(f) == {
+        "au": {"name": "x", "flag": True, "off": False, "n": 7, "ratio": 2.5},
+        "other": {"k": "v"},
+    }
+
+
+def test_load_config_file_returns_empty_for_unknown_unreadable_or_invalid(tmp_path):
+    from au.config import _load_config_file
+
+    assert _load_config_file(tmp_path / "missing.json") == {}
+    bad = tmp_path / "bad.json"
+    bad.write_text("{not json")
+    assert _load_config_file(bad) == {}
+    other = tmp_path / "c.ini"
+    other.write_text("a=1")
+    assert _load_config_file(other) == {}
+
+
+def test_load_config_file_reads_the_au_section_or_the_whole_document(tmp_path):
+    import json
+
+    from au.config import _load_config_file
+
+    nested = tmp_path / "n.json"
+    nested.write_text(json.dumps({"au": {"x": 1}, "other": 2}))
+    flat = tmp_path / "f.json"
+    flat.write_text(json.dumps({"x": 1}))
+    assert _load_config_file(nested) == {"x": 1}
+    assert _load_config_file(flat) == {"x": 1}
+
+
+def test_load_config_file_yaml_when_available_else_empty(tmp_path):
+    from au.config import _load_config_file
+
+    f = tmp_path / "c.yaml"
+    f.write_text("au:\n  x: 1\n")
+    try:
+        import yaml  # noqa: F401
+    except ImportError:
+        assert _load_config_file(f) == {}
+    else:
+        assert _load_config_file(f) == {"x": 1}
+
+
+def test_toml_falls_back_to_the_simple_parser_without_tomllib_and_tomli(
+    tmp_path, monkeypatch
+):
+    import builtins
+
+    from au.config import _load_config_file
+
+    real_import = builtins.__import__
+
+    def no_toml(name, *a, **k):
+        if name in ("tomllib", "tomli"):
+            raise ImportError(name)
+        return real_import(name, *a, **k)
+
+    monkeypatch.setattr(builtins, "__import__", no_toml)
+    f = tmp_path / "c.toml"
+    f.write_text("[au]\nmax_retries = 4\n")
+    assert _load_config_file(f) == {"max_retries": 4}

@@ -308,6 +308,7 @@ class ComputationResult:
     started_at: datetime | None = None  # when the run began, if a worker ran it
 
     def __post_init__(self):
+        """Stamp ``completed_at`` on a result that is already terminal."""
         # A terminal result is stamped when made, whatever store holds it.
         if self.is_ready and self.completed_at is None:
             self.completed_at = datetime.now()
@@ -578,6 +579,7 @@ class StoredError(Exception):
     type_name: str = ""
 
     def __reduce__(self):
+        """Pickle a stand-in error by its type name and message."""
         if not self.type_name:  # a plain StoredError: pickles as any exception
             return super().__reduce__()
         # A stand-in's class is made at run time: pickle the recipe, which
@@ -671,6 +673,7 @@ class FileSystemStore(ComputationStore):
         auto_cleanup: bool = True,
         cleanup_probability: float = 0.1,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(ttl_seconds=ttl_seconds)
         self.base_path = Path(base_path)
         self.base_path.mkdir(parents=True, exist_ok=True)
@@ -818,6 +821,7 @@ class FileSystemStore(ComputationStore):
         return result
 
     def __getitem__(self, key: str) -> ComputationResult:
+        """The stored result for ``key`` (``KeyError`` if absent); may trigger an automatic cleanup."""
         self._maybe_cleanup()
         return self._read(key)
 
@@ -846,6 +850,7 @@ class FileSystemStore(ComputationStore):
             return ComputationResult(None, ComputationStatus.FAILED, error=e)
 
     def __setitem__(self, key: str, result: ComputationResult) -> None:
+        """Store ``result`` under ``key``."""
         path = self._get_path(key)
 
         # A temp file of its own per write, on the same filesystem so the rename
@@ -866,12 +871,15 @@ class FileSystemStore(ComputationStore):
             tmp_path.unlink(missing_ok=True)
 
     def __delitem__(self, key: str) -> None:
+        """Delete the result stored under ``key``."""
         self._get_path(key).unlink(missing_ok=True)
 
     def __iter__(self):
+        """Iterate over the stored keys."""
         return (p.stem for p in self.base_path.glob(f"*{self.suffix}"))
 
     def __len__(self) -> int:
+        """Number of stored results."""
         return sum(1 for _ in self)
 
     def get_reconstruction_info(self) -> dict[str, Any]:
@@ -942,6 +950,7 @@ class LoggingMiddleware(Middleware):
     def __init__(
         self, *, level: int | str = logging.DEBUG, logger_name: str | None = None
     ):
+        """Create the object; the arguments are described in the class docstring."""
         if isinstance(level, str):  # a level name: exact, else case-insensitive
             resolved = logging.getLevelName(level)
             if not isinstance(resolved, int):
@@ -987,6 +996,7 @@ class MetricsMiddleware(Middleware):
     """
 
     def __init__(self):
+        """Create the object; the arguments are described in the class docstring."""
         self.total_computations = 0
         self.completed_computations = 0
         self.failed_computations = 0
@@ -998,6 +1008,7 @@ class MetricsMiddleware(Middleware):
         return {k: v for k, v in self.__dict__.items() if k != "_lock"}
 
     def __setstate__(self, state: dict[str, Any]) -> None:
+        """Restore the counts and make a fresh lock."""
         self.__dict__.update(state)
         self._lock = multiprocessing.Lock()
 
@@ -1047,6 +1058,7 @@ class SharedMetricsMiddleware(Middleware):
         total_duration=None,
         lock=None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         import multiprocessing
 
         self.total_computations = total_computations or multiprocessing.Value("i", 0)
@@ -1058,20 +1070,24 @@ class SharedMetricsMiddleware(Middleware):
         self._lock = lock or multiprocessing.Lock()
 
     def before_compute(self, func, args, kwargs, key):
+        """Count one more computation."""
         with self._lock:
             self.total_computations.value += 1
 
     def after_compute(self, key, result):
+        """Count one more completion and add its duration."""
         with self._lock:
             self.completed_computations.value += 1
             if result.duration:
                 self.total_duration.value += result.duration.total_seconds()
 
     def on_error(self, key, error):
+        """Count one more failure."""
         with self._lock:
             self.failed_computations.value += 1
 
     def get_stats(self) -> dict:
+        """Totals so far: ``total``, ``completed``, ``failed`` and ``avg_duration`` (seconds)."""
         with self._lock:
             completed = self.completed_computations.value
             avg_duration = (
@@ -1085,6 +1101,7 @@ class SharedMetricsMiddleware(Middleware):
             }
 
     def get_shared_state(self):
+        """The shared counters and lock, to pass to another process's middleware."""
         return dict(
             total_computations=self.total_computations,
             completed_computations=self.completed_computations,
@@ -1098,6 +1115,7 @@ class ComputationBackend(ABC):
     """Abstract base for computation execution backends."""
 
     def __init__(self, middleware: list[Middleware] | None = None):
+        """Create the object; the arguments are described in the class docstring."""
         self.middleware = middleware or []
 
     @abstractmethod
@@ -1280,6 +1298,7 @@ class ProcessBackend(ComputationBackend):
         store: ComputationStore | None = None,
         middleware: list[Middleware] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
         self._ensure_fork_method()
@@ -1331,6 +1350,7 @@ class ProcessBackend(ComputationBackend):
             raise _explained_start_failure(e) from e
 
     def terminate(self, key: str) -> None:
+        """Terminate the process computing ``key``, if it is still running."""
         proc = self._processes.get(key)
         if proc and proc.is_alive():
             proc.terminate()
@@ -1352,6 +1372,7 @@ class StdLibQueueBackend(ComputationBackend):
         use_processes: bool = True,
         middleware: list[Middleware] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
         self.max_workers = max_workers
@@ -1679,6 +1700,7 @@ class ThreadBackend(ComputationBackend):
         store: ComputationStore | None = None,
         middleware: list[Middleware] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
 
@@ -1720,6 +1742,7 @@ class RemoteAPIBackend(ComputationBackend):
         api_key: str = "",
         middleware: list[Middleware] | None = None,
     ):
+        """Create the object; the arguments are described in the class docstring."""
         super().__init__(middleware)
         self.store = store
         self.api_url = api_url
