@@ -182,7 +182,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="55"><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 </span><span data-line="56"><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
 </span><span data-line="57"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span data-line="58"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+</span><span data-line="58"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">NoReturn</span>
 </span><span data-line="59"><span class="kn">import</span><span class="w"> </span><span class="nn">builtins</span>
 </span><span data-line="60"><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 </span><span data-line="61"><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -387,7 +387,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="254">    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">moment</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">name</span> <span class="o">+</span> <span class="n">_UTC_OFFSET_SUFFIX</span><span class="p">:</span> <span class="n">offset</span><span class="p">}</span>
 </span><span data-line="255">
 </span><span data-line="256">
-</span><span data-line="257"><span class="k">def</span><span class="w"> </span><span class="nf">_missing</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="257"><span class="k">def</span><span class="w"> </span><span class="nf">_missing</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
 </span><span data-line="258"><span class="w">    </span><span class="sd">"""Raise for a required field a stored record lacks (read as FAILED)."""</span>
 </span><span data-line="259">    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 </span><span data-line="260">
@@ -482,7 +482,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="338"><span class="sd">    Stores should implement cleanup of expired results.</span>
 </span><span data-line="339"><span class="sd">    """</span>
 </span><span data-line="340">
-</span><span data-line="341">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="341">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="342"><span class="w">        </span><span class="sd">"""</span>
 </span><span data-line="343"><span class="sd">        Initialize store with optional TTL.</span>
 </span><span data-line="344">
@@ -840,7 +840,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="672">        <span class="n">serialization</span><span class="p">:</span> <span class="n">SerializationFormat</span> <span class="o">=</span> <span class="n">SerializationFormat</span><span class="o">.</span><span class="n">JSON</span><span class="p">,</span>
 </span><span data-line="673">        <span class="n">auto_cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span data-line="674">        <span class="n">cleanup_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-</span><span data-line="675">    <span class="p">):</span>
+</span><span data-line="675">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="676"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="677">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ttl_seconds</span><span class="o">=</span><span class="n">ttl_seconds</span><span class="p">)</span>
 </span><span data-line="678">        <span class="bp">self</span><span class="o">.</span><span class="n">base_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
@@ -1144,7 +1144,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="949">
 </span><span data-line="950">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span data-line="951">        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="952">    <span class="p">):</span>
+</span><span data-line="952">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="953"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="954">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># a level name: exact, else case-insensitive</span>
 </span><span data-line="955">            <span class="n">resolved</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
@@ -1202,7 +1202,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="995"><span class="sd">    {'total': 0, 'completed': 0, 'failed': 0, 'avg_duration': 0.0}</span>
 </span><span data-line="996"><span class="sd">    """</span>
 </span><span data-line="997">
-</span><span data-line="998">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span data-line="998">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="999"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1000">        <span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span data-line="1001">        <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1279,7 +1279,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1057">        <span class="n">failed_computations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span data-line="1058">        <span class="n">total_duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span data-line="1059">        <span class="n">lock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1060">    <span class="p">):</span>
+</span><span data-line="1060">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1061"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1062">        <span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
 </span><span data-line="1063">
@@ -1293,7 +1293,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1071">
 <div class="viewcode-block" id="SharedMetricsMiddleware.before_compute">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.SharedMetricsMiddleware.before_compute">[docs]</a>
-</span><span data-line="1072">    <span class="k">def</span><span class="w"> </span><span class="nf">before_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+</span><span data-line="1072">    <span class="k">def</span><span class="w"> </span><span class="nf">before_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1073"><span class="w">        </span><span class="sd">"""Count one more computation."""</span>
 </span><span data-line="1074">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
 </span><span data-line="1075">            <span class="bp">self</span><span class="o">.</span><span class="n">total_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span></div>
@@ -1301,7 +1301,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1076">
 <div class="viewcode-block" id="SharedMetricsMiddleware.after_compute">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.SharedMetricsMiddleware.after_compute">[docs]</a>
-</span><span data-line="1077">    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+</span><span data-line="1077">    <span class="k">def</span><span class="w"> </span><span class="nf">after_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1078"><span class="w">        </span><span class="sd">"""Count one more completion and add its duration."""</span>
 </span><span data-line="1079">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
 </span><span data-line="1080">            <span class="bp">self</span><span class="o">.</span><span class="n">completed_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1311,7 +1311,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1083">
 <div class="viewcode-block" id="SharedMetricsMiddleware.on_error">
 <a class="viewcode-back" href="../../_autosummary/au.base.html#au.SharedMetricsMiddleware.on_error">[docs]</a>
-</span><span data-line="1084">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+</span><span data-line="1084">    <span class="k">def</span><span class="w"> </span><span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1085"><span class="w">        </span><span class="sd">"""Count one more failure."""</span>
 </span><span data-line="1086">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
 </span><span data-line="1087">            <span class="bp">self</span><span class="o">.</span><span class="n">failed_computations</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span></div>
@@ -1354,7 +1354,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1114"><span class="k">class</span><span class="w"> </span><span class="nc">ComputationBackend</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 </span><span data-line="1115"><span class="w">    </span><span class="sd">"""Abstract base for computation execution backends."""</span>
 </span><span data-line="1116">
-</span><span data-line="1117">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="1117">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1118"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1119">        <span class="bp">self</span><span class="o">.</span><span class="n">middleware</span> <span class="o">=</span> <span class="n">middleware</span> <span class="ow">or</span> <span class="p">[]</span>
 </span><span data-line="1120">
@@ -1552,7 +1552,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1297">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="1298">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="1299">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1300">    <span class="p">):</span>
+</span><span data-line="1300">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1301"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1302">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="1303">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
@@ -1635,7 +1635,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1371">        <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
 </span><span data-line="1372">        <span class="n">use_processes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span data-line="1373">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1374">    <span class="p">):</span>
+</span><span data-line="1374">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1375"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1376">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="1377">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
@@ -1993,7 +1993,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1699">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="1700">        <span class="n">store</span><span class="p">:</span> <span class="n">ComputationStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="1701">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1702">    <span class="p">):</span>
+</span><span data-line="1702">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1703"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1704">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="1705">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
@@ -2013,7 +2013,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1717">
 </span><span data-line="1718">        <span class="n">store</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_store</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
 </span><span data-line="1719">
-</span><span data-line="1720">        <span class="k">def</span><span class="w"> </span><span class="nf">_worker</span><span class="p">():</span>
+</span><span data-line="1720">        <span class="k">def</span><span class="w"> </span><span class="nf">_worker</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1721">            <span class="n">compute_and_record</span><span class="p">(</span>
 </span><span data-line="1722">                <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">middleware</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">middleware</span>
 </span><span data-line="1723">            <span class="p">)</span>
@@ -2041,7 +2041,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="1741">        <span class="n">api_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span data-line="1742">        <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
 </span><span data-line="1743">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="1744">    <span class="p">):</span>
+</span><span data-line="1744">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="1745"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="1746">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="1747">        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
@@ -2186,7 +2186,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

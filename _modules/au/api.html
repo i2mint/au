@@ -360,7 +360,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="227"><span class="w">    </span><span class="sd">"""``func`` retried under ``policy``. A class rather than a local function so</span>
 </span><span data-line="228"><span class="sd">    it pickles by reference, which a spawned process needs (i2mint/au#7)."""</span>
 </span><span data-line="229">
-</span><span data-line="230">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">RetryPolicy</span><span class="p">):</span>
+</span><span data-line="230">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">RetryPolicy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="231">        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">func</span><span class="p">,</span> <span class="n">policy</span>
 </span><span data-line="232">        <span class="n">functools</span><span class="o">.</span><span class="n">update_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>  <span class="c1"># a name for logs and middleware</span>
 </span><span data-line="233">
@@ -735,7 +735,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

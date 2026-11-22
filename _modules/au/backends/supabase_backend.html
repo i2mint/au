@@ -203,7 +203,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="74">        <span class="n">max_concurrent_tasks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 </span><span data-line="75">        <span class="n">polling_interval_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 </span><span data-line="76">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Middleware"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="77">    <span class="p">):</span>
+</span><span data-line="77">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="78"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="79">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="80">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_SUPABASE</span><span class="p">:</span>
@@ -440,7 +440,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

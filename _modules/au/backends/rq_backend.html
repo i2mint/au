@@ -184,7 +184,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="55">        <span class="n">store</span><span class="p">:</span> <span class="s2">"ComputationStore | None"</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="56">        <span class="n">rq_queue</span><span class="p">:</span> <span class="s2">"Queue | None"</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="57">        <span class="n">middleware</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Middleware"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="58">    <span class="p">):</span>
+</span><span data-line="58">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="59"><span class="w">        </span><span class="sd">"""Create the object; the arguments are described in the class docstring."""</span>
 </span><span data-line="60">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">middleware</span><span class="p">)</span>
 </span><span data-line="61">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_HAS_RQ</span><span class="p">:</span>
@@ -266,7 +266,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>

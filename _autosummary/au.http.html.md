@@ -42,6 +42,9 @@ Placeholder used when pydantic is not installed.
 
 Placeholder for `fastapi.Body` when it is not installed.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### *class* au.http.FastAPI
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -52,6 +55,9 @@ Placeholder used when FastAPI is not installed.
 
 Placeholder for `pydantic.Field` when it is not installed.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### *exception* au.http.HTTPException
 
 Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
@@ -61,6 +67,9 @@ Placeholder used when FastAPI is not installed.
 ### au.http.Query(\*args, \*\*kwargs)
 
 Placeholder for `fastapi.Query` when it is not installed.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.http.TaskCancelResponse
 

@@ -201,7 +201,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="66">        <span class="n">on_complete</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="67">        <span class="n">on_error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="68">        <span class="n">on_retry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TaskEventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="69">    <span class="p">):</span>
+</span><span data-line="69">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="70"><span class="w">        </span><span class="sd">"""Initialize hooks middleware.</span>
 </span><span data-line="71">
 </span><span data-line="72"><span class="sd">        Args:</span>
@@ -319,7 +319,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="169">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="170">        <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"au-tasks"</span><span class="p">,</span>
 </span><span data-line="171">        <span class="n">trace_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="172">    <span class="p">):</span>
+</span><span data-line="172">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="173"><span class="w">        </span><span class="sd">"""Initialize tracing middleware.</span>
 </span><span data-line="174">
 </span><span data-line="175"><span class="sd">        Args:</span>
@@ -389,7 +389,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="227"><span class="sd">    Collects detailed metrics about task execution.</span>
 </span><span data-line="228"><span class="sd">    """</span>
 </span><span data-line="229">
-</span><span data-line="230">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="230">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics_backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="231"><span class="w">        </span><span class="sd">"""Initialize metrics collector.</span>
 </span><span data-line="232">
 </span><span data-line="233"><span class="sd">        Args:</span>
@@ -469,7 +469,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="292"><span class="sd">    Allows using multiple middleware together.</span>
 </span><span data-line="293"><span class="sd">    """</span>
 </span><span data-line="294">
-</span><span data-line="295">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middlewares</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]):</span>
+</span><span data-line="295">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middlewares</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="296"><span class="w">        </span><span class="sd">"""Initialize composite middleware.</span>
 </span><span data-line="297">
 </span><span data-line="298"><span class="sd">        Args:</span>
@@ -585,7 +585,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

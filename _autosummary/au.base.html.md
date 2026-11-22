@@ -558,9 +558,15 @@ Metrics middleware using shared memory for multiprocessing.
 
 Count one more completion and add its duration.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### before_compute(func, args, kwargs, key)
 
 Count one more computation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### get_shared_state()
 
@@ -576,6 +582,9 @@ Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
 #### on_error(key, error)
 
 Count one more failure.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 

@@ -820,6 +820,8 @@ processes.</p>
 </span><span data-line="3"><span class="go">{'total': 0, 'completed': 0, 'failed': 0, 'avg_duration': 0.0}</span>
 </span></pre></div>
 </div>
+<dl class="field-list simple">
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.MetricsMiddleware.after_compute">
 <span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#MetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.MetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
@@ -982,16 +984,28 @@ job tracking mechanisms.</p>
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">au.base.</span></span><span class="sig-name descname"><span class="pre">SharedMetricsMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_computations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#au.base.Middleware" title="au.base.Middleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">Middleware</span></code></a></p>
 <p>Metrics middleware using shared memory for multiprocessing.</p>
+<dl class="field-list simple">
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.after_compute">
 <span class="sig-name descname"><span class="pre">after_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.after_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.after_compute" title="Link to this definition">#</a></dt>
 <dd><p>Count one more completion and add its duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.before_compute">
 <span class="sig-name descname"><span class="pre">before_compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.before_compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.before_compute" title="Link to this definition">#</a></dt>
 <dd><p>Count one more computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -1015,6 +1029,11 @@ job tracking mechanisms.</p>
 <dt class="sig sig-object py" id="au.base.SharedMetricsMiddleware.on_error">
 <span class="sig-name descname"><span class="pre">on_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/au/base.html#SharedMetricsMiddleware.on_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#au.base.SharedMetricsMiddleware.on_error" title="Link to this definition">#</a></dt>
 <dd><p>Count one more failure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -1242,7 +1261,7 @@ reader in another time zone reads the same instant.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

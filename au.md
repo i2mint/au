@@ -1,4 +1,4 @@
-> built 2026-11-22 17:44 UTC from 33db28f (master) · au 0.1.19. Details: build_info.json
+> built 2026-11-22 19:33 UTC from 457691d (master) · au 0.1.20. Details: build_info.json
 
 # index.html.md
 
@@ -1510,9 +1510,15 @@ Metrics middleware using shared memory for multiprocessing.
 
 Count one more completion and add its duration.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### before_compute(func, args, kwargs, key)
 
 Count one more computation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### get_shared_state()
 
@@ -1528,6 +1534,9 @@ Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
 #### on_error(key, error)
 
 Count one more failure.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.base.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -2717,6 +2726,8 @@ Record a task call.
   * **func_name** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Name of the function
   * **args** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Positional arguments
   * **kwargs** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)) – Keyword arguments
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.NonRetryableError
 
@@ -2876,6 +2887,8 @@ Record a retry attempt.
   * **error** ([`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)) – Exception that occurred
   * **will_retry** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Whether another retry will happen
   * **next_retry_at** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]) – Timestamp of next retry
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.RetryableError
 
@@ -2899,9 +2912,15 @@ Metrics middleware using shared memory for multiprocessing.
 
 Count one more completion and add its duration.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### before_compute(func, args, kwargs, key)
 
 Count one more computation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### get_shared_state()
 
@@ -2917,6 +2936,9 @@ Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
 #### on_error(key, error)
 
 Count one more failure.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
@@ -3841,6 +3863,9 @@ Placeholder used when pydantic is not installed.
 
 Placeholder for `fastapi.Body` when it is not installed.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### *class* au.http.FastAPI
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
@@ -3851,6 +3876,9 @@ Placeholder used when FastAPI is not installed.
 
 Placeholder for `pydantic.Field` when it is not installed.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### *exception* au.http.HTTPException
 
 Bases: [`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)
@@ -3860,6 +3888,9 @@ Placeholder used when FastAPI is not installed.
 ### au.http.Query(\*args, \*\*kwargs)
 
 Placeholder for `fastapi.Query` when it is not installed.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.http.TaskCancelResponse
 
@@ -4139,6 +4170,8 @@ Record a retry attempt.
   * **error** ([`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)) – Exception that occurred
   * **will_retry** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Whether another retry will happen
   * **next_retry_at** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]) – Timestamp of next retry
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.retry.RetryableError
 
@@ -4303,6 +4336,8 @@ Record a task call.
   * **func_name** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Name of the function
   * **args** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Positional arguments
   * **kwargs** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)) – Keyword arguments
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.testing.SyncTestBackend(middleware=None)
 
@@ -4682,18 +4717,20 @@ require integration with the async_compute decorator.
 
 # About this build
 
-This documentation was built on **2026-11-22 17:44 UTC** from commit <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28f</code></a> on branch <code>master</code>, for **au 0.1.19** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 19:33 UTC** from commit <a href="https://github.com/i2mint/au/commit/457691dfedbe78af055c2f061dbc33ccb7bfee68"><code>457691d</code></a> on branch <code>master</code>, for **au 0.1.20** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.1.20) is ahead of the latest release on PyPI (0.1.19): these docs describe unreleased code.
 
 ## Source
 
 |                     |                                                                                                                                                  |
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/i2mint/au/commit/33db28fef4133657ef804f8eb1ab486321957e45"><code>33db28fef4133657ef804f8eb1ab486321957e45</code></a> |
+| Commit              | <a href="https://github.com/i2mint/au/commit/457691dfedbe78af055c2f061dbc33ccb7bfee68"><code>457691dfedbe78af055c2f061dbc33ccb7bfee68</code></a> |
 | Branch              | <code>master</code>                                                                                                                              |
-| Tags at this commit | <code>0.1.19</code>                                                                                                                              |
+| Tags at this commit | <code>0.1.20</code>                                                                                                                              |
 | Working tree        | clean                                                                                                                                            |
 | Remote              | <code>https://github.com/i2mint/au</code>                                                                                                        |
 
@@ -4702,9 +4739,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>i2mint/au</code>                                                                     |
-| Run          | <a href="https://github.com/i2mint/au/actions/runs/45050984206">45050984206</a>            |
+| Run          | <a href="https://github.com/i2mint/au/actions/runs/45061257216">45061257216</a>            |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>c61c090904b50cad9f1a546785ed121dc7ffb41c</code> (in the history of the built commit) |
+| Event commit | <code>dfc8a9404750c8bacb2fd2349937884f2e5b7057</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -4729,13 +4766,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/au/0.1.19/">0.1.19</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/au/0.1.19/">0.1.19</a>, older than the documented version (0.1.20).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/i2mint/au && cd au
-git checkout 33db28fef4133657ef804f8eb1ab486321957e45
+git checkout 457691dfedbe78af055c2f061dbc33ccb7bfee68
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

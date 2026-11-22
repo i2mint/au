@@ -157,7 +157,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="28"><span class="sd">    Useful for testing without filesystem dependencies.</span>
 </span><span data-line="29"><span class="sd">    """</span>
 </span><span data-line="30">
-</span><span data-line="31">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">):</span>
+</span><span data-line="31">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="32"><span class="w">        </span><span class="sd">"""Initialize in-memory store.</span>
 </span><span data-line="33">
 </span><span data-line="34"><span class="sd">        Args:</span>
@@ -243,7 +243,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="99"><span class="sd">    making it ideal for testing without the complexity of actual async execution.</span>
 </span><span data-line="100"><span class="sd">    """</span>
 </span><span data-line="101">
-</span><span data-line="102">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="102">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="103"><span class="w">        </span><span class="sd">"""Initialize synchronous test backend.</span>
 </span><span data-line="104">
 </span><span data-line="105"><span class="sd">        Args:</span>
@@ -345,7 +345,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="186">
 <div class="viewcode-block" id="MockTaskTracker.record_call">
 <a class="viewcode-back" href="../../_autosummary/au.testing.html#au.MockTaskTracker.record_call">[docs]</a>
-</span><span data-line="187">    <span class="k">def</span><span class="w"> </span><span class="nf">record_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span data-line="187">    <span class="k">def</span><span class="w"> </span><span class="nf">record_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="188"><span class="w">        </span><span class="sd">"""Record a task call.</span>
 </span><span data-line="189">
 </span><span data-line="190"><span class="sd">        Args:</span>
@@ -420,7 +420,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="246">        <span class="n">middleware</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Middleware</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="247">        <span class="o">*</span><span class="p">,</span>
 </span><span data-line="248">        <span class="n">tracker</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">"MockTaskTracker"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="249">    <span class="p">):</span>
+</span><span data-line="249">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="250"><span class="w">        </span><span class="sd">"""Initialize tracking test backend.</span>
 </span><span data-line="251">
 </span><span data-line="252"><span class="sd">        Args:</span>
@@ -583,7 +583,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=3d116926"></script>
+      <script src="../../_static/documentation_options.js?v=17aaaefc"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

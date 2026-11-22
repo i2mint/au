@@ -161,6 +161,8 @@ Record a retry attempt.
   * **error** ([`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)) – Exception that occurred
   * **will_retry** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Whether another retry will happen
   * **next_retry_at** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]) – Timestamp of next retry
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.retry.RetryableError
 

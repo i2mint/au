@@ -672,6 +672,8 @@ Record a task call.
   * **func_name** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Name of the function
   * **args** ([`tuple`](https://docs.python.org/3/builtins/stdtypes.html#tuple)) – Positional arguments
   * **kwargs** ([`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)) – Keyword arguments
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.NonRetryableError
 
@@ -831,6 +833,8 @@ Record a retry attempt.
   * **error** ([`Exception`](https://docs.python.org/3/builtins/exceptions.html#Exception)) – Exception that occurred
   * **will_retry** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – Whether another retry will happen
   * **next_retry_at** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`float`](https://docs.python.org/3/builtins/functions.html#float)]) – Timestamp of next retry
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *exception* au.RetryableError
 
@@ -854,9 +858,15 @@ Metrics middleware using shared memory for multiprocessing.
 
 Count one more completion and add its duration.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### before_compute(func, args, kwargs, key)
 
 Count one more computation.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### get_shared_state()
 
@@ -872,6 +882,9 @@ Totals so far: `total`, `completed`, `failed` and `avg_duration` (seconds).
 #### on_error(key, error)
 
 Count one more failure.
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* au.StdLibQueueBackend(store=None, max_workers=5, use_processes=True, middleware=None)
 
