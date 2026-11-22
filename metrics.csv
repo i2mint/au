@@ -1,21 +1,21 @@
 metric,value
 schema_version,1.0
-timestamp,2026-11-22T17:42:22.425701Z
+timestamp,2026-11-22T17:42:30.765077Z
 commit_sha,e84690660dceac2a9fd25d9aca4fde4b14e1e2d5
 commit_message,"au: coverage and docstring pass (hooks, config; 13 broken doctests, 31 docstrings) [skip publish]"
 python_version,3.10
-metrics.umpyre_stats.num_functions,20447
-metrics.umpyre_stats.num_classes,3033
-metrics.umpyre_stats.total_lines,544107
-metrics.umpyre_stats.empty_lines,71353
-metrics.umpyre_stats.comment_lines,35611
-metrics.umpyre_stats.docs_lines,43209
-metrics.umpyre_stats.function_lines,326704
-metrics.umpyre_stats.empty_lines_ratio,0.1311378092911872
-metrics.umpyre_stats.comment_lines_ratio,0.06544852391165708
-metrics.umpyre_stats.function_lines_ratio,0.6004407221373738
-metrics.umpyre_stats.mean_lines_per_function,15.978089695309825
-metrics.umpyre_stats.files_analyzed,1336
+metrics.umpyre_stats.num_functions,20517
+metrics.umpyre_stats.num_classes,3047
+metrics.umpyre_stats.total_lines,545583
+metrics.umpyre_stats.empty_lines,71521
+metrics.umpyre_stats.comment_lines,35660
+metrics.umpyre_stats.docs_lines,43105
+metrics.umpyre_stats.function_lines,327649
+metrics.umpyre_stats.empty_lines_ratio,0.13109096141192084
+metrics.umpyre_stats.comment_lines_ratio,0.06536127408661926
+metrics.umpyre_stats.function_lines_ratio,0.600548404184148
+metrics.umpyre_stats.mean_lines_per_function,15.96963493688161
+metrics.umpyre_stats.files_analyzed,1348
 metrics.umpyre_stats.pypi_version,0.1.18
 metrics.workflow_status.last_run_status,success
 metrics.workflow_status.last_success_timestamp,2026-11-02T12:41:54Z
@@ -36,4 +36,4 @@ metrics.coverage.branch_coverage,0.0
 metrics.coverage.statements_covered,0
 metrics.coverage.statements_total,0
 metrics.coverage.error,No coverage file found
-collection_duration_seconds,5.0063090324401855
+collection_duration_seconds,6.452596426010132
